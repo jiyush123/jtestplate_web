@@ -60,17 +60,17 @@ export const getUserList = (params) => {
 //     });
 // }
 
-// export const addUser = (data) => {
-//     return $http({
-//         method: "post",
-//         url: "http://127.0.0.1:8000/user/add/",
-//         params: {},
-//         data: data,
-//         headers: {
-//             "Content-Type": "application/json"
-//         }
-//     });
-// }
+export const addUser = (data) => {
+    return $http({
+        method: "post",
+        url: "http://127.0.0.1:8000/user/add/",
+        params: {},
+        data: data,
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
 
 // export const delUser = (data) => {
 //     return $http({
