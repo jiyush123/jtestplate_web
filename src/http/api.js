@@ -48,17 +48,17 @@ export const getUserList = (params) => {
     });
 }
 
-// export const getUserInfo = (params) => {
-//     return $http({
-//         method: "get",
-//         url: "http://127.0.0.1:8000/user/detail/",
-//         params: params,
-//         data: {},
-//         headers: {
-//             "Content-Type": "application/json"
-//         }
-//     });
-// }
+export const getUserInfo = (params) => {
+    return $http({
+        method: "get",
+        url: "http://127.0.0.1:8000/user/detail/",
+        params: params,
+        data: {},
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
 
 export const addUser = (data) => {
     return $http({
@@ -72,29 +72,29 @@ export const addUser = (data) => {
     });
 }
 
-// export const delUser = (data) => {
-//     return $http({
-//         method: "post",
-//         url: "http://127.0.0.1:8000/user/del/",
-//         params: {},
-//         data: data,
-//         headers: {
-//             "Content-Type": "application/json"
-//         }
-//     });
-// }
+export const delUser = (data) => {
+    return $http({
+        method: "post",
+        url: "http://127.0.0.1:8000/user/del/",
+        params: {},
+        data: data,
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
 
-// export const updateUser = (data) => {
-//     return $http({
-//         method: "post",
-//         url: "http://127.0.0.1:8000/user/update/",
-//         params: {},
-//         data: data,
-//         headers: {
-//             "Content-Type": "application/json"
-//         }
-//     });
-// }
+export const updateUser = (data) => {
+    return $http({
+        method: "post",
+        url: "http://127.0.0.1:8000/user/update/",
+        params: {},
+        data: data,
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
 
 
 // // API

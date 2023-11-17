@@ -4,6 +4,9 @@
         <el-form-item label="姓名" prop="name">
             <el-input v-model="queryForm.name" clearable />
         </el-form-item>
+        <el-form-item label="用户名" prop="username">
+            <el-input v-model="queryForm.username" clearable />
+        </el-form-item>
         <el-button type="primary" @click="queryList">查询</el-button>
     </el-form>
     <!-- 新增按钮 -->
@@ -19,7 +22,8 @@
         <el-table-column prop="username" label="用户名" />
         <el-table-column prop="updated_time" label="修改时间" />
         <el-table-column fixed="login_time" label="最后一次登录时间" />
-        <!-- <template #default="scope">
+        <el-table-column label="操作">
+        <template #default="scope">
                 <el-button type="primary" size="small" @click="updateDialog(scope.row.id)">编辑</el-button>
                 <el-popconfirm width="220" hide-after="0" confirm-button-text="确定" cancel-button-text="取消" :icon="InfoFilled"
                     icon-color="#626AEF" title="是否确定删除?" @confirm="delFun(scope.row.id)">
@@ -28,7 +32,7 @@
                 </template>
                 </el-popconfirm>
             </template>
-        </el-table-column> -->
+        </el-table-column>
     </el-table>
     <div class="demo-pagination-block">
         <div class="demonstration"></div>
@@ -38,56 +42,68 @@
     </div>
     <!-- 新增弹窗 -->
     <el-dialog v-model="AddDialog" title="新增用户" width="40%" align-center>
-        <el-form :model="addform" label-width="80px" ref="formRef">
+        <el-form :model="formdata" label-width="80px" ref="formRef">
             <el-form-item label="姓名" prop="name" :rules="[
                 { required: true, message: '姓名不能为空' },
             ]">
-                <el-input v-model="addform.name" />
+                <el-input v-model="formdata.name" />
             </el-form-item>
             <el-form-item label="用户名" prop="username" :rules="[
                 { required: true, message: '用户名不能为空' },
             ]">
-                <el-input v-model="addform.username" />
+                <el-input v-model="formdata.username" />
             </el-form-item>
             <el-form-item label="密码" prop="password" :rules="[
                 { required: true, message: '密码不能为空' },
                 { min: 6, max: 18, message: '密码长度在6-18位' }
             ]">
-                <el-input v-model="addform.password" />
+                <el-input v-model="formdata.password" />
             </el-form-item>
             <el-form-item label="确认密码" prop="check_password" :rules="[
                 { required: true, message: '密码不能为空' },
                 { min: 6, max: 18, message: '密码长度在6-18位' },
                 { validator: checkPassword, trigger: 'blur' }
             ]">
-                <el-input v-model="addform.check_password" />
+                <el-input v-model="formdata.check_password" />
             </el-form-item>
 
         </el-form>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="resetForm(formRef)">取消</el-button>
-                <el-button type="primary" @click="onSubmit">
+                <el-button type="primary" @click="onSubmit(formRef)">
                     保存
                 </el-button>
             </span>
         </template>
     </el-dialog>
     <!-- 编辑弹窗 -->
-    <!-- <el-dialog v-model="updateDialogVisible" title="编辑用户" width="40%" align-center>
+    <el-dialog v-model="UpdateDialog" title="编辑用户" width="40%" align-center>
         <el-form :model="formdata" label-width="80px" ref="formRef">
-            <el-form-item label="用户名" prop="username">
-                <el-input v-model="formdata.username" disabled />
+            <el-form-item label="姓名" prop="name" :rules="[
+                { required: true, message: '姓名不能为空' },
+            ]">
+                <el-input v-model="formdata.name" />
             </el-form-item>
-            <el-form-item label="密码" prop="password">
+            <el-form-item label="用户名" prop="username" :rules="[
+                { required: true, message: '用户名不能为空' },
+            ]">
+                <el-input v-model="formdata.username" disabled/>
+            </el-form-item>
+            <el-form-item label="密码" prop="password" :rules="[
+                { required: true, message: '密码不能为空' },
+                { min: 6, max: 18, message: '密码长度在6-18位' }
+            ]">
                 <el-input v-model="formdata.password" />
             </el-form-item>
-            <el-form-item label="手机号" prop="mobile" :rules="[
-                { required: true, message: '手机号不能为空' },
-                { type: 'number', message: '手机号必须为11位数字' },
+            <el-form-item label="确认密码" prop="check_password" :rules="[
+                { required: true, message: '密码不能为空' },
+                { min: 6, max: 18, message: '密码长度在6-18位' },
+                { validator: checkPassword, trigger: 'blur' }
             ]">
-                <el-input v-model.number="formdata.mobile" type="text" autocomplete="off" />
+                <el-input v-model="formdata.check_password" />
             </el-form-item>
+            
         </el-form>
         <template #footer>
             <span class="dialog-footer">
@@ -97,7 +113,7 @@
                 </el-button>
             </span>
         </template>
-    </el-dialog> -->
+    </el-dialog>
 </template>
 <style>
 .queryForm {
@@ -133,7 +149,7 @@
 
 <script setup>
 import { reactive, ref, onMounted } from 'vue'
-import { getUserList, addUser } from '../http/api'
+import { getUserList, getUserInfo, addUser, delUser, updateUser } from '../http/api'
 import { ElMessage } from 'element-plus'
 // import { InfoFilled } from '@element-plus/icons-vue'
 
@@ -143,7 +159,6 @@ const data = reactive({
     table: [],
     total: 0,
 })
-// const name = ref(null);
 const queryForm = reactive({
     name: '',
 })
@@ -152,7 +167,7 @@ const params = {
     "page": 1,
     "size": 10,
 }
-const addform = reactive({
+const formdata = reactive({
     name: '',
     username: '',
     password: '',
@@ -160,12 +175,12 @@ const addform = reactive({
     id: null
 })
 const AddDialog = ref(false);
-// let updateDialogVisible = ref(false);
+const UpdateDialog = ref(false);
 
 // 确认密码校验规则
 const checkPassword = () => {
-    if (addform.password == addform.check_password) {
-        return
+    if (formdata.password == formdata.check_password) {
+        return true
     }
     else {
         return new Error("两次输入的密码不一致")
@@ -173,11 +188,10 @@ const checkPassword = () => {
 }
 const formRef = ref(null);
 
-const ruleFormRef = ref(null);
 // 这个方法是等待表单验证结果，因为返回的是promise.reject,所以要用try去捕捉异常再返回布尔值
 const assertForm = async () => {
     try {
-        await ruleFormRef.value.validate();
+        await formRef.value.validate();
         return true
     } catch (e) {
         return false
@@ -186,28 +200,28 @@ const assertForm = async () => {
 
 const resetForm = (formEl) => {
     AddDialog.value = false;
-    // updateDialogVisible.value = false;
+    UpdateDialog.value = false;
     if (!formEl) return
     formEl.resetFields();
 }
 
 let getUserListFun = async () => {
-        // 发送到后端获取列表数据
-        const res = await getUserList(params);
-        if (res.status == true) {
-            data.table = res.data;
-            data.total = res.total;
-        }
-        else {
-            ElMessage({
-                showClose: true,
-                center: true,
-                message: '请求失败',
-                type: 'error',
-            })
-        }
-
+    // 发送到后端获取列表数据
+    const res = await getUserList(params);
+    if (res.status == true) {
+        data.table = res.data;
+        data.total = res.total;
     }
+    else {
+        ElMessage({
+            showClose: true,
+            center: true,
+            message: '请求失败',
+            type: 'error',
+        })
+    }
+
+}
 
 const handleSizeChange = (val) => {
     params.size = val;
@@ -223,31 +237,57 @@ const queryList = () => {
     } else {
         params.name = queryForm.name;
     }
-    // if (mobile.value == '') {
-    //     delete params.mobile;
-    // } else {
-    //     params.mobile = mobile.value;
-    // }
+    if (queryForm.username == '') {
+        delete params.username;
+    } else {
+        params.username = queryForm.username;
+    }
     getUserListFun()
 }
 
 const onSubmit = async () => {
-    const result = await assertForm()
+    const result = await assertForm();
     // 验证表单通过后再发送
     if (!result) return
     // 发送到后端新增用户数据
-    delete addform.check_password;
-    const res = await addUser(addform);
+    else {
+        console.log('发送请求');
+        delete formdata.check_password;
+        const res = await addUser(formdata);
+        if (res.status) {
+            // 先重置弹窗再给提示;
+            resetForm(formRef.value);
+            ElMessage({
+                showClose: true,
+                center: true,
+                message: res.msg,
+                type: 'success',
+            })
+            console.log(4);
+            getUserListFun();
+        }
+        else {
+            ElMessage({
+                showClose: true,
+                center: true,
+                message: res.msg,
+                type: 'error',
+            })
+        }
+    }
+}
+
+const delFun=async(Did)=>{
+    let data = {id:Did};
+    const res = await delUser(data);
     if (res.status) {
-        // 先重置弹窗再给提示;
-        resetForm(formRef.value);
         ElMessage({
             showClose: true,
             center: true,
             message: res.msg,
             type: 'success',
         })
-        console.log(4);
+        console.log(5);
         getUserListFun();
     }
     else {
@@ -260,70 +300,44 @@ const onSubmit = async () => {
     }
 }
 
-// const delFun=async(Did)=>{
-//     let data = {id:Did};
-//     const res = await delUser(data);
-//     if (res.status) {
-//         ElMessage({
-//             showClose: true,
-//             center: true,
-//             message: res.msg,
-//             type: 'success',
-//         })
-//         console.log(5);
-//         getUserListFun();
-//     }
-//     else {
-//         ElMessage({
-//             showClose: true,
-//             center: true,
-//             message: res.msg,
-//             type: 'error',
-//         })
-//     }
-// }
+const updateDialog=async(Did)=>{
+    // 打开弹窗同时给表单赋值id，更新时根据id修改数据
+    UpdateDialog.value = true;
+    let params = {id:Did}
+    const res = await getUserInfo(params);
+    formdata.name = res.data.name;
+    formdata.username = res.data.username;
+    // formdata.password = res.data.password;
+    formdata.id = Did
+}
 
-// const updateDialog=async(Did)=>{
-//     // 打开弹窗同时给表单赋值id，更新时根据id修改数据
-//     updateDialogVisible.value = true;
-//     let params = {id:Did}
-//     const res = await getUserInfo(params);
-//     formdata.username = res.data.username;
-//     formdata.password = res.data.password;
-//     formdata.mobile = res.data.mobile;
-//     formdata.id = res.data.id
-// }
+const updateSubmit = async () => {
+    // 发送到后端新增用户数据
+    const res = await updateUser(formdata);
+    if (res.status) {
+        // 先重置弹窗再给提示;
+        resetForm(formRef.value);
+        ElMessage({
+            showClose: true,
+            center: true,
+            message: res.msg,
+            type: 'success',
+        })
+        getUserListFun();
+    }
+    else {
+        ElMessage({
+            showClose: true,
+            center: true,
+            message: res.msg,
+            type: 'error',
+        })
+    }
+}
 
-// const updateSubmit = async () => {
-//     // 发送到后端新增用户数据
-//     const res = await updateUser(formdata);
-//     if (res.status) {
-//         // 先重置弹窗再给提示;
-//         resetForm(formRef.value);
-//         ElMessage({
-//             showClose: true,
-//             center: true,
-//             message: res.msg,
-//             type: 'success',
-//         })
-//         console.log(6);
-//         getUserListFun();
-//     }
-//     else {
-//         ElMessage({
-//             showClose: true,
-//             center: true,
-//             message: res.msg,
-//             type: 'error',
-//         })
-//     }
-// }
-
-// getUserListFun();
 onMounted(() => {
     getUserListFun();
     setTimeout(() => {
-        // console.log(222)
     }, 1000)
 })
 </script>

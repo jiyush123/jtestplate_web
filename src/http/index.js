@@ -12,14 +12,12 @@ const $http = axios.create({
 // 请求拦截器
 $http.interceptors.request.use(function(config){
     // 在发请求前做什么
-    console.log(config.url);
     // 如果是登录退出，不需要添加token
     if (config.url.includes('login') || config.url.includes('logout')){
         return config
     }
     else{
         // 其它页面添加请求头访问
-        console.log('添加请求头token');
         config.headers['Authorization']=localStorage.getItem('token');
         return config;
     }
