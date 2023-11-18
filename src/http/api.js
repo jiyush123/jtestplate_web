@@ -96,43 +96,58 @@ export const updateUser = (data) => {
     });
 }
 
+// 模块接口
+export const getModuleList = (params) => {
+    return $http({
+        method: "get",
+        url: "http://127.0.0.1:8000/module/list/",
+        params: params,
+        data: {},
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
 
-// // API
-// export const getAPIList = (params) => {
-//     return $http({
-//         method: "get",
-//         url: "http://127.0.0.1:8000/api/list/",
-//         params: params,
-//         data: {},
-//         headers: {
-//             "Content-Type": "application/json"
-//         }
-//     });
-// }
 
-// export const getAPIInfo = (params) => {
-//     return $http({
-//         method: "get",
-//         url: "http://127.0.0.1:8000/api/detail/",
-//         params: params,
-//         data: {},
-//         headers: {
-//             "Content-Type": "application/json"
-//         }
-//     });
-// }
+// API接口
+export const getAPIList = (params) => {
+    return $http({
+        method: "get",
+        url: "http://127.0.0.1:8000/api/list/",
+        params: params,
+        data: {},
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
 
-// export const addAPI = (data) => {
-//     return $http({
-//         method: "post",
-//         url: "http://127.0.0.1:8000/api/addsave/",
-//         params: {},
-//         data: data,
-//         headers: {
-//             "Content-Type": "application/json"
-//         }
-//     });
-// }
+export const getAPIInfo = (params) => {
+    return $http({
+        method: "get",
+        url: "http://127.0.0.1:8000/api/detail/",
+        params: params,
+        data: {},
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
+
+export const addAPI = (data) => {
+    return $http({
+        method: "post",
+        url: "http://127.0.0.1:8000/api/add/",
+        params: {},
+        data: data,
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
+
+
 
 // export const editAPI = (data) => {
 //     return $http({
