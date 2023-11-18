@@ -22,24 +22,24 @@ const routes = [
           title: "用户列表",
         }
       },
-      // {
-      //   path: '/api/list',
-      //   name: 'apilist',
-      //   component: () => import(/* webpackChunkName: "apilist" */ '../views/ApiList.vue'),
-      //   meta: {
-      //     isShow: true,
-      //     title: "接口管理",
-      //   },
-      // },
-      // {
-      //   path: '/api/add',
-      //   name: 'apiadd',
-      //   component: () => import(/* webpackChunkName: "apilist" */ '../views/ApiAdd.vue'),
-      //   meta: {
-      //     isShow: false,
-      //     title: "新增接口",
-      //   }
-      // },
+      {
+        path: '/api/list',
+        name: 'apilist',
+        component: () => import(/* webpackChunkName: "apilist" */ '../views/ApiList.vue'),
+        meta: {
+          isShow: true,
+          title: "接口管理",
+        },
+      },
+      {
+        path: '/api/add',
+        name: 'apiadd',
+        component: () => import(/* webpackChunkName: "apiadd" */ '../views/ApiAdd.vue'),
+        meta: {
+          isShow: false,
+          title: "新增接口",
+        }
+      },
       // {
       //   path: '/api/edit/:id',
       //   name: 'apiedit',
