@@ -40,16 +40,16 @@ const routes = [
           title: "新增接口",
         }
       },
-      // {
-      //   path: '/api/edit/:id',
-      //   name: 'apiedit',
-      //   component: () => import(/* webpackChunkName: "apilist" */ '../views/ApiEdit.vue'),
-      //   props: true,
-      //   meta: {
-      //     isShow: false,
-      //     title: "修改接口",
-      //   }
-      // },
+      {
+        path: '/api/edit/:id',
+        name: 'apiedit',
+        component: () => import(/* webpackChunkName: "apilist" */ '../views/ApiEdit.vue'),
+        props: true,
+        meta: {
+          isShow: false,
+          title: "修改接口",
+        }
+      },
     ]
   },
   {
