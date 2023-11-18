@@ -205,7 +205,7 @@ const resetForm = (formEl) => {
     formEl.resetFields();
 }
 
-let getUserListFun = async () => {
+const getUserListFun = async () => {
     // 发送到后端获取列表数据
     const res = await getUserList(params);
     if (res.status == true) {
@@ -220,7 +220,6 @@ let getUserListFun = async () => {
             type: 'error',
         })
     }
-
 }
 
 const handleSizeChange = (val) => {
