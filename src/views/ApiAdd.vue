@@ -4,7 +4,7 @@
         <el-breadcrumb-item>新增接口</el-breadcrumb-item>
     </el-breadcrumb>
     <el-divider />
-    <el-form :model="addform" label-width="120px" ref="ruleFormRef">
+    <el-form :model="addform" label-width="120px" ref="ruleFormRef" class="apiform">
         <el-form-item label="接口名称" prop="name" :rules="[
             { required: true, message: '接口名称不能为空' },
             { min: 3, max: 30, message: '长度需要为3-30个字符' },
@@ -129,12 +129,12 @@
 </template>
 
 <style>
-form {
+.apiform {
     margin: 50px 200px auto 200px;
 
 }
 
-.el-table .el-input {
+.apiform .el-table .el-input {
     width: 95%;
 }
 </style>
@@ -170,8 +170,8 @@ const addform = reactive({
     params: {},
     body: {},
     response: {},
-    created_user: "admin",
-    updated_user: "admin",
+    created_user: '',
+    updated_user: '',
 });
 
 const ruleFormRef = ref(null);
@@ -209,6 +209,8 @@ const onSubmit = async () => {
             addform.body = null;
         }
         // 发送到后端新增用户数据
+        addform.created_user = localStorage.getItem('name');
+        addform.updated_user = localStorage.getItem('name');
         const res = await addAPI(addform);
         if (res.status) {
             ElMessage({
