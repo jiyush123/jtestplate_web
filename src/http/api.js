@@ -148,30 +148,29 @@ export const addAPI = (data) => {
 }
 
 
+export const editAPI = (data) => {
+    return $http({
+        method: "post",
+        url: "http://127.0.0.1:8000/api/update/",
+        params: {},
+        data: data,
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
 
-// export const editAPI = (data) => {
-//     return $http({
-//         method: "post",
-//         url: "http://127.0.0.1:8000/api/update/",
-//         params: {},
-//         data: data,
-//         headers: {
-//             "Content-Type": "application/json"
-//         }
-//     });
-// }
-
-// export const delAPI = (data) => {
-//     return $http({
-//         method: "post",
-//         url: "http://127.0.0.1:8000/api/del/",
-//         params: {},
-//         data: data,
-//         headers: {
-//             "Content-Type": "application/json"
-//         }
-//     });
-// }
+export const delAPI = (data) => {
+    return $http({
+        method: "post",
+        url: "http://127.0.0.1:8000/api/del/",
+        params: {},
+        data: data,
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
 
 // export const debugAPI = (data) => {
 //     return $http({
