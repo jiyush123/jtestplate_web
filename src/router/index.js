@@ -50,6 +50,15 @@ const routes = [
           title: "修改接口",
         }
       },
+      {
+        path: '/environment/list',
+        name: 'environmentlist',
+        component: () => import(/* webpackChunkName: "environmentlist" */ '../views/EnvironmentList.vue'),
+        meta: {
+          isShow: true,
+          title: "环境管理",
+        }
+      },
     ]
   },
   {

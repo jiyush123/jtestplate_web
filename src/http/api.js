@@ -109,6 +109,67 @@ export const getModuleList = (params) => {
     });
 }
 
+// 环境接口
+export const getEnvironmentList = (params) => {
+    return $http({
+        method: "get",
+        url: "http://127.0.0.1:8000/environment/list/",
+        params: params,
+        data: {},
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
+
+export const getEnvironmentInfo = (params) => {
+    return $http({
+        method: "get",
+        url: "http://127.0.0.1:8000/environment/detail/",
+        params: params,
+        data: {},
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
+
+export const addEnvironment = (data) => {
+    return $http({
+        method: "post",
+        url: "http://127.0.0.1:8000/environment/add/",
+        params: {},
+        data: data,
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
+
+export const delEnvironment = (data) => {
+    return $http({
+        method: "post",
+        url: "http://127.0.0.1:8000/environment/del/",
+        params: {},
+        data: data,
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
+
+export const updateEnvironment = (data) => {
+    return $http({
+        method: "post",
+        url: "http://127.0.0.1:8000/environment/update/",
+        params: {},
+        data: data,
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
+
 
 // API接口
 export const getAPIList = (params) => {
