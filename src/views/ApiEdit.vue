@@ -268,12 +268,12 @@ const bodyData = reactive(
 );
 
 // 创建一个新的 Map 对象  
-let api_status = new Map();
+let status = new Map();
 
 // 添加键值对  
-api_status.set('未开始', '1');
-api_status.set('进行中', '2');
-api_status.set('已完成', '3');
+status.set('未开始', '1');
+status.set('进行中', '2');
+status.set('已完成', '3');
 
 const editform = reactive({
     id: null,
@@ -311,7 +311,7 @@ const getInfo = async () => {
     if (res.status) {
         editform.id = res.data.id;
         editform.name = res.data.name;
-        editform.status = api_status.get(res.data.status);
+        editform.status = status.get(res.data.status);
         editform.description = res.data.description;
         editform.module = res.data.module;
         editform.method = res.data.method;
