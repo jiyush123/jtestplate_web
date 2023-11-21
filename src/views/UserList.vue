@@ -11,7 +11,7 @@
     </el-form>
     <!-- 新增按钮 -->
     <div class="addBtn">
-        <el-button type="primary" @click="AddDialog = true">
+            <el-button type="primary" @click="AddDialog">    
             新增用户
         </el-button>
     </div>
@@ -40,8 +40,8 @@
             :background="true" layout="total, prev, pager, next, sizes, jumper" :total="data.total"
             @size-change="handleSizeChange" @current-change="handleCurrentChange" />
     </div>
-    <!-- 新增弹窗 -->
-    <el-dialog v-model="AddDialog" title="新增用户" width="40%" align-center>
+    <!-- 弹窗 -->
+    <el-dialog v-model="Dialog" :title="dialog_title" width="40%" align-center @close="cancelDialog(formRef)">
         <el-form :model="formdata" label-width="80px" ref="formRef">
             <el-form-item label="姓名" prop="name" :rules="[
                 { required: true, message: '姓名不能为空' },
@@ -51,7 +51,7 @@
             <el-form-item label="用户名" prop="username" :rules="[
                 { required: true, message: '用户名不能为空' },
             ]">
-                <el-input v-model="formdata.username" />
+                <el-input v-model="formdata.username" :disabled="isEdit"/>
             </el-form-item>
             <el-form-item label="密码" prop="password" :rules="[
                 { required: true, message: '密码不能为空' },
@@ -70,50 +70,14 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="resetForm(formRef)">取消</el-button>
-                <el-button type="primary" @click="onSubmit(formRef)">
+                <el-button @click="cancelDialog(formRef)">取消</el-button>
+                <el-button type="primary" @click="Submit">
                     保存
                 </el-button>
             </span>
         </template>
     </el-dialog>
-    <!-- 编辑弹窗 -->
-    <el-dialog v-model="UpdateDialog" title="编辑用户" width="40%" align-center>
-        <el-form :model="formdata" label-width="80px" ref="formRef">
-            <el-form-item label="姓名" prop="name" :rules="[
-                { required: true, message: '姓名不能为空' },
-            ]">
-                <el-input v-model="formdata.name" />
-            </el-form-item>
-            <el-form-item label="用户名" prop="username" :rules="[
-                { required: true, message: '用户名不能为空' },
-            ]">
-                <el-input v-model="formdata.username" disabled/>
-            </el-form-item>
-            <el-form-item label="密码" prop="password" :rules="[
-                { required: true, message: '密码不能为空' },
-                { min: 6, max: 18, message: '密码长度在6-18位' }
-            ]">
-                <el-input v-model="formdata.password" />
-            </el-form-item>
-            <el-form-item label="确认密码" prop="check_password" :rules="[
-                { required: true, message: '密码不能为空' },
-                { min: 6, max: 18, message: '密码长度在6-18位' },
-                { validator: checkPassword, trigger: 'blur' }
-            ]">
-                <el-input v-model="formdata.check_password" />
-            </el-form-item>
-            
-        </el-form>
-        <template #footer>
-            <span class="dialog-footer">
-                <el-button @click="resetForm(formRef)">取消</el-button>
-                <el-button type="primary" @click="updateSubmit">
-                    保存
-                </el-button>
-            </span>
-        </template>
-    </el-dialog>
+
 </template>
 <style>
 .queryForm {
@@ -151,7 +115,6 @@
 import { reactive, ref, onMounted } from 'vue'
 import { getUserList, getUserInfo, addUser, delUser, updateUser } from '../http/api'
 import { ElMessage } from 'element-plus'
-// import { InfoFilled } from '@element-plus/icons-vue'
 
 const currentPage1 = ref(1);
 const pageSize1 = ref(10);
@@ -174,8 +137,25 @@ const formdata = reactive({
     check_password: '',
     id: null
 })
-const AddDialog = ref(false);
-const UpdateDialog = ref(false);
+
+const Dialog = ref(false);
+// 用来判断是否是编辑弹窗
+const isEdit = ref(null);
+const dialog_title = ref(null);
+
+const AddDialog=()=>{
+    // 打开弹窗
+    Dialog.value = true;
+    dialog_title.value = '新建用户';
+    isEdit.value = 0
+}
+
+const cancelDialog = (formEl) =>{
+    // 取消弹窗，重置
+    Dialog.value = false;
+    if (!formEl) return
+    formEl.resetFields();
+}
 
 // 确认密码校验规则
 const checkPassword = () => {
@@ -196,13 +176,6 @@ const assertForm = async () => {
     } catch (e) {
         return false
     }
-}
-
-const resetForm = (formEl) => {
-    AddDialog.value = false;
-    UpdateDialog.value = false;
-    if (!formEl) return
-    formEl.resetFields();
 }
 
 const getUserListFun = async () => {
@@ -244,18 +217,28 @@ const queryList = () => {
     getUserListFun()
 }
 
+
+const Submit = () =>{
+    if(!isEdit.value){
+        onSubmit();
+    }
+    else{
+        updateSubmit();
+    }
+}
+
+
 const onSubmit = async () => {
     const result = await assertForm();
     // 验证表单通过后再发送
     if (!result) return
     // 发送到后端新增用户数据
     else {
-        console.log('发送请求');
         delete formdata.check_password;
         const res = await addUser(formdata);
         if (res.status) {
             // 先重置弹窗再给提示;
-            resetForm(formRef.value);
+            cancelDialog();
             ElMessage({
                 showClose: true,
                 center: true,
@@ -301,12 +284,13 @@ const delFun=async(Did)=>{
 
 const updateDialog=async(Did)=>{
     // 打开弹窗同时给表单赋值id，更新时根据id修改数据
-    UpdateDialog.value = true;
+    Dialog.value = true;
+    dialog_title.value = '编辑用户';
+    isEdit.value = 1
     let params = {id:Did}
     const res = await getUserInfo(params);
     formdata.name = res.data.name;
     formdata.username = res.data.username;
-    // formdata.password = res.data.password;
     formdata.id = Did
 }
 
@@ -315,7 +299,7 @@ const updateSubmit = async () => {
     const res = await updateUser(formdata);
     if (res.status) {
         // 先重置弹窗再给提示;
-        resetForm(formRef.value);
+        cancelDialog();
         ElMessage({
             showClose: true,
             center: true,

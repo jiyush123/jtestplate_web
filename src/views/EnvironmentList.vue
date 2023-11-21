@@ -9,7 +9,7 @@
     </el-form>
     <!-- 新增按钮 -->
     <div class="addBtn">
-        <el-button type="primary" @click="AddDialog = true">
+        <el-button type="primary" @click="AddDialog">
             新增环境
         </el-button>
     </div>
@@ -38,8 +38,8 @@
             :background="true" layout="total, prev, pager, next, sizes, jumper" :total="data.total"
             @size-change="handleSizeChange" @current-change="handleCurrentChange" />
     </div>
-    <!-- 新增弹窗 -->
-    <el-dialog v-model="AddDialog" title="新增环境" width="40%" align-center>
+    <!-- 弹窗 -->
+    <el-dialog v-model="Dialog" :title="dialog_title" width="40%" align-center @close="cancelDialog(formRef)">
         <el-form :model="formdata" label-width="80px" ref="formRef">
             <el-form-item label="环境名称" prop="name" :rules="[
                 { required: true, message: '环境名称不能为空' },
@@ -73,50 +73,8 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="resetForm(formRef)">取消</el-button>
-                <el-button type="primary" @click="onSubmit(formRef)">
-                    保存
-                </el-button>
-            </span>
-        </template>
-    </el-dialog>
-    <!-- 编辑弹窗 -->
-    <el-dialog v-model="UpdateDialog" title="编辑环境" width="40%" align-center>
-        <el-form :model="formdata" label-width="80px" ref="formRef">
-            <el-form-item label="环境名称" prop="name" :rules="[
-                { required: true, message: '环境名称不能为空' },
-            ]">
-                <el-input v-model="formdata.name" />
-            </el-form-item>
-
-            <el-form-item label="协议" prop="protocol" :rules="[
-                { required: true, message: '协议不能为空' },
-            ]">
-                <el-select v-model="formdata.protocol" class="m-2" placeholder="请选择协议">
-                    <el-option label="http" value="1" />
-                    <el-option label="https" value="2" />
-                </el-select>
-            </el-form-item>
-
-            <el-form-item label="地址" prop="host" :rules="[
-                { required: true, message: '地址不能为空' },
-                { min: 7, max: 15, message: '地址长度在7-15位' }
-            ]">
-                <el-input v-model="formdata.host" />
-            </el-form-item>
-
-            <el-form-item label="端口" prop="port" :rules="[
-                { required: true, message: '端口不能为空' },
-                { type: 'number', message: '必须是数字' }
-            ]">
-                <el-input v-model.number="formdata.port" />
-            </el-form-item>
-
-        </el-form>
-        <template #footer>
-            <span class="dialog-footer">
-                <el-button @click="resetForm(formRef)">取消</el-button>
-                <el-button type="primary" @click="updateSubmit">
+                <el-button @click="cancelDialog(formRef)">取消</el-button>
+                <el-button type="primary" @click="Submit">
                     保存
                 </el-button>
             </span>
@@ -183,8 +141,11 @@ const formdata = reactive({
     port: '',
     id: null
 })
-const AddDialog = ref(false);
-const UpdateDialog = ref(false);
+
+const Dialog = ref(false);
+// 用来判断是否是编辑弹窗
+const isEdit = ref(null);
+const dialog_title = ref(null);
 
 const formRef = ref(null);
 
@@ -205,10 +166,16 @@ let protocol = new Map();
 protocol.set('http', "1");
 protocol.set('https', "2");
 
-// 重置弹窗
-const resetForm = (formEl) => {
-    AddDialog.value = false;
-    UpdateDialog.value = false;
+const AddDialog=()=>{
+    // 打开弹窗
+    Dialog.value = true;
+    dialog_title.value = '新建环境';
+    isEdit.value = 0
+}
+
+const cancelDialog = (formEl) =>{
+    // 取消弹窗，重置
+    Dialog.value = false;
     if (!formEl) return
     formEl.resetFields();
 }
@@ -247,6 +214,15 @@ const queryList = () => {
     getEnvironmentListFun()
 }
 
+const Submit = () =>{
+    if(!isEdit.value){
+        onSubmit();
+    }
+    else{
+        updateSubmit();
+    }
+}
+
 const onSubmit = async () => {
     const result = await assertForm();
     // 验证表单通过后再发送
@@ -256,7 +232,7 @@ const onSubmit = async () => {
         const res = await addEnvironment(formdata);
         if (res.status) {
             // 先重置弹窗再给提示;
-            resetForm(formRef);
+            cancelDialog();
             ElMessage({
                 showClose: true,
                 center: true,
@@ -300,7 +276,9 @@ const delFun = async (Did) => {
 
 const updateDialog = async (Did) => {
     // 打开弹窗同时给表单赋值id，更新时根据id修改数据
-    UpdateDialog.value = true;
+    Dialog.value = true;
+    dialog_title.value = '编辑环境';
+    isEdit.value = 1
     let params = { id: Did }
     const res = await getEnvironmentInfo(params);
     formdata.name = res.data.name;
@@ -315,7 +293,7 @@ const updateSubmit = async () => {
     const res = await updateEnvironment(formdata);
     if (res.status) {
         // 先重置弹窗再给提示;
-        resetForm(formRef);
+        cancelDialog();
         ElMessage({
             showClose: true,
             center: true,
