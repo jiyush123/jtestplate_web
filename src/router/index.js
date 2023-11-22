@@ -59,6 +59,15 @@ const routes = [
           title: "环境管理",
         }
       },
+      {
+        path: '/apicase/add',
+        name: 'apicaseadd',
+        component: () => import(/* webpackChunkName: "apicaseadd" */ '../views/ApiCaseAdd.vue'),
+        meta: {
+          isShow: true,
+          title: "新增测试用例",
+        }
+      },
     ]
   },
   {
