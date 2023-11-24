@@ -233,14 +233,27 @@ export const delAPI = (data) => {
     });
 }
 
-// export const debugAPI = (data) => {
-//     return $http({
-//         method: "post",
-//         url: "http://127.0.0.1:8000/api/test/",
-//         params: {},
-//         data: data,
-//         headers: {
-//             "Content-Type": "application/json"
-//         }
-//     });
-// }
+export const debugAPI = (data) => {
+    return $http({
+        method: "post",
+        url: "http://127.0.0.1:8000/api/debug/",
+        params: {},
+        data: data,
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
+
+export const addAPICase = (data) => {
+    return $http({
+        method: "post",
+        url: "http://127.0.0.1:8000/apicase/add/",
+        params: {},
+        data: data,
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
+addAPICase
