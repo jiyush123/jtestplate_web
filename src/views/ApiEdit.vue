@@ -29,12 +29,12 @@
                 </el-form-item>
 
                 <el-form-item label="所属模块" prop="module" :rules="[
-            { required: true, message: '请选择所属模块' },
-        ]">
-            <el-select v-model="editform.module" filterable placeholder="请选择">
-                <el-option v-for="item in moduleOptions" :key="item.id" :label="item.name" :value="item.id" />
-            </el-select>
-        </el-form-item>
+                    { required: true, message: '请选择所属模块' },
+                ]">
+                    <el-select v-model="editform.module" filterable placeholder="请选择">
+                        <el-option v-for="item in moduleOptions" :key="item.id" :label="item.name" :value="item.id" />
+                    </el-select>
+                </el-form-item>
 
                 <el-form-item label="请求方式" prop="method" :rules="[
                     { required: true, message: '请选择请求方式' },
@@ -140,12 +140,21 @@
             </el-form>
             <!-- 上面是表单，下面是下一个标签页 -->
         </el-tab-pane>
-        <!-- <el-tab-pane label="调试" name="debug">
+        <el-tab-pane label="调试" name="debug">
             <el-form :model="debugform" label-width="120px" ref="debugFormRef">
                 <el-form-item label="调试环境" prop="host" :rules="[
-                    { required: true, message: '环境不能为空' },
+                    { required: true, message: '请选择调试环境' },
                 ]">
-                    <el-input v-model="debugform.host" placeholder="http:127.0.0.1:8080" />
+                    <el-select v-model="debugform.host" filterable placeholder="请选择" style="width: 400px;">
+                        <el-option v-for="item in envOptions" :key="item.id" :label="item.name +'    '+ item.protocol + '://' + item.host + ':' + item.port"
+                            :value="item.protocol + '://' + item.host + ':' + item.port">
+
+                            <span style="float: left">{{ item.name }}</span>
+                            <span style="float: right;font-size: 13px;">
+                            {{ item.protocol + '://' + item.host + ':' + item.port }}
+                        </span>
+                        </el-option>
+                    </el-select>
                 </el-form-item>
 
                 <el-form-item label="请求方式" prop="method" :rules="[
@@ -235,23 +244,23 @@
                     <el-button @click="cancelBtn">取消</el-button>
                 </el-form-item>
             </el-form>
-            
-        </el-tab-pane> -->
+
+        </el-tab-pane>
     </el-tabs>
 </template>
 
-<style>
-</style>
+<style></style>
 
 <script setup>
-import { ref, reactive,onMounted } from 'vue'
-import { getAPIInfo,editAPI,getModuleList } from '../http/api'
+import { ref, reactive, onMounted } from 'vue'
+import { getAPIInfo, editAPI, getModuleList, getEnvironmentList, debugAPI } from '../http/api'
 import { ElMessage } from 'element-plus'
 import router from "../router/index"
 import { useRoute } from 'vue-router'
 
 
 const moduleOptions = ref(null);
+const envOptions = ref(null);
 
 const activeName = ref('info');
 
@@ -290,17 +299,17 @@ const editform = reactive({
     updated_user: ""
 });
 
-// const debugform = reactive({
-//     host: '',
-//     method: '',
-//     uri: '',
-//     headers: {},
-//     params: {},
-//     body: {},
-//     api_response: '',
-//     updated_user: "admin",
-//     updated_time: '',
-// });
+const debugform = reactive({
+    host: '',
+    method: '',
+    uri: '',
+    headers: {},
+    params: {},
+    body: {},
+    api_response: '',
+    updated_user: "admin",
+    updated_time: '',
+});
 
 
 // 获取接口信息
@@ -317,8 +326,8 @@ const getInfo = async () => {
         editform.method = res.data.method;
         editform.uri = res.data.uri;
         // 调试字段
-        // debugform.method = res.data.method;
-        // debugform.uri = res.data.uri;
+        debugform.method = res.data.method;
+        debugform.uri = res.data.uri;
         headersData.pop();
         for (let key in res.data.headers) {
             let value = res.data.headers[key];
@@ -359,7 +368,7 @@ const getInfo = async () => {
 }
 
 const ruleFormRef = ref(null);
-// const debugFormRef = ref(null);
+const debugFormRef = ref(null);
 // 这个方法是等待表单验证结果，因为返回的是promise.reject,所以要用try去捕捉异常再返回布尔值
 const assertForm = async () => {
     try {
@@ -370,14 +379,14 @@ const assertForm = async () => {
     }
 }
 
-// const debugFormAssert = async () => {
-//     try {
-//         await debugFormRef.value.validate();
-//         return true
-//     } catch (e) {
-//         return false
-//     }
-// }
+const debugFormAssert = async () => {
+    try {
+        await debugFormRef.value.validate();
+        return true
+    } catch (e) {
+        return false
+    }
+}
 
 const onSubmit = async () => {
 
@@ -447,43 +456,43 @@ const delBody = (index) => {
     bodyData.splice(index, 1);
 }
 
-// const debug = async () => {
-//     const result = await debugFormAssert();
-//     if (!result) return
-//     else {
-//         for (let i = 0; i < headersData.length; i++) {
-//             debugform.headers[headersData[i].headerskey] = { "value": headersData[i].headersvalue };
-//         }
-//         for (let i = 0; i < paramsData.length; i++) {
-//             debugform.params[paramsData[i].paramskey] = { "value": paramsData[i].paramsvalue };
-//         }
-//         for (let i = 0; i < bodyData.length; i++) {
-//             debugform.data[bodyData[i].bodykey] = { "value": bodyData[i].bodyvalue };
-//         }
-//         // 发送调试
-//         const res = await debugAPI(debugform);
-//         if (res.status) {
-//             ElMessage({
-//                 showClose: true,
-//                 center: true,
-//                 message: res.msg,
-//                 type: 'success',
-//             })
-//             debugform.api_response = res.status_code +'\n'+ res.response;
-//         }
-//         else {
-//             ElMessage({
-//                 showClose: true,
-//                 center: true,
-//                 message: res.msg,
-//                 type: 'error',
-//             })
-//         }
-//     }
-// }
+const debug = async () => {
+    const result = await debugFormAssert();
+    if (!result) return
+    else {
+        for (let i = 0; i < headersData.length; i++) {
+            debugform.headers[headersData[i].headerskey] = { "value": headersData[i].headersvalue };
+        }
+        for (let i = 0; i < paramsData.length; i++) {
+            debugform.params[paramsData[i].paramskey] = { "value": paramsData[i].paramsvalue };
+        }
+        for (let i = 0; i < bodyData.length; i++) {
+            debugform.body[bodyData[i].bodykey] = { "value": bodyData[i].bodyvalue };
+        }
+        // 发送调试
+        const res = await debugAPI(debugform);
+        if (res.status) {
+            ElMessage({
+                showClose: true,
+                center: true,
+                message: res.msg,
+                type: 'success',
+            })
+            debugform.api_response = res.status_code + '\n' + res.response;
+        }
+        else {
+            ElMessage({
+                showClose: true,
+                center: true,
+                message: res.msg,
+                type: 'error',
+            })
+        }
+    }
+}
 
 const getModuleFun = async () => {
-    // 发送到后端获取列表数据
+    // 发送到后端获取模块列表数据
     const res = await getModuleList();
     if (res.status == true) {
         moduleOptions.value = res.data;
@@ -498,9 +507,26 @@ const getModuleFun = async () => {
     }
 }
 
+const getEnvironmentFun = async () => {
+    // 发送到后端获取环境列表数据
+    const res = await getEnvironmentList();
+    if (res.status == true) {
+        envOptions.value = res.data;
+    }
+    else {
+        ElMessage({
+            showClose: true,
+            center: true,
+            message: '请求失败',
+            type: 'error',
+        })
+    }
+}
+
 onMounted(() => {
     getInfo();
     getModuleFun();
+    getEnvironmentFun();
     setTimeout(() => {
     }, 1000)
 })
