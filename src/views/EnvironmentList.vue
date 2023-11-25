@@ -82,35 +82,7 @@
     </el-dialog>
 </template>
 <style>
-.queryForm {
-    margin: 0;
-}
 
-.queryForm .el-form-item {
-    margin-bottom: 0;
-    margin-right: 10px;
-}
-
-.demo-pagination-block {
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 10px;
-}
-
-.dialog-footer button:first-child {
-    margin-right: 10px;
-}
-
-.addBtn {
-    margin-top: 20px;
-    margin-bottom: 10px;
-    display: flex;
-}
-
-.listquery .el-input {
-    width: 200px;
-}
 </style>
 
 <script setup>
