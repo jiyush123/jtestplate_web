@@ -244,7 +244,7 @@ export const debugAPI = (data) => {
         }
     });
 }
-
+// 测试用例接口
 export const addAPICase = (data) => {
     return $http({
         method: "post",
@@ -256,4 +256,27 @@ export const addAPICase = (data) => {
         }
     });
 }
-addAPICase
+
+export const getAPICaseList = (params) => {
+    return $http({
+        method: "get",
+        url: "http://127.0.0.1:8000/apicase/list/",
+        params: params,
+        data: {},
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
+
+export const delAPICase = (data) => {
+    return $http({
+        method: "post",
+        url: "http://127.0.0.1:8000/apicase/del/",
+        params: {},
+        data: data,
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
