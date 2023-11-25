@@ -60,11 +60,20 @@ const routes = [
         }
       },
       {
+        path: '/apicase/list',
+        name: 'apicaselist',
+        component: () => import(/* webpackChunkName: "apicaselist" */ '../views/ApiCaseList.vue'),
+        meta: {
+          isShow: true,
+          title: "接口用例管理",
+        },
+      },
+      {
         path: '/apicase/add',
         name: 'apicaseadd',
         component: () => import(/* webpackChunkName: "apicaseadd" */ '../views/ApiCaseAdd.vue'),
         meta: {
-          isShow: true,
+          isShow: false,
           title: "新增测试用例",
         }
       },
