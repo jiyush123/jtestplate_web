@@ -225,7 +225,7 @@ const delBody = (index, delindex) => {
 }
 
 const cancelBtn = () => {
-    router.push('/api/list');
+    router.push('/apicase/list');
 }
 
 const ruleFormRef = ref(null);
@@ -285,7 +285,7 @@ const onSubmit = async () => {
                 message: res.msg,
                 type: 'success',
             })
-            router.push('/api/list');
+            router.push('/apicase/list');
         }
         else {
             ElMessage({
