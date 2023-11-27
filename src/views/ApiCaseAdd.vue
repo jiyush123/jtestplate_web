@@ -17,7 +17,8 @@
                 <el-option label="3" value="3" />
             </el-select>
         </el-form-item>
-
+        <el-button type="primary" @click="AddStep">新增步骤</el-button>
+<!-- 测试步骤 -->
         <div v-for="(step, index) in addForm.steps" :key="index" style="margin:10px">
             <el-collapse>
                 <el-collapse-item :name="index">
@@ -30,8 +31,8 @@
                             ]">
                             <el-input v-model="step.name" @click.stop />
                         </el-form-item>
+                        <el-button class="mt-2" type="danger" @click.prevent="removeDomain(step)" @click.stop>删除步骤</el-button>
                     </template>
-                    <!-- 测试步骤 -->
 
                     <el-form-item label="请求方式" :prop="'steps.' + index + '.method'" :rules="[
                         { required: true, message: '请选择请求方式' },
@@ -127,13 +128,12 @@
                     </el-form-item>
                     <el-button type="primary" @click="addBody(index)"
                         style="margin-left: 50px;margin-bottom: 10px;">新增body参数</el-button>
-                    <!-- </el-form> -->
 
                 </el-collapse-item>
             </el-collapse>
         </div>
     </el-form>
-    <el-button type="primary" @click="AddStep">新增步骤</el-button>
+    
     <el-button type="primary" @click="onSubmit(ruleFormRef)">保存</el-button>
     <el-button @click="cancelBtn">取消</el-button>
 </template>
@@ -153,7 +153,7 @@ const addForm = reactive({
     status: 1,
     steps: [{
         title: "步骤",
-        sort: 1,
+        sort: null,
         name: '',
         method: '',
         uri: '',
@@ -165,13 +165,11 @@ const addForm = reactive({
     updated_user: localStorage.getItem('name')
 })
 
-let sort = 1;
 
 const AddStep = () => {
-    sort = sort + 1;
     addForm.steps.push({
         title: "步骤",
-        sort: sort,
+        sort: null,
         name: '',
         method: '',
         uri: '',
@@ -182,6 +180,16 @@ const AddStep = () => {
     headersData.push([]);
     paramsData.push([]);
     bodyData.push([]);
+}
+
+const removeDomain = (step) => {
+  const index = addForm.steps.indexOf(step)
+  if (index !== -1) {
+    addForm.steps.splice(index, 1);
+    headersData.splice(index, 1);
+    paramsData.splice(index, 1);
+    bodyData.splice(index, 1);
+  }
 }
 
 const headersData = reactive(
@@ -240,6 +248,7 @@ const assertForm = async () => {
 }
 
 const onSubmit = async () => {
+    console.log(addForm);
     const result = await assertForm()
     if (!result) return
     else {
@@ -272,6 +281,10 @@ const onSubmit = async () => {
             if (bodyData[i].length === 0) {
                 addForm.steps[i].body = null;
             }
+        }
+        
+        for (let i = 0; i<addForm.steps.length; i++){
+            addForm.steps[i].sort = i;
         }
         console.log(addForm);
         // 发送到后端新增数据
