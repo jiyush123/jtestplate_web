@@ -1,5 +1,9 @@
 <template>
-    <h1>新增测试用例</h1>
+    <el-breadcrumb :separator-icon="ArrowRight" style="margin-bottom: 30px;">
+        <el-breadcrumb-item :to="{ path: '/apicase/list' }">接口管理</el-breadcrumb-item>
+        <el-breadcrumb-item>新增接口测试用例</el-breadcrumb-item>
+    </el-breadcrumb>
+    <el-divider />
     <el-form :model="addForm" label-width="120px" ref="ruleFormRef">
         <el-form-item label="测试用例名称" prop="name" :rules="[
             { required: true, message: '测试用例名称不能为空' },
@@ -19,6 +23,8 @@
         </el-form-item>
         <el-button type="primary" @click="AddStep">新增步骤</el-button>
 <!-- 测试步骤 -->
+<draggable v-model="addForm.steps" :options="{ group: 'collapse' }">
+            <transition-group>
         <div v-for="(step, index) in addForm.steps" :key="index" style="margin:10px">
             <el-collapse>
                 <el-collapse-item :name="index">
@@ -132,6 +138,8 @@
                 </el-collapse-item>
             </el-collapse>
         </div>
+    </transition-group>
+    </draggable>
     </el-form>
     
     <el-button type="primary" @click="onSubmit(ruleFormRef)">保存</el-button>
@@ -144,7 +152,8 @@
 import { ref, reactive } from 'vue';
 import router from "../router/index";
 import { addAPICase } from '../http/api';
-import { ElMessage } from 'element-plus'
+import { ElMessage } from 'element-plus';
+import { VueDraggableNext as Draggable } from 'vue-draggable-next';
 
 
 const addForm = reactive({
