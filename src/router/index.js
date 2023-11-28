@@ -51,15 +51,6 @@ const routes = [
         }
       },
       {
-        path: '/environment/list',
-        name: 'environmentlist',
-        component: () => import(/* webpackChunkName: "environmentlist" */ '../views/EnvironmentList.vue'),
-        meta: {
-          isShow: true,
-          title: "环境管理",
-        }
-      },
-      {
         path: '/apicase/list',
         name: 'apicaselist',
         component: () => import(/* webpackChunkName: "apicaselist" */ '../views/ApiCaseList.vue'),
@@ -75,6 +66,24 @@ const routes = [
         meta: {
           isShow: false,
           title: "新增测试用例",
+        }
+      },
+      {
+        path: '/apicase/edit/:id',
+        name: 'apicaseedit',
+        component: () => import(/* webpackChunkName: "apicaseedit" */ '../views/ApiCaseEdit.vue'),
+        meta: {
+          isShow: false,
+          title: "修改测试用例",
+        }
+      },
+      {
+        path: '/environment/list',
+        name: 'environmentlist',
+        component: () => import(/* webpackChunkName: "environmentlist" */ '../views/EnvironmentList.vue'),
+        meta: {
+          isShow: true,
+          title: "环境管理",
         }
       },
     ]
