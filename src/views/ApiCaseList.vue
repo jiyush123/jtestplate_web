@@ -49,6 +49,7 @@
             </template>
         </el-table-column>
         <el-table-column prop="last_time" label="最后一次执行时间"/>
+        <el-table-column prop="updated_time" label="修改时间"/>
 
         <el-table-column fixed="right" label="操作">
             <template #default="scope">
@@ -139,9 +140,9 @@ const goToAdd = () => {
     router.push('/apicase/add');
 }
 
-// const goToEdit = (id) => {
-//     router.push({ name: 'apicaseedit', params: { id } });
-// }
+const goToEdit = (id) => {
+    router.push({ name: 'apicaseedit', params: { id } });
+}
 
 const delFun = async (Did) => {
     let data = { id: Did };
