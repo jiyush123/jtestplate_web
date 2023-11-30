@@ -32,7 +32,7 @@
         </el-form-item>
         <el-button type="primary" @click="AddStep">新增步骤</el-button>
         <!-- 测试步骤 -->
-        <draggable v-model="editform.steps" :options="{ group: 'collapse' }">
+        <draggable v-model="editform.steps">
             <transition-group>
                 <div v-for="(step, index) in editform.steps" :key="index" style="margin:10px">
                     <el-collapse>
@@ -159,10 +159,10 @@
 <style></style>
 
 <script setup>
-import { reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import router from "../router/index";
 import { useRoute } from 'vue-router'
-import { getAPICaseInfo } from '../http/api';
+import { getAPICaseInfo,editAPICase } from '../http/api';
 import { ElMessage } from 'element-plus';
 import { VueDraggableNext as Draggable } from 'vue-draggable-next';
 
@@ -327,81 +327,64 @@ const getCaseInfo = async () => {
     }
 }
 
-// const ruleFormRef = ref(null);
-// // 这个方法是等待表单验证结果，因为返回的是promise.reject,所以要用try去捕捉异常再返回布尔值
-// const assertForm = async () => {
-//     try {
-//         await ruleFormRef.value.validate();
-//         return true
-//     } catch (e) {
-//         return false
-//     }
-// }
+const ruleFormRef = ref(null);
+// 这个方法是等待表单验证结果，因为返回的是promise.reject,所以要用try去捕捉异常再返回布尔值
+const assertForm = async () => {
+    try {
+        await ruleFormRef.value.validate();
+        return true
+    } catch (e) {
+        return false
+    }
+}
 
 
-// const onSubmit = async () => {
-//     console.log(editform);
-//     const result = await assertForm()
-//     if (!result) return
-//     else {
-//         for (let j = 0; j < headersData.length; j++) {
-//             for (let i = 0; i < headersData[j].length; i++) {
-//                 editform.steps[j].headers[headersData[j][i].headerskey] = { "value": headersData[j][i].headersvalue, "decription": headersData[j][i].headersdecription };
-//             }
-//         }
-//         for (let j = 0; j < headersData.length; j++) {
-//             for (let i = 0; i < paramsData[j].length; i++) {
-//                 editform.steps[j].params[paramsData[j][i].paramskey] = { "value": paramsData[j][i].paramsvalue, "decription": paramsData[j][i].paramsdecription };
-//             }
-//         }
-//         for (let j = 0; j < headersData.length; j++) {
-//             for (let i = 0; i < bodyData[j].length; i++) {
-//                 editform.steps[j].body[bodyData[j][i].bodykey] = { "value": bodyData[j][i].bodyvalue, "decription": bodyData[j][i].bodydecription };
-//             }
-//         }
-//         for (let i = 0; i < headersData.length; i++) {
-//             if (headersData[i].length === 0) {
-//                 editform.steps[i].headers = null;
-//             }
-//         }
-//         for (let i = 0; i < headersData.length; i++) {
-//             if (paramsData[i].length === 0) {
-//                 editform.steps[i].params = null;
-//             }
-//         }
-//         for (let i = 0; i < headersData.length; i++) {
-//             if (bodyData[i].length === 0) {
-//                 editform.steps[i].body = null;
-//             }
-//         }
+const onSubmit = async () => {
+    const result = await assertForm();
+    if (!result) return
+    else {
+        for (let j = 0; j < headersData.length; j++) {
+            for (let i = 0; i < headersData[j].length; i++) {
+                editform.steps[j].headers[headersData[j][i].headerskey] = { "value": headersData[j][i].headersvalue, "decription": headersData[j][i].headersdecription };
+            }
+        }
+        for (let j = 0; j < headersData.length; j++) {
+            for (let i = 0; i < paramsData[j].length; i++) {
+                editform.steps[j].params[paramsData[j][i].paramskey] = { "value": paramsData[j][i].paramsvalue, "decription": paramsData[j][i].paramsdecription };
+            }
+        }
+        for (let j = 0; j < headersData.length; j++) {
+            for (let i = 0; i < bodyData[j].length; i++) {
+                editform.steps[j].body[bodyData[j][i].bodykey] = { "value": bodyData[j][i].bodyvalue, "decription": bodyData[j][i].bodydecription };
+            }
+        }
 
-//         for (let i = 0; i < editform.steps.length; i++) {
-//             editform.steps[i].sort = i;
-//         }
-//         console.log(editform);
-//         // 发送到后端新增数据
-//         editform.created_user = localStorage.getItem('name');
-//         editform.updated_user = localStorage.getItem('name');
-//         const res = await editAPICase(editform);
-//         if (res.status) {
-//             ElMessage({
-//                 showClose: true,
-//                 center: true,
-//                 message: res.msg,
-//                 type: 'success',
-//             })
-//             router.push('/apicase/list');
-//         }
-//         else {
-//             ElMessage({
-//                 showClose: true,
-//                 center: true,
-//                 message: res.msg,
-//                 type: 'error',
-//             })
-//         }
-//     }
-// }
+        for (let i = 0; i < editform.steps.length; i++) {
+            editform.steps[i].sort = i;
+        }
+        console.log(editform);
+        // 发送到后端新增数据
+        editform.updated_user = localStorage.getItem('name');
+        const res = await editAPICase(editform);
+        if (res.status) {
+            ElMessage({
+                showClose: true,
+                center: true,
+                message: res.msg,
+                type: 'success',
+            })
+            router.push('/apicase/list');
+        }
+        else {
+            ElMessage({
+                showClose: true,
+                center: true,
+                message: res.msg,
+                type: 'error',
+            })
+        }
+    }
+}
 
 onMounted(() => {
     getCaseInfo();
