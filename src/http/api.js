@@ -292,3 +292,15 @@ export const getAPICaseInfo = (params) => {
         }
     });
 }
+
+export const editAPICase = (data) => {
+    return $http({
+        method: "post",
+        url: "http://127.0.0.1:8000/apicase/update/",
+        params: {},
+        data: data,
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
