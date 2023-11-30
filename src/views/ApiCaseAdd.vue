@@ -23,7 +23,7 @@
         </el-form-item>
         <el-button type="primary" @click="AddStep">新增步骤</el-button>
 <!-- 测试步骤 -->
-<draggable v-model="addForm.steps" :options="{ group: 'collapse' }">
+<draggable v-model="addForm.steps">
             <transition-group>
         <div v-for="(step, index) in addForm.steps" :key="index" style="margin:10px">
             <el-collapse>
