@@ -5,7 +5,7 @@
     </el-breadcrumb>
     <el-divider />
 
-    <el-form :model="editform" label-width="120px" ref="ruleFormRef">
+    <el-form :model="editform" label-width="120px" ref="ruleFormRef" class="api_case_form">
         <el-form-item label="测试用例名称" prop="name" :rules="[
             { required: true, message: '测试用例名称不能为空' },
             { min: 3, max: 30, message: '长度需要为3-30个字符' },
@@ -152,8 +152,8 @@
         </draggable>
     </el-form>
 
-    <el-button type="primary" @click="onSubmit(ruleFormRef)">保存</el-button>
-    <el-button @click="cancelBtn">取消</el-button>
+    <el-button type="primary" class="api_case_save_btn" @click="onSubmit(ruleFormRef)">保存</el-button>
+    <el-button class="api_case_cancel_btn" @click="cancelBtn">取消</el-button>
 </template>
 
 <style></style>
@@ -171,12 +171,6 @@ let status = new Map();
 status.set('未开始', '1');
 status.set('进行中', '2');
 status.set('已完成', '3');
-
-// let level = new Map();
-
-// level.set('1', '1');
-// level.set('2', '2');
-// level.set('3', '3');
 
 const editform = reactive({
     name: '',
