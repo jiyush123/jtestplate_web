@@ -20,10 +20,10 @@
     <!-- 列表 -->
     <el-table :data="data.table" stripe style="width: 100%">
         <el-table-column prop="id" label="id" width="80px" />
-        <el-table-column prop="name" label="接口名称" width="300px"/>
-        <el-table-column prop="description" label="描述" width="300px"/>
-        <el-table-column prop="module" label="所属模块" width="200px"/>
-        <el-table-column prop="method" label="请求方式" width="100px">
+        <el-table-column prop="name" label="接口名称"/>
+        <el-table-column prop="description" label="描述"/>
+        <el-table-column prop="module" label="所属模块"/>
+        <el-table-column prop="method" label="请求方式">
             <template #default="scope">
                 <el-tag v-if="scope.row.method === 'GET'" class="ml-2" type="success">
                     {{ scope.row.method }}
@@ -34,8 +34,8 @@
             </template>
         </el-table-column>
         <el-table-column prop="uri" label="路径" />
-        <el-table-column prop="status" label="状态" width="100px"/>
-        <el-table-column prop="created_user" label="创建人" width="100px"/>
+        <el-table-column prop="status" label="状态"/>
+        <el-table-column prop="created_user" label="创建人"/>
         <el-table-column prop="updated_time" label="修改时间" />
         <el-table-column fixed="right" label="操作">
             <template #default="scope">
