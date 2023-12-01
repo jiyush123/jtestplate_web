@@ -4,7 +4,7 @@
         <el-breadcrumb-item>新增接口测试用例</el-breadcrumb-item>
     </el-breadcrumb>
     <el-divider />
-    <el-form :model="addForm" label-width="120px" ref="ruleFormRef">
+    <el-form :model="addForm" label-width="120px" ref="ruleFormRef" class="api_case_form">
         <el-form-item label="测试用例名称" prop="name" :rules="[
             { required: true, message: '测试用例名称不能为空' },
             { min: 3, max: 30, message: '长度需要为3-30个字符' },
@@ -142,11 +142,22 @@
     </draggable>
     </el-form>
     
-    <el-button type="primary" @click="onSubmit(ruleFormRef)">保存</el-button>
-    <el-button @click="cancelBtn">取消</el-button>
+    <el-button type="primary" class="api_case_save_btn" @click="onSubmit(ruleFormRef)">保存</el-button>
+    <el-button class="api_case_cancel_btn" @click="cancelBtn">取消</el-button>
 </template>
 
-<style></style>
+<style>
+.api_case_form{
+    width: 60%;
+    margin: auto
+}
+.api_case_save_btn{
+    margin-left: 40%;
+}
+.api_case_cancel_btn{
+    margin-left: 40%;
+}
+</style>
 
 <script setup>
 import { ref, reactive } from 'vue';
