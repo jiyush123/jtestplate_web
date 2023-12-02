@@ -11,7 +11,7 @@
     </el-form>
     <!-- 新增按钮 -->
     <div class="addBtn">
-            <el-button type="primary" @click="AddDialog">    
+        <el-button type="primary" @click="AddDialog">
             新增用户
         </el-button>
     </div>
@@ -23,13 +23,13 @@
         <el-table-column prop="updated_time" label="修改时间" />
         <el-table-column fixed="login_time" label="最后一次登录时间" />
         <el-table-column label="操作">
-        <template #default="scope">
+            <template #default="scope">
                 <el-button type="primary" size="small" @click="updateDialog(scope.row.id)">编辑</el-button>
-                <el-popconfirm width="220" hide-after="0" confirm-button-text="确定" cancel-button-text="取消" :icon="InfoFilled"
-                    icon-color="#626AEF" title="是否确定删除?" @confirm="delFun(scope.row.id)">
+                <el-popconfirm width="220" :hide-after="hideAfter" confirm-button-text="确定" cancel-button-text="取消" title="是否确定删除?"
+                    @confirm="delFun(scope.row.id)">
                     <template #reference>
-                    <el-button ref="delBtn" type="danger" size="small">删除</el-button>
-                </template>
+                        <el-button ref="delBtn" type="danger" size="small">删除</el-button>
+                    </template>
                 </el-popconfirm>
             </template>
         </el-table-column>
@@ -51,7 +51,7 @@
             <el-form-item label="用户名" prop="username" :rules="[
                 { required: true, message: '用户名不能为空' },
             ]">
-                <el-input v-model="formdata.username" :disabled="isEdit"/>
+                <el-input v-model="formdata.username" :disabled="isEdit" />
             </el-form-item>
             <el-form-item label="密码" prop="password" :rules="[
                 { required: true, message: '密码不能为空' },
@@ -77,11 +77,8 @@
             </span>
         </template>
     </el-dialog>
-
 </template>
-<style>
-
-</style>
+<style></style>
 
 <script setup>
 import { reactive, ref, onMounted } from 'vue'
@@ -90,6 +87,7 @@ import { ElMessage } from 'element-plus'
 
 const currentPage1 = ref(1);
 const pageSize1 = ref(10);
+const hideAfter = ref(0);
 const data = reactive({
     table: [],
     total: 0,
@@ -115,14 +113,14 @@ const Dialog = ref(false);
 const isEdit = ref(null);
 const dialog_title = ref(null);
 
-const AddDialog=()=>{
+const AddDialog = () => {
     // 打开弹窗
     Dialog.value = true;
     dialog_title.value = '新建用户';
-    isEdit.value = 0
+    isEdit.value = false
 }
 
-const cancelDialog = (formEl) =>{
+const cancelDialog = (formEl) => {
     // 取消弹窗，重置
     Dialog.value = false;
     if (!formEl) return
@@ -190,11 +188,11 @@ const queryList = () => {
 }
 
 
-const Submit = () =>{
-    if(!isEdit.value){
+const Submit = () => {
+    if (!isEdit.value) {
         onSubmit();
     }
-    else{
+    else {
         updateSubmit();
     }
 }
@@ -231,8 +229,8 @@ const onSubmit = async () => {
     }
 }
 
-const delFun=async(Did)=>{
-    let data = {id:Did};
+const delFun = async (Did) => {
+    let data = { id: Did };
     const res = await delUser(data);
     if (res.status) {
         ElMessage({
@@ -254,12 +252,12 @@ const delFun=async(Did)=>{
     }
 }
 
-const updateDialog=async(Did)=>{
+const updateDialog = async (Did) => {
     // 打开弹窗同时给表单赋值id，更新时根据id修改数据
     Dialog.value = true;
     dialog_title.value = '编辑用户';
-    isEdit.value = 1
-    let params = {id:Did}
+    isEdit.value = true;
+    let params = { id: Did };
     const res = await getUserInfo(params);
     formdata.name = res.data.name;
     formdata.username = res.data.username;

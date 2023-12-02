@@ -1,5 +1,5 @@
 <template>
-    <el-breadcrumb :separator-icon="ArrowRight" style="margin-bottom: 30px;">
+    <el-breadcrumb separator="/" style="margin-bottom: 30px;">
         <el-breadcrumb-item :to="{ path: '/apicase/list' }">接口管理</el-breadcrumb-item>
         <el-breadcrumb-item>编辑接口测试用例</el-breadcrumb-item>
     </el-breadcrumb>
@@ -166,6 +166,9 @@ import { getAPICaseInfo,editAPICase } from '../http/api';
 import { ElMessage } from 'element-plus';
 import { VueDraggableNext as Draggable } from 'vue-draggable-next';
 
+const route = useRoute();
+const id_params = route.params;
+
 let status = new Map();
 
 status.set('未开始', '1');
@@ -261,11 +264,9 @@ const cancelBtn = () => {
 }
 
 const getCaseInfo = async () => {
-    const route = useRoute();
-    const params = route.params;
-    const res = await getAPICaseInfo(params);
+    const res = await getAPICaseInfo(id_params);
     if (res.status) {
-        editform.id = res.data.case.id;
+        editform.id = id_params.id;
         editform.name = res.data.case.name;
         editform.status = status.get(res.data.case.status);
         editform.level = res.data.case.level;
@@ -356,7 +357,6 @@ const onSubmit = async () => {
         for (let i = 0; i < editform.steps.length; i++) {
             editform.steps[i].sort = i;
         }
-        console.log(editform);
         // 发送到后端新增数据
         editform.updated_user = localStorage.getItem('name');
         const res = await editAPICase(editform);

@@ -1,5 +1,5 @@
 <template>
-    <el-breadcrumb :separator-icon="ArrowRight" style="margin-bottom: 30px;">
+    <el-breadcrumb separator="/" style="margin-bottom: 30px;">
         <el-breadcrumb-item :to="{ path: '/api/list' }">接口管理</el-breadcrumb-item>
         <el-breadcrumb-item>编辑接口</el-breadcrumb-item>
     </el-breadcrumb>
@@ -258,6 +258,8 @@ import { ElMessage } from 'element-plus'
 import router from "../router/index"
 import { useRoute } from 'vue-router'
 
+const route = useRoute();
+const id_params = route.params;
 
 const moduleOptions = ref(null);
 const envOptions = ref(null);
@@ -285,7 +287,6 @@ status.set('进行中', '2');
 status.set('已完成', '3');
 
 const editform = reactive({
-    id: null,
     name: '',
     status: '',
     description: '',
@@ -314,11 +315,9 @@ const debugform = reactive({
 
 // 获取接口信息
 const getInfo = async () => {
-    const route = useRoute();
-    const params = route.params;
-    const res = await getAPIInfo(params);
+    const res = await getAPIInfo(id_params);
     if (res.status) {
-        editform.id = res.data.id;
+        editform.id = id_params.id;
         editform.name = res.data.name;
         editform.status = status.get(res.data.status);
         editform.description = res.data.description;
@@ -509,7 +508,7 @@ const getModuleFun = async () => {
 
 const getEnvironmentFun = async () => {
     // 发送到后端获取环境列表数据
-    const res = await getEnvironmentList();
+    const res = await getEnvironmentList({'size':100,'page':1});
     if (res.status == true) {
         envOptions.value = res.data;
     }

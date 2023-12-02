@@ -2,8 +2,7 @@
     <div class="Home">
         <el-container>
             <el-header class="top-menu" style="padding: 0;">
-                <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" :ellipsis="false"
-                    @select="handleSelect">
+                <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" :ellipsis="false">
                     <el-menu-item index="0">LOGO</el-menu-item>
                     <div class="flex-grow"></div>
                     <el-sub-menu index="1">
@@ -16,12 +15,8 @@
             <el-container>
                 <el-aside width="200px">
                     <el-col>
-                        <el-menu router="true" default-active="1" class="el-menu-vertical-demo" @open="handleOpen"
-                            @close="handleClose">
+                        <el-menu :router="true" default-active="1" class="el-menu-vertical-demo">
                             <el-menu-item index="/home">
-                                <el-icon>
-                                    <setting />
-                                </el-icon>
                                 <span>首页</span>
                             </el-menu-item>
 
@@ -92,6 +87,7 @@ import router from "../router/index";
 import { logout } from '../http/api';
 import { ElMessage } from 'element-plus';
 
+const activeIndex = ref('1');
 
 let tablist = router.options.routes[0].children;
 let showmenus=() =>{

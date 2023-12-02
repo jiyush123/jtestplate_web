@@ -1,5 +1,5 @@
 <template>
-    <el-breadcrumb :separator-icon="ArrowRight" style="margin-bottom: 30px;">
+    <el-breadcrumb separator="\" style="margin-bottom: 30px;">
         <el-breadcrumb-item :to="{ path: '/api/list' }">接口管理</el-breadcrumb-item>
         <el-breadcrumb-item>新增接口</el-breadcrumb-item>
     </el-breadcrumb>

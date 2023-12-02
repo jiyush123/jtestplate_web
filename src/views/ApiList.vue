@@ -28,7 +28,7 @@
                 <el-tag v-if="scope.row.method === 'GET'" class="ml-2" type="success">
                     {{ scope.row.method }}
                 </el-tag>
-                <el-tag v-else-if="scope.row.method === 'POST'" class="ml-2" type="primary">
+                <el-tag v-else-if="scope.row.method === 'POST'" class="ml-2" type="">
                     {{ scope.row.method }}
                 </el-tag>
             </template>
@@ -40,8 +40,8 @@
         <el-table-column fixed="right" label="操作">
             <template #default="scope">
                 <el-button type="primary" size="small" @click="goToEdit(scope.row.id)">编辑</el-button>
-                <el-popconfirm width="220" hide-after="0" confirm-button-text="确定" cancel-button-text="取消"
-                    :icon="InfoFilled" icon-color="#626AEF" title="是否确定删除?" @confirm="delFun(scope.row.id)">
+                <el-popconfirm width="220" :hide-after="hideAfter" confirm-button-text="确定" cancel-button-text="取消"
+                    title="是否确定删除?" @confirm="delFun(scope.row.id)">
                     <template #reference>
                         <el-button ref="delBtn" type="danger" size="small">删除</el-button>
                     </template>
@@ -70,6 +70,7 @@ import router from "../router/index"
 
 const currentPage1 = ref(1);
 const pageSize1 = ref(10);
+const hideAfter = ref(0);
 let data = reactive({
     table: [],
     total: 0,
@@ -117,10 +118,17 @@ const getApiListFun = async () => {
 
     // 发送到后端获取列表数据
     const res = await getAPIList(params);
-    console.log(data.table);
     data.table = res.data;
     data.total = res.total
 
+}
+const handleSizeChange = (val) => {
+    params.size = val;
+    getApiListFun()
+}
+const handleCurrentChange = (val) => {
+    params.page = val;
+    getApiListFun()
 }
 
 const goToAdd = () => {

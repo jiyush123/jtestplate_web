@@ -23,8 +23,8 @@
         <el-table-column label="操作">
             <template #default="scope">
                 <el-button type="primary" size="small" @click="updateDialog(scope.row.id)">编辑</el-button>
-                <el-popconfirm width="220" hide-after="0" confirm-button-text="确定" cancel-button-text="取消"
-                    :icon="InfoFilled" icon-color="#626AEF" title="是否确定删除?" @confirm="delFun(scope.row.id)">
+                <el-popconfirm width="220" :hide-after="hideAfter" confirm-button-text="确定" cancel-button-text="取消"
+                    title="是否确定删除?" @confirm="delFun(scope.row.id)">
                     <template #reference>
                         <el-button ref="delBtn" type="danger" size="small">删除</el-button>
                     </template>
@@ -92,6 +92,7 @@ import { ElMessage } from 'element-plus'
 
 const currentPage1 = ref(1);
 const pageSize1 = ref(10);
+const hideAfter = ref(0);
 const data = reactive({
     table: [],
     total: 0,
@@ -104,7 +105,6 @@ const params = {
     "page": 1,
     "size": 10,
 }
-
 
 const formdata = reactive({
     name: '',
@@ -142,7 +142,7 @@ const AddDialog=()=>{
     // 打开弹窗
     Dialog.value = true;
     dialog_title.value = '新建环境';
-    isEdit.value = 0
+    isEdit.value = false
 }
 
 const cancelDialog = (formEl) =>{
@@ -250,8 +250,8 @@ const updateDialog = async (Did) => {
     // 打开弹窗同时给表单赋值id，更新时根据id修改数据
     Dialog.value = true;
     dialog_title.value = '编辑环境';
-    isEdit.value = 1
-    let params = { id: Did }
+    isEdit.value = true;
+    let params = { id: Did };
     const res = await getEnvironmentInfo(params);
     formdata.name = res.data.name;
     formdata.protocol = protocol.get(res.data.protocol);
