@@ -6,7 +6,7 @@ import { ElMessage } from 'element-plus'
 // 创建了一个axios实例,给这个实例编写配置，后续所有通过实例发送的请求，都受当前配置约束
 const $http = axios.create({
     baseURL: "http://127.0.0.1:8000",
-    timeout: 1000,
+    timeout: 10000,
     headers:{'Content-Type':'application/json'}
 });
 // 请求拦截器
@@ -45,6 +45,44 @@ $http.interceptors.response.use(function(response){
     return data;
 },function(error){
     // 对响应报错做什么
+    if (error.response) {
+        switch (error.response.status) {
+          case 404:
+            // 页面未找到
+            ElMessage({
+                showClose: true,
+                center: true,
+                message: '找不到页面',
+                type: 'error',
+            })
+            break;
+          case 500:
+            // 服务器内部错误
+            ElMessage({
+                showClose: true,
+                center: true,
+                message: '服务器异常',
+                type: 'error',
+            })
+            break;
+          default:
+            // 其他状态码
+            ElMessage({
+                showClose: true,
+                center: true,
+                message: '未知异常',
+                type: 'error',
+            })
+        }
+      } else {
+        // 处理连接问题或网络中断等
+        ElMessage({
+            showClose: true,
+            center: true,
+            message: '服务器网络异常',
+            type: 'error',
+        })
+      }
     return Promise.reject(error);
 });
 
