@@ -19,8 +19,8 @@
     </div>
     <!-- 列表 -->
     <el-table :data="data.table" stripe style="width: 100%">
-        <el-table-column prop="id" label="id"/>
-        <el-table-column prop="name" label="用例名称"/>
+        <el-table-column prop="id" label="id" />
+        <el-table-column prop="name" label="用例名称" />
         <el-table-column prop="level" label="优先级">
             <template #default="scope">
                 <el-tag v-if="scope.row.level === '1'" class="ml-2" type="danger">
@@ -34,7 +34,7 @@
                 </el-tag>
             </template>
         </el-table-column>
-        <el-table-column prop="status" label="状态"/>
+        <el-table-column prop="status" label="状态" />
         <el-table-column prop="result" label="结果">
             <template #default="scope">
                 <el-tag v-if="scope.row.result === '成功'" class="ml-2" type="success">
@@ -48,11 +48,12 @@
                 </el-tag>
             </template>
         </el-table-column>
-        <el-table-column prop="last_time" label="最后一次执行时间"/>
-        <el-table-column prop="updated_time" label="修改时间"/>
+        <el-table-column prop="last_time" label="最后一次执行时间" />
+        <el-table-column prop="updated_time" label="修改时间" />
 
         <el-table-column fixed="right" label="操作">
             <template #default="scope">
+                <el-button type="primary" size="small" @click="goToSelectEnv(scope.row.id)">运行</el-button>
                 <el-button type="primary" size="small" @click="goToEdit(scope.row.id)">编辑</el-button>
                 <el-popconfirm width="220" :hide-after="hideAfter" confirm-button-text="确定" cancel-button-text="取消"
                     title="是否确定删除?" @confirm="delFun(scope.row.id)">
@@ -69,17 +70,48 @@
             :background="true" layout="total, prev, pager, next, sizes, jumper" :total="data.total"
             @size-change="handleSizeChange" @current-change="handleCurrentChange" />
     </div>
+    <!-- 弹窗 -->
+    <el-dialog v-model="Dialog" title="选择运行环境" width="40%" align-center @close="cancelDialog(formRef)">
+        <el-form :model="formdata" label-width="80px" ref="formRef">
+            <el-form-item label="运行环境" prop="host" :rules="[
+                { required: true, message: '请选择运行环境' },
+            ]">
+                <el-select v-model="formdata.host" filterable placeholder="请选择" style="width: 400px;">
+                    <el-option v-for="item in envOptions" :key="item.id"
+                        :label="item.name + '    ' + item.protocol + '://' + item.host + ':' + item.port"
+                        :value="item.protocol + '://' + item.host + ':' + item.port">
+
+                        <span style="float: left">{{ item.name }}</span>
+                        <span style="float: right;font-size: 13px;">
+                            {{ item.protocol + '://' + item.host + ':' + item.port }}
+                        </span>
+                    </el-option>
+                </el-select>
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="cancelDialog(formRef)">取消</el-button>
+                <el-button type="primary" @click="runTest(case_id)">
+                    运行
+                </el-button>
+            </span>
+        </template>
+    </el-dialog>
 </template>
 
-<style>
-</style>
+<style></style>
 
 <script setup>
 import { reactive, ref, onMounted } from 'vue'
-import { getAPICaseList, delAPICase } from '../http/api'
+import { getAPICaseList, delAPICase, runAPICase, getEnvironmentList } from '../http/api'
 import { ElMessage } from 'element-plus'
 import router from "../router/index"
 
+const Dialog = ref(false);
+// const case_ids = ref([]);
+const case_id = ref(null);
+const envOptions = ref(null);
 
 const currentPage1 = ref(1);
 const pageSize1 = ref(10);
@@ -110,6 +142,10 @@ const status_options = [{
 let queryForm = reactive({
     name: '',
     status: '',
+})
+
+const formdata = reactive({
+    host: ''
 })
 
 
@@ -153,6 +189,30 @@ const goToEdit = (id) => {
     router.push({ name: 'apicaseedit', params: { id } });
 }
 
+const goToSelectEnv = (id) => {
+
+    Dialog.value = true;
+    getEnvironmentFun();
+    case_id.value = id;
+}
+
+const cancelDialog = (formEl) => {
+    // 取消弹窗，重置
+    Dialog.value = false;
+    if (!formEl) return
+    formEl.resetFields();
+}
+
+const formRef = ref(null);
+const assertForm = async () => {
+    try {
+        await formRef.value.validate();
+        return true
+    } catch (e) {
+        return false
+    }
+}
+
 const delFun = async (Did) => {
     let data = { id: Did };
     const res = await delAPICase(data);
@@ -172,6 +232,67 @@ const delFun = async (Did) => {
             message: res.msg,
             type: 'error',
         })
+    }
+}
+
+const getEnvironmentFun = async () => {
+    // 发送到后端获取环境列表数据
+    const res = await getEnvironmentList({ 'size': 100, 'page': 1 });
+    if (res.status == true) {
+        envOptions.value = res.data;
+    }
+    else {
+        ElMessage({
+            showClose: true,
+            center: true,
+            message: '请求失败',
+            type: 'error',
+        })
+    }
+}
+
+const runTest = async (case_id) => {
+    const result = await assertForm();
+    if (!result) return
+    else {
+        let data = {
+            'id': case_id,
+            'host': formdata.host
+        };
+        cancelDialog();
+        ElMessage({
+            showClose: true,
+            center: true,
+            message: '开始执行',
+            type: 'success',
+        })
+        try {
+            const res = await runAPICase(data);
+            if (res.status) {
+                ElMessage({
+                    showClose: true,
+                    center: true,
+                    message: res.msg,
+                    type: 'success',
+                })
+            }
+            else {
+                ElMessage({
+                    showClose: true,
+                    center: true,
+                    message: '请求异常',
+                    type: 'error',
+                })
+            }
+        }
+        catch (e) {
+            ElMessage({
+                showClose: true,
+                center: true,
+                message: '请求异常',
+                type: 'error',
+            })
+        }
     }
 }
 
