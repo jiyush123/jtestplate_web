@@ -304,3 +304,15 @@ export const editAPICase = (data) => {
         }
     });
 }
+
+export const runAPICase = (data) => {
+    return $http({
+        method: "post",
+        url: "http://127.0.0.1:8000/apicase/run/",
+        params: {},
+        data: data,
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
