@@ -78,12 +78,30 @@ const routes = [
         }
       },
       {
+        path: '/report/list',
+        name: 'reportlist',
+        component: () => import(/* webpackChunkName: "reportlist" */ '../views/ReportList.vue'),
+        meta: {
+          isShow: true,
+          title: "报告管理",
+        }
+      },
+      {
         path: '/environment/list',
         name: 'environmentlist',
         component: () => import(/* webpackChunkName: "environmentlist" */ '../views/EnvironmentList.vue'),
         meta: {
           isShow: true,
           title: "环境管理",
+        }
+      },
+      {
+        path: '/websocket/test',
+        name: 'websocket',
+        component: () => import(/* webpackChunkName: "websocket" */ '../views/TestWebSocket.vue'),
+        meta: {
+          isShow: true,
+          title: "测试websocket",
         }
       },
     ]

@@ -316,3 +316,27 @@ export const runAPICase = (data) => {
         }
     });
 }
+
+export const getReportList = (params) => {
+    return $http({
+        method: "get",
+        url: "http://127.0.0.1:8000/report/list/",
+        params: params,
+        data: {},
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
+
+export const delReport = (data) => {
+    return $http({
+        method: "post",
+        url: "http://127.0.0.1:8000/report/del/",
+        params: {},
+        data: data,
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
