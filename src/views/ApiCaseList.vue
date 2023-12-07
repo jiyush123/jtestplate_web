@@ -16,9 +16,13 @@
         <el-button type="primary" @click="goToAdd">
             新增测试用例
         </el-button>
+        <el-button type="primary" @click="goToSelectEnv(null)">
+            批量执行
+        </el-button>
     </div>
     <!-- 列表 -->
-    <el-table :data="data.table" stripe style="width: 100%">
+    <el-table :data="data.table" stripe @select="handleSelect" style="width: 100%">
+        <el-table-column type="selection" width="55" />
         <el-table-column prop="id" label="id" />
         <el-table-column prop="name" label="用例名称" />
         <el-table-column prop="level" label="优先级">
@@ -92,7 +96,10 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="cancelDialog(formRef)">取消</el-button>
-                <el-button type="primary" @click="runTest(case_id)">
+                <el-button v-if="batch_run" type="primary" @click="runTest(case_ids)">
+                    运行
+                </el-button>
+                <el-button v-else type="primary" @click="runTest([case_id])">
                     运行
                 </el-button>
             </span>
@@ -109,7 +116,8 @@ import { ElMessage } from 'element-plus'
 import router from "../router/index"
 
 const Dialog = ref(false);
-// const case_ids = ref([]);
+const case_ids = ref([]);
+const batch_run = ref(false);
 const case_id = ref(null);
 const envOptions = ref(null);
 
@@ -193,7 +201,12 @@ const goToSelectEnv = (id) => {
 
     Dialog.value = true;
     getEnvironmentFun();
-    case_id.value = id;
+    if (id) {
+        case_id.value = id;
+    }
+    else {
+        batch_run.value = true;
+    }
 }
 
 const cancelDialog = (formEl) => {
@@ -251,12 +264,12 @@ const getEnvironmentFun = async () => {
     }
 }
 
-const runTest = async (case_id) => {
+const runTest = async (case_ids) => {
     const result = await assertForm();
     if (!result) return
     else {
         let data = {
-            'id': case_id,
+            'ids': case_ids,
             'created_user': localStorage.getItem('name'),
             'host': formdata.host
         };
@@ -293,6 +306,19 @@ const runTest = async (case_id) => {
                 message: '请求异常',
                 type: 'error',
             })
+        }
+    }
+}
+
+const handleSelect = (row) => {
+
+    if (!case_ids.value.includes(row.id)) {
+        case_ids.value.push(row.id);
+    }
+    else {
+        let index = case_ids.value.indexOf(row.id);
+        if (index !== -1) {
+            case_ids.value.splice(index, 1);
         }
     }
 }
