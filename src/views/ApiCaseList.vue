@@ -116,6 +116,7 @@ import { ElMessage } from 'element-plus'
 import router from "../router/index"
 
 const Dialog = ref(false);
+const case_info = ref([]);
 const case_ids = ref([]);
 const batch_run = ref(false);
 const case_id = ref(null);
@@ -206,6 +207,9 @@ const goToSelectEnv = (id) => {
     }
     else {
         batch_run.value = true;
+        for(let i=0;i<case_info.value.length;i++){
+            case_ids.value.push(case_info.value[i].id);
+        }
     }
 }
 
@@ -310,17 +314,8 @@ const runTest = async (case_ids) => {
     }
 }
 
-const handleSelect = (row) => {
-
-    if (!case_ids.value.includes(row.id)) {
-        case_ids.value.push(row.id);
-    }
-    else {
-        let index = case_ids.value.indexOf(row.id);
-        if (index !== -1) {
-            case_ids.value.splice(index, 1);
-        }
-    }
+const handleSelect = (selection) => {
+    case_info.value = selection;
 }
 
 
