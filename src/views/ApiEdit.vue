@@ -278,7 +278,7 @@ const bodyData = reactive(
     []
 );
 
-// 创建一个新的 Map 对象  
+// 创建一个新的 Map 对象作映射
 let status = new Map();
 
 // 添加键值对  
