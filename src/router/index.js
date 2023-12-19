@@ -95,15 +95,15 @@ const routes = [
           title: "环境管理",
         }
       },
-      {
-        path: '/websocket/test',
-        name: 'websocket',
-        component: () => import(/* webpackChunkName: "websocket" */ '../views/TestWebSocket.vue'),
-        meta: {
-          isShow: true,
-          title: "测试websocket",
-        }
-      },
+      // {
+      //   path: '/websocket/test',
+      //   name: 'websocket',
+      //   component: () => import(/* webpackChunkName: "websocket" */ '../views/TestWebSocket.vue'),
+      //   meta: {
+      //     isShow: true,
+      //     title: "测试websocket",
+      //   }
+      // },
     ]
   },
   {
