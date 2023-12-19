@@ -94,7 +94,7 @@ const status_options = [{
     label: '已完成',
 },]
 
-let queryForm = reactive({
+const queryForm = reactive({
     name: '',
     status: '',
 })
