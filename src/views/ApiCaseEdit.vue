@@ -39,6 +39,8 @@
                         <el-collapse-item :name="index">
                             <template #title>
                                 {{ step.title + (index + 1) }}
+                                <el-button type="primary" @click="APIDialog(index)" style="margin:auto;"
+                                    @click.stop>选择接口</el-button>
                                 <el-form-item label="步骤名称" :prop="'steps.' + index + '.name'"
                                     style="margin:auto;width: 500px;" :rules="[
                                         { required: true, message: '步骤名称不能为空' },
@@ -65,18 +67,18 @@
                             </el-form-item>
                             <!-- 请求头 -->
                             <el-form-item label="Headers">
-                                <el-table :data="headersData[index]" border style="width: 700px">
-                                    <el-table-column prop="headerskey" label="Keys" width='200'>
+                                <el-table :data="headersData[index]" border style="width: 100%">
+                                    <el-table-column prop="headerskey" label="Keys">
                                         <template #default="scope">
                                             <el-input v-model="headersData[index][scope.$index].headerskey" />
                                         </template>
                                     </el-table-column>
-                                    <el-table-column prop="headersvalue" label="Values" width='200'>
+                                    <el-table-column prop="headersvalue" label="Values">
                                         <template #default="scope">
                                             <el-input v-model="headersData[index][scope.$index].headersvalue" />
                                         </template>
                                     </el-table-column>
-                                    <el-table-column prop="headersdecription" label="描述" width='200'>
+                                    <el-table-column prop="headersdecription" label="描述">
                                         <template #default="scope">
                                             <el-input v-model="headersData[index][scope.$index].headersdecription" />
                                         </template>
@@ -92,18 +94,18 @@
                                 style="margin-left: 50px;margin-bottom: 10px;">新增请求头参数</el-button>
                             <!-- 请求参数 -->
                             <el-form-item label="Params">
-                                <el-table :data="paramsData[index]" border style="width: 700px">
-                                    <el-table-column prop="paramskey" label="Keys" width='200'>
+                                <el-table :data="paramsData[index]" border style="width: 100%">
+                                    <el-table-column prop="paramskey" label="Keys">
                                         <template #default="scope">
                                             <el-input v-model="paramsData[index][scope.$index].paramskey" />
                                         </template>
                                     </el-table-column>
-                                    <el-table-column prop="paramsvalue" label="Values" width='200'>
+                                    <el-table-column prop="paramsvalue" label="Values">
                                         <template #default="scope">
                                             <el-input v-model="paramsData[index][scope.$index].paramsvalue" />
                                         </template>
                                     </el-table-column>
-                                    <el-table-column prop="paramsdecription" label="描述" width='200'>
+                                    <el-table-column prop="paramsdecription" label="描述">
                                         <template #default="scope">
                                             <el-input v-model="paramsData[index][scope.$index].paramsdecription" />
                                         </template>
@@ -119,18 +121,18 @@
                                 style="margin-left: 50px;margin-bottom: 10px;">新增params参数</el-button>
                             <!-- 请求体 -->
                             <el-form-item label="Body">
-                                <el-table :data="bodyData[index]" border style="width: 700px">
-                                    <el-table-column prop="bodykey" label="Keys" width='200'>
+                                <el-table :data="bodyData[index]" border style="width: 100%">
+                                    <el-table-column prop="bodykey" label="Keys">
                                         <template #default="scope">
                                             <el-input v-model="bodyData[index][scope.$index].bodykey" />
                                         </template>
                                     </el-table-column>
-                                    <el-table-column prop="bodyvalue" label="Values" width='200'>
+                                    <el-table-column prop="bodyvalue" label="Values">
                                         <template #default="scope">
                                             <el-input v-model="bodyData[index][scope.$index].bodyvalue" />
                                         </template>
                                     </el-table-column>
-                                    <el-table-column prop="bodydecription" label="描述" width='200'>
+                                    <el-table-column prop="bodydecription" label="描述">
                                         <template #default="scope">
                                             <el-input v-model="bodyData[index][scope.$index].bodydecription" />
                                         </template>
@@ -154,17 +156,182 @@
 
     <el-button type="primary" class="api_case_save_btn" @click="onSubmit(ruleFormRef)">保存</el-button>
     <el-button class="api_case_cancel_btn" @click="cancelBtn">取消</el-button>
+
+     <!-- 弹窗 -->
+     <el-dialog v-model="Dialog" title="选择接口" width="60%" align-center @close="cancelDialog(formRef)">
+        <!-- 搜索栏 -->
+        <el-form :inline="true" :model="queryForm" label-width="80px" class="queryForm listquery">
+            <el-form-item label="接口名称" prop="name">
+                <el-input v-model="queryForm.name" clearable />
+            </el-form-item>
+            <el-form-item label="所属模块" prop="module">
+                <el-input v-model="queryForm.module" clearable />
+            </el-form-item>
+            <el-button type="primary" @click="queryList">查询</el-button>
+        </el-form>
+        <!-- 列表 -->
+        <el-table :data="data.table" stripe style="width: 100%" show-overflow-tooltip>
+            <el-table-column prop="id" label="id" width="80px" />
+            <el-table-column prop="name" label="接口名称" />
+            <el-table-column prop="description" label="描述" />
+            <el-table-column prop="module" label="所属模块" />
+            <el-table-column prop="method" label="请求方式">
+                <template #default="scope">
+                    <el-tag v-if="scope.row.method === 'GET'" class="ml-2" type="success">
+                        {{ scope.row.method }}
+                    </el-tag>
+                    <el-tag v-else-if="scope.row.method === 'POST'" class="ml-2" type="">
+                        {{ scope.row.method }}
+                    </el-tag>
+                </template>
+            </el-table-column>
+            <el-table-column prop="uri" label="路径" />
+            <el-table-column label="操作">
+                <template #default="scope">
+                    <el-button type="primary" size="small" @click="SelectApi(scope.row.id)">选择</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <div class="demo-pagination-block">
+            <div class="demonstration"></div>
+            <el-pagination v-model:current-page="currentPage1" v-model:page-size="pageSize1" :page-sizes="[10, 20, 50, 100]"
+                :background="true" layout="total, prev, pager, next, sizes, jumper" :total="data.total"
+                @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+        </div>
+    </el-dialog>
 </template>
 
-<style></style>
+<style>
+.api_case_form {
+    width: 60%;
+    margin: auto
+}
+
+.api_case_save_btn {
+    margin-left: 40%;
+}
+
+.api_case_cancel_btn {
+    margin-left: 40%;
+}
+</style>
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
 import router from "../router/index";
 import { useRoute } from 'vue-router'
-import { getAPICaseInfo,editAPICase } from '../http/api';
+import { getAPIList, getAPIInfo, getAPICaseInfo,editAPICase } from '../http/api';
 import { ElMessage } from 'element-plus';
 import { VueDraggableNext as Draggable } from 'vue-draggable-next';
+
+const Dialog = ref(false);
+
+let params = {
+    "page": 1,
+    "size": 10,
+};
+const currentPage1 = ref(1);
+const pageSize1 = ref(10);
+let data = reactive({
+    table: [],
+    total: 0,
+})
+const queryForm = reactive({
+    name: '',
+    module: '',
+})
+
+const APIDialog_id = ref(null);
+const APIDialog = async (index) => {
+    // 打开弹窗，请求接口
+    Dialog.value = true;
+    APIDialog_id.value = index;
+    getApiListFun()
+}
+
+const cancelDialog = (formEl) => {
+    // 取消弹窗，重置
+    Dialog.value = false;
+    if (!formEl) return
+    formEl.resetFields();
+}
+
+const handleSizeChange = (val) => {
+    params.size = val;
+    getApiListFun()
+}
+const handleCurrentChange = (val) => {
+    params.page = val;
+    getApiListFun()
+}
+
+const queryList = () => {
+    if (queryForm.name == '') {
+        delete params.name;
+    } else {
+        params.name = queryForm.name;
+    }
+    if (queryForm.module == '') {
+        delete params.module;
+    } else {
+        params.module = queryForm.module;
+    }
+    getApiListFun()
+}
+
+const getApiListFun = async () => {
+    // 发送到后端获取列表数据
+    const res = await getAPIList(params);
+    data.table = res.data;
+    data.total = res.total
+}
+
+const SelectApi = async (id) => {
+    const APIid = { 'id': id };
+    const res = await getAPIInfo(APIid);
+    if (res.status) {
+        // 测试步骤赋值
+        editform.steps[APIDialog_id.value].name = res.data.name;
+        editform.steps[APIDialog_id.value].method = res.data.method;
+        editform.steps[APIDialog_id.value].uri = res.data.uri;
+        // 请求头
+        for (let key in res.data.headers) {
+            let value = res.data.headers[key];
+            headersData[APIDialog_id.value].push({
+                headerskey: key,
+                headersvalue: value.value,
+                headersdecription: value.decription
+            });
+        }
+        // 请求参数
+        for (let key in res.data.params) {
+            let value = res.data.params[key];
+            paramsData[APIDialog_id.value].push({
+                paramskey: key,
+                paramsvalue: value.value,
+                paramsdecription: value.decription
+            });
+        }
+        // 请求体
+        for (let key in res.data.body) {
+            let value = res.data.body[key];
+            bodyData[APIDialog_id.value].push({
+                bodykey: key,
+                bodyvalue: value.value,
+                bodydecription: value.decription
+            });
+        }
+    }
+    else {
+        ElMessage({
+            showClose: true,
+            center: true,
+            message: res.msg,
+            type: 'error',
+        })
+    }
+    cancelDialog();
+}
 
 const route = useRoute();
 const id_params = route.params;
@@ -270,10 +437,6 @@ const getCaseInfo = async () => {
         editform.name = res.data.case.name;
         editform.status = status.get(res.data.case.status);
         editform.level = res.data.case.level;
-        
-        // 调试字段
-        // debugform.method = res.data.method;
-        // debugform.uri = res.data.uri;
 
         editform.steps.pop();
         // 测试步骤赋值

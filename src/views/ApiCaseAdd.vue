@@ -58,23 +58,23 @@
                             </el-form-item>
                             <!-- 请求头 -->
                             <el-form-item label="Headers">
-                                <el-table :data="headersData[index]" border style="width: 700px">
-                                    <el-table-column prop="headerskey" label="Keys" width='200'>
+                                <el-table :data="headersData[index]" border style="width: 100%">
+                                    <el-table-column prop="headerskey" label="Keys">
                                         <template #default="scope">
                                             <el-input v-model="headersData[index][scope.$index].headerskey" />
                                         </template>
                                     </el-table-column>
-                                    <el-table-column prop="headersvalue" label="Values" width='200'>
+                                    <el-table-column prop="headersvalue" label="Values">
                                         <template #default="scope">
                                             <el-input v-model="headersData[index][scope.$index].headersvalue" />
                                         </template>
                                     </el-table-column>
-                                    <el-table-column prop="headersdecription" label="描述" width='200'>
+                                    <el-table-column prop="headersdecription" label="描述">
                                         <template #default="scope">
                                             <el-input v-model="headersData[index][scope.$index].headersdecription" />
                                         </template>
                                     </el-table-column>
-                                    <el-table-column width='100'>
+                                    <el-table-column width="100">
                                         <template #default="scope">
                                             <el-button type="danger" @click="delHeader(index, scope.$index)">删除</el-button>
                                         </template>
@@ -85,18 +85,18 @@
                                 style="margin-left: 50px;margin-bottom: 10px;">新增请求头参数</el-button>
                             <!-- 请求参数 -->
                             <el-form-item label="Params">
-                                <el-table :data="paramsData[index]" border style="width: 700px">
-                                    <el-table-column prop="paramskey" label="Keys" width='200'>
+                                <el-table :data="paramsData[index]" border style="width: 100%">
+                                    <el-table-column prop="paramskey" label="Keys">
                                         <template #default="scope">
                                             <el-input v-model="paramsData[index][scope.$index].paramskey" />
                                         </template>
                                     </el-table-column>
-                                    <el-table-column prop="paramsvalue" label="Values" width='200'>
+                                    <el-table-column prop="paramsvalue" label="Values">
                                         <template #default="scope">
                                             <el-input v-model="paramsData[index][scope.$index].paramsvalue" />
                                         </template>
                                     </el-table-column>
-                                    <el-table-column prop="paramsdecription" label="描述" width='200'>
+                                    <el-table-column prop="paramsdecription" label="描述">
                                         <template #default="scope">
                                             <el-input v-model="paramsData[index][scope.$index].paramsdecription" />
                                         </template>
@@ -112,18 +112,18 @@
                                 style="margin-left: 50px;margin-bottom: 10px;">新增params参数</el-button>
                             <!-- 请求体 -->
                             <el-form-item label="Body">
-                                <el-table :data="bodyData[index]" border style="width: 700px">
-                                    <el-table-column prop="bodykey" label="Keys" width='200'>
+                                <el-table :data="bodyData[index]" border style="width: 100%">
+                                    <el-table-column prop="bodykey" label="Keys">
                                         <template #default="scope">
                                             <el-input v-model="bodyData[index][scope.$index].bodykey" />
                                         </template>
                                     </el-table-column>
-                                    <el-table-column prop="bodyvalue" label="Values" width='200'>
+                                    <el-table-column prop="bodyvalue" label="Values">
                                         <template #default="scope">
                                             <el-input v-model="bodyData[index][scope.$index].bodyvalue" />
                                         </template>
                                     </el-table-column>
-                                    <el-table-column prop="bodydecription" label="描述" width='200'>
+                                    <el-table-column prop="bodydecription" label="描述">
                                         <template #default="scope">
                                             <el-input v-model="bodyData[index][scope.$index].bodydecription" />
                                         </template>
@@ -149,7 +149,7 @@
     <el-button class="api_case_cancel_btn" @click="cancelBtn">取消</el-button>
 
     <!-- 弹窗 -->
-    <el-dialog v-model="Dialog" title="选择接口" width="40%" align-center @close="cancelDialog(formRef)">
+    <el-dialog v-model="Dialog" title="选择接口" width="60%" align-center @close="cancelDialog(formRef)">
         <!-- 搜索栏 -->
         <el-form :inline="true" :model="queryForm" label-width="80px" class="queryForm listquery">
             <el-form-item label="接口名称" prop="name">
@@ -161,7 +161,7 @@
             <el-button type="primary" @click="queryList">查询</el-button>
         </el-form>
         <!-- 列表 -->
-        <el-table :data="data.table" stripe style="width: 100%">
+        <el-table :data="data.table" stripe style="width: 100%" show-overflow-tooltip>
             <el-table-column prop="id" label="id" width="80px" />
             <el-table-column prop="name" label="接口名称" />
             <el-table-column prop="description" label="描述" />
