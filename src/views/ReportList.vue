@@ -10,8 +10,8 @@
 
     <!-- 列表 -->
     <el-table :data="data.table" stripe style="width: 100%">
-        <el-table-column prop="id" label="id" />
-        <el-table-column prop="name" label="标题" />
+        <el-table-column prop="id" label="id" width="50"/>
+        <el-table-column prop="name" label="标题"/>
         <el-table-column prop="result" label="结果">
         <template #default="scope">
             <el-tag v-if="scope.row.result === '成功'" class="ml-2" type="success">

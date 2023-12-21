@@ -171,11 +171,11 @@
         </el-form>
         <!-- 列表 -->
         <el-table :data="data.table" stripe style="width: 100%" show-overflow-tooltip>
-            <el-table-column prop="id" label="id" width="80px" />
-            <el-table-column prop="name" label="接口名称" />
-            <el-table-column prop="description" label="描述" />
-            <el-table-column prop="module" label="所属模块" />
-            <el-table-column prop="method" label="请求方式">
+            <el-table-column prop="id" label="id" width="50px" fixed  />
+            <el-table-column prop="name" label="接口名称" width="200px" fixed />
+            <el-table-column prop="description" label="描述" width="100px"/>
+            <el-table-column prop="module" label="所属模块" width="100px"/>
+            <el-table-column prop="method" label="请求方式" width="100px">
                 <template #default="scope">
                     <el-tag v-if="scope.row.method === 'GET'" class="ml-2" type="success">
                         {{ scope.row.method }}
@@ -185,8 +185,8 @@
                     </el-tag>
                 </template>
             </el-table-column>
-            <el-table-column prop="uri" label="路径" />
-            <el-table-column label="操作">
+            <el-table-column prop="uri" label="路径" width="300px"/>
+            <el-table-column label="操作" fixed="right">
                 <template #default="scope">
                     <el-button type="primary" size="small" @click="SelectApi(scope.row.id)">选择</el-button>
                 </template>

@@ -21,10 +21,10 @@
         </el-button>
     </div>
     <!-- 列表 -->
-    <el-table :data="data.table" stripe @select="handleSelect" style="width: 100%">
-        <el-table-column type="selection" width="55" />
-        <el-table-column prop="id" label="id" />
-        <el-table-column prop="name" label="用例名称" />
+    <el-table :data="data.table" stripe @select="handleSelect" style="width: 100%" show-overflow-tooltip>
+        <el-table-column type="selection" width="50" fixed />
+        <el-table-column prop="id" label="id" width="50" fixed />
+        <el-table-column prop="name" label="用例名称" width="200" fixed />
         <el-table-column prop="level" label="优先级">
             <template #default="scope">
                 <el-tag v-if="scope.row.level === '1'" class="ml-2" type="danger">
@@ -52,10 +52,10 @@
                 </el-tag>
             </template>
         </el-table-column>
-        <el-table-column prop="last_time" label="最后一次执行时间" />
-        <el-table-column prop="updated_time" label="修改时间" />
+        <el-table-column prop="last_time" label="最后一次执行时间" width="200"/>
+        <el-table-column prop="updated_time" label="修改时间" width="200"/>
 
-        <el-table-column fixed="right" label="操作">
+        <el-table-column fixed="right" label="操作" width="200">
             <template #default="scope">
                 <el-button type="primary" size="small" @click="goToSelectEnv(scope.row.id)">运行</el-button>
                 <el-button type="primary" size="small" @click="goToEdit(scope.row.id)">编辑</el-button>
