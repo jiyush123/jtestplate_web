@@ -38,9 +38,11 @@ $http.interceptors.response.use(function (response) {
             center: true,
             message: data.msg,
             type: 'error',
-        })
+        });
+        localStorage.removeItem('user_id');
+        localStorage.removeItem('name');
+        localStorage.removeItem('token');
         router.push('/login');
-
     }
     return data;
 }, function (error) {
