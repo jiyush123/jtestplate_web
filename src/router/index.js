@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { createRouter, createWebHashHistory } from 'vue-router'
+import { createRouter ,createWebHistory} from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import LoginView from '../views/LoginView.vue'
 
@@ -117,7 +117,7 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory(),
   routes
 })
 
@@ -133,7 +133,7 @@ router.beforeEach((to, from, next) => {
         next();
       } else {
       // 否则直接强制跳转至登录页
-        router.push('/login');
+        next('/login');
       }
   }
   else {
@@ -143,9 +143,8 @@ router.beforeEach((to, from, next) => {
       next();
     }
     else {
-    // 否则直接强制跳转至上一个页面
-      router.push(from.path)
-      next();
+    // 否则直接强制跳转至首页
+      router.push('/home');
     }
   }
 });
