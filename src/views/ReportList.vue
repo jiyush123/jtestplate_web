@@ -9,9 +9,9 @@
     </el-form>
 
     <!-- 列表 -->
-    <el-table :data="data.table" stripe style="width: 100%">
+    <el-table :data="data.table" stripe style="width: 100%" show-overflow-tooltip>
         <el-table-column prop="id" label="id" width="50"/>
-        <el-table-column prop="name" label="标题"/>
+        <el-table-column prop="name" label="标题" width="250"/>
         <el-table-column prop="result" label="结果">
         <template #default="scope">
             <el-tag v-if="scope.row.result === '成功'" class="ml-2" type="success">
@@ -25,10 +25,10 @@
             </el-tag>
         </template>
         </el-table-column>
-        <el-table-column prop="end_time" label="结束时间" />
-        <el-table-column prop="created_user" label="创建人" />
-        <el-table-column prop="created_time" label="创建时间" />
-        <el-table-column label="操作">
+        <el-table-column prop="end_time" label="结束时间"/>
+        <el-table-column prop="created_user" label="创建人"/>
+        <el-table-column prop="created_time" label="创建时间"/>
+        <el-table-column label="操作" width="200" fixed="right">
             <template #default="scope">
                 <!-- <el-button type="primary" size="small" @click="updateDialog(scope.row.id)">详情</el-button> -->
                 <el-popconfirm width="220" :hide-after="hideAfter" confirm-button-text="确定" cancel-button-text="取消"
