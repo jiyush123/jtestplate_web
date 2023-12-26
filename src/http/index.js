@@ -43,6 +43,7 @@ $http.interceptors.response.use(function (response) {
         localStorage.removeItem('name');
         localStorage.removeItem('token');
         router.push('/login');
+        return data;
     }
     return data;
 }, function (error) {
