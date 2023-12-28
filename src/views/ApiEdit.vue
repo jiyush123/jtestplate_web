@@ -146,13 +146,14 @@
                     { required: true, message: '请选择调试环境' },
                 ]">
                     <el-select v-model="debugform.host" filterable placeholder="请选择" style="width: 400px;">
-                        <el-option v-for="item in envOptions" :key="item.id" :label="item.name +'    '+ item.protocol + '://' + item.host + ':' + item.port"
+                        <el-option v-for="item in envOptions" :key="item.id"
+                            :label="item.name + '    ' + item.protocol + '://' + item.host + ':' + item.port"
                             :value="item.protocol + '://' + item.host + ':' + item.port">
 
                             <span style="float: left">{{ item.name }}</span>
                             <span style="float: right;font-size: 13px;">
-                            {{ item.protocol + '://' + item.host + ':' + item.port }}
-                        </span>
+                                {{ item.protocol + '://' + item.host + ':' + item.port }}
+                            </span>
                         </el-option>
                     </el-select>
                 </el-form-item>
@@ -321,7 +322,7 @@ const getInfo = async () => {
         editform.name = res.data.name;
         editform.status = status.get(res.data.status);
         editform.description = res.data.description;
-        editform.module = res.data.module;
+        editform.module = res.data.mod_id;
         editform.method = res.data.method;
         editform.uri = res.data.uri;
         // 调试字段
@@ -508,7 +509,7 @@ const getModuleFun = async () => {
 
 const getEnvironmentFun = async () => {
     // 发送到后端获取环境列表数据
-    const res = await getEnvironmentList({'size':100,'page':1});
+    const res = await getEnvironmentList({ 'size': 100, 'page': 1 });
     if (res.status == true) {
         envOptions.value = res.data;
     }
@@ -523,8 +524,8 @@ const getEnvironmentFun = async () => {
 }
 
 onMounted(() => {
-    getInfo();
     getModuleFun();
+    getInfo();
     getEnvironmentFun();
     setTimeout(() => {
     }, 1000)
