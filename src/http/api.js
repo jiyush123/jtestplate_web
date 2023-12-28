@@ -305,6 +305,18 @@ export const editAPICase = (data) => {
     });
 }
 
+export const debugAPICase = (data) => {
+    return $http({
+        method: "post",
+        url: "http://127.0.0.1:8000/apicase/debug/",
+        params: {},
+        data: data,
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
+
 export const runAPICase = (data) => {
     return $http({
         method: "post",

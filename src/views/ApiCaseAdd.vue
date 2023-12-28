@@ -21,7 +21,20 @@
                 <el-option label="3" value="3" />
             </el-select>
         </el-form-item>
-        <el-button type="primary" @click="AddStep">新增步骤</el-button>
+        <el-row class="handle_info" :gutter="20">
+            <el-col :span="6">
+                <el-button type="primary" @click="AddStep">新增步骤</el-button>
+            </el-col>
+            <el-col :span="6">
+                <el-text class="mx-4">耗时：</el-text>
+            </el-col>
+            <el-col :span="6">
+                <el-text class="mx-4">结果：</el-text>
+            </el-col>
+            <el-col :span="6">
+                <el-button type="primary" @click="AddStep">调试</el-button>
+            </el-col>
+        </el-row>
         <!-- 测试步骤 -->
         <draggable v-model="addForm.steps">
             <transition-group>
@@ -165,7 +178,7 @@
             <el-table-column prop="id" label="id" width="50px" fixed />
             <el-table-column prop="name" label="接口名称" width="200px" fixed />
             <el-table-column prop="description" label="描述" width="100px" />
-            <el-table-column prop="module" label="所属模块" width="100px"/>
+            <el-table-column prop="module" label="所属模块" width="100px" />
             <el-table-column prop="method" label="请求方式" width="100px">
                 <template #default="scope">
                     <el-tag v-if="scope.row.method === 'GET'" class="ml-2" type="success">
@@ -176,7 +189,7 @@
                     </el-tag>
                 </template>
             </el-table-column>
-            <el-table-column prop="uri" label="路径" width="300px"/>
+            <el-table-column prop="uri" label="路径" width="300px" />
             <el-table-column label="操作" fixed="right">
                 <template #default="scope">
                     <el-button type="primary" size="small" @click="SelectApi(scope.row.id)">选择</el-button>
@@ -204,6 +217,19 @@
 
 .api_case_cancel_btn {
     margin-left: 40%;
+}
+.handle_info{
+    height: 40px;
+}
+.handle_info .el-col{
+    display:flex;
+    height: 100%;
+}
+.handle_info .el-col .el-text{
+    align-items: center;
+}
+.el-collapse-item__header{
+    height: 60px;
 }
 </style>
 
