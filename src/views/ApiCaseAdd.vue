@@ -22,19 +22,51 @@
             </el-select>
         </el-form-item>
         <el-row class="handle_info" :gutter="20">
-            <el-col :span="6">
+            <el-col :span="4">
                 <el-button type="primary" @click="AddStep">新增步骤</el-button>
             </el-col>
-            <el-col :span="6">
+            <el-col :span="4">
                 <el-text class="mx-4">耗时：</el-text>
             </el-col>
-            <el-col :span="6">
+            <el-col :span="4">
                 <el-text class="mx-4">结果：</el-text>
             </el-col>
-            <el-col :span="6">
-                <el-button type="primary" @click="AddStep">调试</el-button>
+            <el-col :span="8">
+                <el-button type="primary" @click="goToSelectEnv">运行环境</el-button>
+                <span>
+                    {{ env.host }}
+                </span>
+            </el-col>
+            <el-col :span="4" class="debugBtn">
+                <el-button type="primary" @click="debug">调试</el-button>
             </el-col>
         </el-row>
+        <!-- 选择运行环境弹窗 -->
+        <el-dialog v-model="envDialog" title="选择运行环境" width="40%" align-center @close="cancelDialog(envformRef)">
+            <el-form :model="envdata" label-width="80px" ref="envformRef">
+                <el-form-item label="运行环境" prop="host">
+                    <el-select v-model="envdata.host" filterable placeholder="请选择" style="width: 400px;">
+                        <el-option v-for="item in envOptions" :key="item.id"
+                            :label="item.name + '    ' + item.protocol + '://' + item.host + ':' + item.port"
+                            :value="item.protocol + '://' + item.host + ':' + item.port">
+
+                            <span style="float: left">{{ item.name }}</span>
+                            <span style="float: right;font-size: 13px;">
+                                {{ item.protocol + '://' + item.host + ':' + item.port }}
+                            </span>
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button type="primary" @click="sureEnv(envformRef)">
+                        确定
+                    </el-button>
+                    <el-button @click="cancelDialog(envformRef)">取消</el-button>
+                </span>
+            </template>
+        </el-dialog>
         <!-- 测试步骤 -->
         <draggable v-model="addForm.steps">
             <transition-group>
@@ -46,12 +78,23 @@
                                 <el-button type="primary" @click="APIDialog(index)" style="margin:auto;"
                                     @click.stop>选择接口</el-button>
                                 <el-form-item label="步骤名称" :prop="'steps.' + index + '.name'"
-                                    style="margin:auto;width: 500px;" :rules="[
+                                    style="margin:auto; width: 300px;" :rules="[
                                         { required: true, message: '步骤名称不能为空' },
                                         { min: 3, max: 30, message: '长度需要为3-30个字符' },
                                     ]">
                                     <el-input v-model="step.name" @click.stop />
                                 </el-form-item>
+
+                                <el-text class="mx-1">耗时：</el-text>
+                                <el-text class="mx-1" type="primary">{{ step.time }}</el-text>
+                                <el-text class="mx-1">ms</el-text>
+
+
+                                <el-text class="mx-1">结果：</el-text>
+                                <el-text class="mx-1" v-if="step.result==='success'" type="success" >{{ step.result }}</el-text>
+                                <el-text class="mx-1" v-else type="danger" >{{ step.result }}</el-text>
+
+
                                 <el-button class="mt-2" type="danger" @click.prevent="removeDomain(step)"
                                     @click.stop>删除步骤</el-button>
                             </template>
@@ -150,7 +193,9 @@
                             </el-form-item>
                             <el-button type="primary" @click="addBody(index)"
                                 style="margin-left: 50px;margin-bottom: 10px;">新增body参数</el-button>
-
+                            <el-form-item label="响应" :prop="'steps.' + index + '.response'">
+                                <el-input v-model="step.response" type="textarea" autosize disabled />
+                            </el-form-item>
                         </el-collapse-item>
                     </el-collapse>
                 </div>
@@ -218,29 +263,68 @@
 .api_case_cancel_btn {
     margin-left: 40%;
 }
-.handle_info{
+
+.handle_info {
     height: 40px;
 }
-.handle_info .el-col{
-    display:flex;
+
+.handle_info .el-col {
+    display: flex;
     height: 100%;
-}
-.handle_info .el-col .el-text{
     align-items: center;
 }
-.el-collapse-item__header{
+
+.el-collapse-item__header {
     height: 60px;
+}
+
+.debugBtn {
+    justify-content: flex-end;
 }
 </style>
 
 <script setup>
 import { ref, reactive } from 'vue';
 import router from "../router/index";
-import { getAPIList, getAPIInfo, addAPICase } from '../http/api';
+import { getAPIList, getAPIInfo, addAPICase, getEnvironmentList, debugAPICase } from '../http/api';
 import { ElMessage } from 'element-plus';
 import { VueDraggableNext as Draggable } from 'vue-draggable-next';
 
 const Dialog = ref(false);
+const envDialog = ref(false);
+const envOptions = ref(null);
+
+const envdata = reactive({
+    host: ''
+})
+
+const env = reactive({})
+
+const goToSelectEnv = () => {
+    envDialog.value = true;
+    getEnvironmentFun();
+}
+
+const sureEnv = (formEl) => {
+    env.host = envdata.host;
+    cancelDialog(formEl);
+}
+
+const getEnvironmentFun = async () => {
+    // 发送到后端获取环境列表数据
+    const res = await getEnvironmentList({ 'size': 100, 'page': 1 });
+    if (res.status == true) {
+        envOptions.value = res.data;
+    }
+    else {
+        ElMessage({
+            showClose: true,
+            center: true,
+            message: '请求失败',
+            type: 'error',
+        })
+    }
+}
 
 let params = {
     "page": 1,
@@ -268,6 +352,7 @@ const APIDialog = async (index) => {
 const cancelDialog = (formEl) => {
     // 取消弹窗，重置
     Dialog.value = false;
+    envDialog.value = false;
     if (!formEl) return
     formEl.resetFields();
 }
@@ -316,9 +401,14 @@ const addForm = reactive({
         headers: {},
         params: {},
         body: {},
+        time: '',
+        result: '',
+        response: '',
     }],
     created_user: localStorage.getItem('name'),
-    updated_user: localStorage.getItem('name')
+    updated_user: localStorage.getItem('name'),
+    time: '',
+    result: '',
 })
 
 
@@ -332,6 +422,9 @@ const AddStep = () => {
         headers: {},
         params: {},
         body: {},
+        time: '',
+        result: '',
+        response: '',
     });
     headersData.push([]);
     paramsData.push([]);
@@ -451,7 +544,6 @@ const assertForm = async () => {
 }
 
 const onSubmit = async () => {
-    console.log(addForm);
     const result = await assertForm()
     if (!result) return
     else {
@@ -513,4 +605,75 @@ const onSubmit = async () => {
     }
 }
 
+const debug = async () => {
+    const result = await assertForm()
+    if (!result) return
+    else {
+        for (let j = 0; j < headersData.length; j++) {
+            for (let i = 0; i < headersData[j].length; i++) {
+                addForm.steps[j].headers[headersData[j][i].headerskey] = { "value": headersData[j][i].headersvalue, "decription": headersData[j][i].headersdecription };
+            }
+        }
+        for (let j = 0; j < headersData.length; j++) {
+            for (let i = 0; i < paramsData[j].length; i++) {
+                addForm.steps[j].params[paramsData[j][i].paramskey] = { "value": paramsData[j][i].paramsvalue, "decription": paramsData[j][i].paramsdecription };
+            }
+        }
+        for (let j = 0; j < headersData.length; j++) {
+            for (let i = 0; i < bodyData[j].length; i++) {
+                addForm.steps[j].body[bodyData[j][i].bodykey] = { "value": bodyData[j][i].bodyvalue, "decription": bodyData[j][i].bodydecription };
+            }
+        }
+        for (let i = 0; i < headersData.length; i++) {
+            if (headersData[i].length === 0) {
+                addForm.steps[i].headers = null;
+            }
+        }
+        for (let i = 0; i < headersData.length; i++) {
+            if (paramsData[i].length === 0) {
+                addForm.steps[i].params = null;
+            }
+        }
+        for (let i = 0; i < headersData.length; i++) {
+            if (bodyData[i].length === 0) {
+                addForm.steps[i].body = null;
+            }
+        }
+
+        for (let i = 0; i < addForm.steps.length; i++) {
+            addForm.steps[i].sort = i;
+        }
+        addForm.env = env.host;
+        // 发送到后端调试
+        const res = await debugAPICase(addForm);
+        if (res.status) {
+            console.log(res.data.res, res.data.time);
+            for (let i = 0; i < addForm.steps.length; i++) {
+                if (res.data.res[i].status) {
+                    addForm.steps[i].result = 'success';
+                }
+                else {
+                    addForm.steps[i].result = 'error';
+                }
+                addForm.steps[i].time = res.data.time[i];
+
+                addForm.steps[i].response = res.data.res[i].status + '\n' + res.data.res[i].status_code + '\n' + res.data.res[i].response;
+            }
+            ElMessage({
+                showClose: true,
+                center: true,
+                message: res.msg,
+                type: 'success',
+            })
+        }
+        else {
+            ElMessage({
+                showClose: true,
+                center: true,
+                message: res.msg,
+                type: 'error',
+            })
+        }
+    }
+}
 </script>
