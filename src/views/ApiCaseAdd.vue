@@ -580,10 +580,15 @@ const onSubmit = async () => {
 
         for (let i = 0; i < addForm.steps.length; i++) {
             addForm.steps[i].sort = i;
+            delete addForm.steps[i].response;
+            delete addForm.steps[i].time;
+            delete addForm.steps[i].result;
         }
         // 发送到后端新增数据
         addForm.created_user = localStorage.getItem('name');
         addForm.updated_user = localStorage.getItem('name');
+        delete addForm.result;
+        delete addForm.time;
         const res = await addAPICase(addForm);
         if (res.status) {
             ElMessage({
