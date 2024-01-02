@@ -30,7 +30,52 @@
                 <el-option label="3" value="3" />
             </el-select>
         </el-form-item>
-        <el-button type="primary" @click="AddStep">新增步骤</el-button>
+        <el-row class="handle_info" :gutter="20">
+            <el-col :span="4">
+                <el-button type="primary" @click="AddStep">新增步骤</el-button>
+            </el-col>
+            <el-col :span="4">
+                <el-text class="mx-4">耗时：</el-text>
+            </el-col>
+            <el-col :span="4">
+                <el-text class="mx-4">结果：</el-text>
+            </el-col>
+            <el-col :span="8">
+                <el-button type="primary" @click="goToSelectEnv">运行环境</el-button>
+                <span style="margin-left: 10px;">
+                    {{ env.host }}
+                </span>
+            </el-col>
+            <el-col :span="4" class="debugBtn">
+                <el-button type="primary" @click="debug">调试</el-button>
+            </el-col>
+        </el-row>
+        <!-- 选择运行环境弹窗 -->
+        <el-dialog v-model="envDialog" title="选择运行环境" width="40%" align-center @close="cancelDialog(envformRef)">
+            <el-form :model="envdata" label-width="80px" ref="envformRef">
+                <el-form-item label="运行环境" prop="host">
+                    <el-select v-model="envdata.host" filterable placeholder="请选择" style="width: 400px;">
+                        <el-option v-for="item in envOptions" :key="item.id"
+                            :label="item.name + '    ' + item.protocol + '://' + item.host + ':' + item.port"
+                            :value="item.protocol + '://' + item.host + ':' + item.port">
+
+                            <span style="float: left">{{ item.name }}</span>
+                            <span style="float: right;font-size: 13px;">
+                                {{ item.protocol + '://' + item.host + ':' + item.port }}
+                            </span>
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button type="primary" @click="sureEnv(envformRef)">
+                        确定
+                    </el-button>
+                    <el-button @click="cancelDialog(envformRef)">取消</el-button>
+                </span>
+            </template>
+        </el-dialog>
         <!-- 测试步骤 -->
         <draggable v-model="editform.steps">
             <transition-group>
@@ -42,12 +87,22 @@
                                 <el-button type="primary" @click="APIDialog(index)" style="margin:auto;"
                                     @click.stop>选择接口</el-button>
                                 <el-form-item label="步骤名称" :prop="'steps.' + index + '.name'"
-                                    style="margin:auto;width: 500px;" :rules="[
+                                    style="margin:auto;width: 300px;" :rules="[
                                         { required: true, message: '步骤名称不能为空' },
                                         { min: 3, max: 30, message: '长度需要为3-30个字符' },
                                     ]">
                                     <el-input v-model="step.name" @click.stop />
                                 </el-form-item>
+                                <el-text class="mx-1">耗时：</el-text>
+                                <el-text class="mx-1" type="primary">{{ step.time }}</el-text>
+                                <el-text class="mx-1">ms</el-text>
+
+
+                                <el-text class="mx-1" style="margin-left: 5px;">结果：</el-text>
+                                <el-text class="mx-1" v-if="step.result==='success'" type="success" style="margin-right: 5px;">{{ step.result }}</el-text>
+                                <el-text class="mx-1" v-else type="danger" style="margin-right: 5px;">{{ step.result }}</el-text>
+
+
                                 <el-button class="mt-2" type="danger" @click.prevent="removeDomain(step)"
                                     @click.stop>删除步骤</el-button>
                             </template>
@@ -146,7 +201,9 @@
                             </el-form-item>
                             <el-button type="primary" @click="addBody(index)"
                                 style="margin-left: 50px;margin-bottom: 10px;">新增body参数</el-button>
-
+                                <el-form-item label="响应" :prop="'steps.' + index + '.response'">
+                                <el-input v-model="step.response" type="textarea" autosize disabled />
+                            </el-form-item>
                         </el-collapse-item>
                     </el-collapse>
                 </div>
@@ -214,17 +271,66 @@
 .api_case_cancel_btn {
     margin-left: 40%;
 }
+.handle_info{
+    height: 40px;
+}
+.handle_info .el-col{
+    display:flex;
+    height: 100%;
+    align-items:center;
+}
+.el-collapse-item__header{
+    height: 60px;
+}
+.debugBtn{
+    justify-content:flex-end;
+}
 </style>
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
 import router from "../router/index";
 import { useRoute } from 'vue-router'
-import { getAPIList, getAPIInfo, getAPICaseInfo,editAPICase } from '../http/api';
+import { getAPIList, getAPIInfo, getAPICaseInfo,editAPICase, getEnvironmentList, debugAPICase } from '../http/api';
 import { ElMessage } from 'element-plus';
 import { VueDraggableNext as Draggable } from 'vue-draggable-next';
 
 const Dialog = ref(false);
+const envDialog = ref(false);
+const envOptions = ref(null);
+
+const envdata = reactive({
+    host: ''
+})
+
+const env = reactive({})
+
+const goToSelectEnv = () => {
+    envDialog.value = true;
+    getEnvironmentFun();
+}
+
+const sureEnv = (formEl) => {
+    env.host = envdata.host;
+    cancelDialog(formEl);
+}
+
+const getEnvironmentFun = async () => {
+    // 发送到后端获取环境列表数据
+    const res = await getEnvironmentList({ 'size': 100, 'page': 1 });
+    if (res.status == true) {
+        envOptions.value = res.data;
+    }
+    else {
+        ElMessage({
+            showClose: true,
+            center: true,
+            message: '请求失败',
+            type: 'error',
+        })
+    }
+}
+
 
 let params = {
     "page": 1,
@@ -252,6 +358,7 @@ const APIDialog = async (index) => {
 const cancelDialog = (formEl) => {
     // 取消弹窗，重置
     Dialog.value = false;
+    envDialog.value = false;
     if (!formEl) return
     formEl.resetFields();
 }
@@ -286,53 +393,6 @@ const getApiListFun = async () => {
     data.total = res.total
 }
 
-const SelectApi = async (id) => {
-    const APIid = { 'id': id };
-    const res = await getAPIInfo(APIid);
-    if (res.status) {
-        // 测试步骤赋值
-        editform.steps[APIDialog_id.value].name = res.data.name;
-        editform.steps[APIDialog_id.value].method = res.data.method;
-        editform.steps[APIDialog_id.value].uri = res.data.uri;
-        // 请求头
-        for (let key in res.data.headers) {
-            let value = res.data.headers[key];
-            headersData[APIDialog_id.value].push({
-                headerskey: key,
-                headersvalue: value.value,
-                headersdecription: value.decription
-            });
-        }
-        // 请求参数
-        for (let key in res.data.params) {
-            let value = res.data.params[key];
-            paramsData[APIDialog_id.value].push({
-                paramskey: key,
-                paramsvalue: value.value,
-                paramsdecription: value.decription
-            });
-        }
-        // 请求体
-        for (let key in res.data.body) {
-            let value = res.data.body[key];
-            bodyData[APIDialog_id.value].push({
-                bodykey: key,
-                bodyvalue: value.value,
-                bodydecription: value.decription
-            });
-        }
-    }
-    else {
-        ElMessage({
-            showClose: true,
-            center: true,
-            message: res.msg,
-            type: 'error',
-        })
-    }
-    cancelDialog();
-}
-
 const route = useRoute();
 const id_params = route.params;
 
@@ -355,8 +415,13 @@ const editform = reactive({
         headers: {},
         params: {},
         body: {},
+        time: '',
+        result: '',
+        response: '',
     }],
-    updated_user: localStorage.getItem('name')
+    updated_user: localStorage.getItem('name'),
+    time: '',
+    result: '',
 })
 
 
@@ -370,6 +435,9 @@ const AddStep = () => {
         headers: {},
         params: {},
         body: {},
+        time: '',
+        result: '',
+        response: '',
     });
     headersData.push([]);
     paramsData.push([]);
@@ -430,6 +498,63 @@ const cancelBtn = () => {
     router.push('/apicase/list');
 }
 
+const SelectApi = async (id) => {
+    const APIid = { 'id': id };
+    const res = await getAPIInfo(APIid);
+    if (res.status) {
+        // 测试步骤赋值
+        editform.steps[APIDialog_id.value].name = res.data.name;
+        editform.steps[APIDialog_id.value].method = res.data.method;
+        editform.steps[APIDialog_id.value].uri = res.data.uri;
+        const headers = [];
+        const params = [];
+        const bodys = [];
+        // 请求头
+        for (let key in res.data.headers) {
+            let value = res.data.headers[key];
+            headers.push({
+                headerskey: key,
+                headersvalue: value.value,
+                headersdecription: value.decription
+            });
+        }
+        headersData[APIDialog_id.value] = headers;
+        // 请求参数
+        for (let key in res.data.params) {
+            let value = res.data.params[key];
+            params.push({
+                paramskey: key,
+                paramsvalue: value.value,
+                paramsdecription: value.decription
+            })
+        }
+        paramsData[APIDialog_id.value] = params;
+        // 请求体
+        for (let key in res.data.body) {
+            let value = res.data.body[key];
+            bodys.push({
+                bodykey: key,
+                bodyvalue: value.value,
+                bodydecription: value.decription
+            })
+        }
+        bodyData[APIDialog_id.value] = bodys;
+        // 重置耗时，结果，响应
+        editform.steps[APIDialog_id.value].time = '';
+        editform.steps[APIDialog_id.value].result = '';
+        editform.steps[APIDialog_id.value].response = '';
+    }
+    else {
+        ElMessage({
+            showClose: true,
+            center: true,
+            message: res.msg,
+            type: 'error',
+        })
+    }
+    cancelDialog();
+}
+
 const getCaseInfo = async () => {
     const res = await getAPICaseInfo(id_params);
     if (res.status) {
@@ -439,6 +564,9 @@ const getCaseInfo = async () => {
         editform.level = res.data.case.level;
 
         editform.steps.pop();
+        headersData.pop();
+        paramsData.pop();
+        bodyData.pop();
         // 测试步骤赋值
         for (let i=0; i<res.data.steps.length;i++) {
             AddStep();
@@ -473,7 +601,6 @@ const getCaseInfo = async () => {
                 });
             }
         }
-        // editform.response = res.data.response;
     }
     else {
         ElMessage({
@@ -485,6 +612,8 @@ const getCaseInfo = async () => {
     }
 }
 
+
+
 const ruleFormRef = ref(null);
 // 这个方法是等待表单验证结果，因为返回的是promise.reject,所以要用try去捕捉异常再返回布尔值
 const assertForm = async () => {
@@ -495,7 +624,6 @@ const assertForm = async () => {
         return false
     }
 }
-
 
 const onSubmit = async () => {
     const result = await assertForm();
@@ -519,9 +647,15 @@ const onSubmit = async () => {
 
         for (let i = 0; i < editform.steps.length; i++) {
             editform.steps[i].sort = i;
+            delete editform.steps[i].response;
+            delete editform.steps[i].time;
+            delete editform.steps[i].result;
         }
         // 发送到后端新增数据
         editform.updated_user = localStorage.getItem('name');
+        delete editform.result;
+        delete editform.time;
+        delete editform.env;
         const res = await editAPICase(editform);
         if (res.status) {
             ElMessage({
@@ -531,6 +665,78 @@ const onSubmit = async () => {
                 type: 'success',
             })
             router.push('/apicase/list');
+        }
+        else {
+            ElMessage({
+                showClose: true,
+                center: true,
+                message: res.msg,
+                type: 'error',
+            })
+        }
+    }
+}
+
+const debug = async () => {
+    const result = await assertForm()
+    if (!result) return
+    else {
+        console.log(headersData.length);
+        for (let j = 0; j < headersData.length; j++) {
+            for (let i = 0; i < headersData[j].length; i++) {
+                editform.steps[j].headers[headersData[j][i].headerskey] = { "value": headersData[j][i].headersvalue, "decription": headersData[j][i].headersdecription };
+            }
+        }
+        for (let j = 0; j < headersData.length; j++) {
+            for (let i = 0; i < paramsData[j].length; i++) {
+                editform.steps[j].params[paramsData[j][i].paramskey] = { "value": paramsData[j][i].paramsvalue, "decription": paramsData[j][i].paramsdecription };
+            }
+        }
+        for (let j = 0; j < headersData.length; j++) {
+            for (let i = 0; i < bodyData[j].length; i++) {
+                editform.steps[j].body[bodyData[j][i].bodykey] = { "value": bodyData[j][i].bodyvalue, "decription": bodyData[j][i].bodydecription };
+            }
+        }
+        for (let i = 0; i < headersData.length; i++) {
+            if (headersData[i].length === 0) {
+                editform.steps[i].headers = null;
+            }
+        }
+        for (let i = 0; i < paramsData.length; i++) {
+            if (paramsData[i].length === 0) {
+                editform.steps[i].params = null;
+            }
+        }
+        for (let i = 0; i < bodyData.length; i++) {
+            if (bodyData[i].length === 0) {
+                editform.steps[i].body = null;
+            }
+        }
+
+        for (let i = 0; i < editform.steps.length; i++) {
+            editform.steps[i].sort = i;
+        }
+        editform.env = env.host;
+        // 发送到后端调试
+        const res = await debugAPICase(editform);
+        if (res.status) {
+            for (let i = 0; i < editform.steps.length; i++) {
+                if (res.data.res[i].status) {
+                    editform.steps[i].result = 'success';
+                }
+                else {
+                    editform.steps[i].result = 'error';
+                }
+                editform.steps[i].time = res.data.time[i];
+
+                editform.steps[i].response = res.data.res[i].status + '\n' + res.data.res[i].status_code + '\n' + res.data.res[i].response;
+            }
+            ElMessage({
+                showClose: true,
+                center: true,
+                message: res.msg,
+                type: 'success',
+            })
         }
         else {
             ElMessage({

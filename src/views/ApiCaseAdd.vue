@@ -33,7 +33,7 @@
             </el-col>
             <el-col :span="8">
                 <el-button type="primary" @click="goToSelectEnv">运行环境</el-button>
-                <span>
+                <span style="margin-left: 10px;">
                     {{ env.host }}
                 </span>
             </el-col>
@@ -90,9 +90,9 @@
                                 <el-text class="mx-1">ms</el-text>
 
 
-                                <el-text class="mx-1">结果：</el-text>
-                                <el-text class="mx-1" v-if="step.result==='success'" type="success" >{{ step.result }}</el-text>
-                                <el-text class="mx-1" v-else type="danger" >{{ step.result }}</el-text>
+                                <el-text class="mx-1" style="margin-left: 5px;">结果：</el-text>
+                                <el-text class="mx-1" v-if="step.result==='success'" type="success" style="margin-right: 5px;">{{ step.result }}</el-text>
+                                <el-text class="mx-1" v-else type="danger" style="margin-right: 5px;">{{ step.result }}</el-text>
 
 
                                 <el-button class="mt-2" type="danger" @click.prevent="removeDomain(step)"
@@ -441,7 +441,7 @@ const removeDomain = (step) => {
     }
 }
 
-let headersData = reactive(
+const headersData = reactive(
     [[]]
 );
 
@@ -599,6 +599,7 @@ const onSubmit = async () => {
         addForm.updated_user = localStorage.getItem('name');
         delete addForm.result;
         delete addForm.time;
+        delete addForm.env;
         const res = await addAPICase(addForm);
         if (res.status) {
             ElMessage({
@@ -624,6 +625,7 @@ const debug = async () => {
     const result = await assertForm()
     if (!result) return
     else {
+        console.log(headersData.length);
         for (let j = 0; j < headersData.length; j++) {
             for (let i = 0; i < headersData[j].length; i++) {
                 addForm.steps[j].headers[headersData[j][i].headerskey] = { "value": headersData[j][i].headersvalue, "decription": headersData[j][i].headersdecription };
@@ -644,12 +646,12 @@ const debug = async () => {
                 addForm.steps[i].headers = null;
             }
         }
-        for (let i = 0; i < headersData.length; i++) {
+        for (let i = 0; i < paramsData.length; i++) {
             if (paramsData[i].length === 0) {
                 addForm.steps[i].params = null;
             }
         }
-        for (let i = 0; i < headersData.length; i++) {
+        for (let i = 0; i < bodyData.length; i++) {
             if (bodyData[i].length === 0) {
                 addForm.steps[i].body = null;
             }
@@ -662,7 +664,6 @@ const debug = async () => {
         // 发送到后端调试
         const res = await debugAPICase(addForm);
         if (res.status) {
-            console.log(res.data.res, res.data.time);
             for (let i = 0; i < addForm.steps.length; i++) {
                 if (res.data.res[i].status) {
                     addForm.steps[i].result = 'success';
