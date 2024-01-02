@@ -493,33 +493,43 @@ const SelectApi = async (id) => {
         addForm.steps[APIDialog_id.value].name = res.data.name;
         addForm.steps[APIDialog_id.value].method = res.data.method;
         addForm.steps[APIDialog_id.value].uri = res.data.uri;
+        const headers = [];
+        const params = [];
+        const bodys = [];
         // 请求头
         for (let key in res.data.headers) {
             let value = res.data.headers[key];
-            headersData[APIDialog_id.value].push({
+            headers.push({
                 headerskey: key,
                 headersvalue: value.value,
                 headersdecription: value.decription
             });
         }
+        headersData[APIDialog_id.value] = headers;
         // 请求参数
         for (let key in res.data.params) {
             let value = res.data.params[key];
-            paramsData[APIDialog_id.value].push({
+            params.push({
                 paramskey: key,
                 paramsvalue: value.value,
                 paramsdecription: value.decription
-            });
+            })
         }
+        paramsData[APIDialog_id.value] = params;
         // 请求体
         for (let key in res.data.body) {
             let value = res.data.body[key];
-            bodyData[APIDialog_id.value].push({
+            bodys.push({
                 bodykey: key,
                 bodyvalue: value.value,
                 bodydecription: value.decription
-            });
+            })
         }
+        bodyData[APIDialog_id.value] = bodys;
+        // 重置耗时，结果，响应
+        addForm.steps[APIDialog_id.value].time = '';
+        addForm.steps[APIDialog_id.value].result = '';
+        addForm.steps[APIDialog_id.value].response = '';
     }
     else {
         ElMessage({
