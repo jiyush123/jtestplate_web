@@ -624,6 +624,16 @@ const onSubmit = async () => {
 }
 
 const debug = async () => {
+    addForm.env = env.host;
+    if(addForm.env === undefined){
+        ElMessage({
+                showClose: true,
+                center: true,
+                message: '请选择运行环境',
+                type: 'error',
+            })
+        return
+    }
     const result = await assertForm()
     if (!result) return
     else {
@@ -662,7 +672,6 @@ const debug = async () => {
         for (let i = 0; i < addForm.steps.length; i++) {
             addForm.steps[i].sort = i;
         }
-        addForm.env = env.host;
         // 发送到后端调试
         const res = await debugAPICase(addForm);
         if (res.status) {
