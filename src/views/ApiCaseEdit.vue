@@ -166,7 +166,17 @@
                                     </el-table-column>
                                     <el-table-column prop="paramsvalue" label="Values">
                                         <template #default="scope">
-                                            <el-input v-model="paramsData[index][scope.$index].paramsvalue" />
+                                            <el-input v-model="paramsData[index][scope.$index].paramsvalue"
+                                                class="input-with-select">
+                                                <template #prepend>
+                                                    <el-select v-model="paramsData[index][scope.$index].paramDataType"
+                                                        style="width: 100px">
+                                                        <el-option label="string" value="string" />
+                                                        <el-option label="int" value="int" />
+                                                        <el-option label="bool" value="bool" />
+                                                    </el-select>
+                                                </template>
+                                            </el-input>
                                         </template>
                                     </el-table-column>
                                     <el-table-column prop="paramsdecription" label="描述">
@@ -193,7 +203,17 @@
                                     </el-table-column>
                                     <el-table-column prop="bodyvalue" label="Values">
                                         <template #default="scope">
-                                            <el-input v-model="bodyData[index][scope.$index].bodyvalue" />
+                                            <el-input v-model="bodyData[index][scope.$index].bodyvalue"
+                                                class="input-with-select">
+                                                <template #prepend>
+                                                    <el-select v-model="bodyData[index][scope.$index].bodyDataType"
+                                                        style="width: 100px">
+                                                        <el-option label="string" value="string" />
+                                                        <el-option label="int" value="int" />
+                                                        <el-option label="bool" value="bool" />
+                                                    </el-select>
+                                                </template>
+                                            </el-input>
                                         </template>
                                     </el-table-column>
                                     <el-table-column prop="bodydecription" label="描述">
@@ -223,7 +243,17 @@
                                     </el-table-column>
                                     <el-table-column prop="assertvalue" label="期望值">
                                         <template #default="scope">
-                                            <el-input v-model="assertData[index][scope.$index].assertvalue" />
+                                            <el-input v-model="assertData[index][scope.$index].assertvalue"
+                                                class="input-with-select">
+                                                <template #prepend>
+                                                    <el-select v-model="assertData[index][scope.$index].assertDataType"
+                                                        style="width: 100px">
+                                                        <el-option label="string" value="string" />
+                                                        <el-option label="int" value="int" />
+                                                        <el-option label="bool" value="bool" />
+                                                    </el-select>
+                                                </template>
+                                            </el-input>
                                         </template>
                                     </el-table-column>
                                     <el-table-column prop="assertdecription" label="描述">
@@ -329,6 +359,10 @@
 
 .debugBtn {
     justify-content: flex-end;
+}
+
+.input-with-select .el-input-group__prepend {
+    background-color: var(--el-fill-color-blank);
 }
 </style>
 
@@ -531,6 +565,7 @@ const delHeader = (index, delindex) => {
 
 const addParams = (index) => {
     paramsData[index].push({
+        paramDataType: 'string'
     })
 }
 
@@ -540,6 +575,7 @@ const delParam = (index, delindex) => {
 
 const addBody = (index) => {
     bodyData[index].push({
+        bodyDataType: 'string'
     })
 }
 
@@ -549,6 +585,7 @@ const delBody = (index, delindex) => {
 
 const addAssert = (index) => {
     assertData[index].push({
+        assertDataType: 'string'
     })
 }
 
@@ -707,16 +744,34 @@ const onSubmit = async () => {
         }
         for (let j = 0; j < paramsData.length; j++) {
             for (let i = 0; i < paramsData[j].length; i++) {
+                if (paramsData[j][i].paramDataType === 'int') {
+                    paramsData[j][i].paramsvalue = Number(paramsData[j][i].paramsvalue);
+                }
+                else if (paramsData[j][i].paramDataType === 'bool') {
+                    paramsData[j][i].paramsvalue = Boolean(paramsData[j][i].paramsvalue);
+                }
                 editform.steps[j].params[paramsData[j][i].paramskey] = { "value": paramsData[j][i].paramsvalue, "decription": paramsData[j][i].paramsdecription };
             }
         }
         for (let j = 0; j < bodyData.length; j++) {
             for (let i = 0; i < bodyData[j].length; i++) {
+                if (bodyData[j][i].bodyDataType === 'int') {
+                    bodyData[j][i].bodyvalue = Number(bodyData[j][i].bodyvalue);
+                }
+                else if (bodyData[j][i].bodyDataType === 'bool') {
+                    bodyData[j][i].bodyvalue = Boolean(bodyData[j][i].bodyvalue);
+                }
                 editform.steps[j].body[bodyData[j][i].bodykey] = { "value": bodyData[j][i].bodyvalue, "decription": bodyData[j][i].bodydecription };
             }
         }
         for (let j = 0; j < assertData.length; j++) {
             for (let i = 0; i < assertData[j].length; i++) {
+                if (assertData[j][i].assertDataType === 'int') {
+                    assertData[j][i].assertvalue = Number(assertData[j][i].assertvalue);
+                }
+                else if (assertData[j][i].assertDataType === 'bool') {
+                    assertData[j][i].assertvalue = Boolean(assertData[j][i].assertvalue);
+                }
                 editform.steps[j].assert_result[assertData[j][i].assertkey] = { "value": assertData[j][i].assertvalue, "decription": assertData[j][i].assertdecription };
             }
         }
@@ -795,16 +850,34 @@ const debug = async () => {
         }
         for (let j = 0; j < paramsData.length; j++) {
             for (let i = 0; i < paramsData[j].length; i++) {
+                if (paramsData[j][i].paramDataType === 'int') {
+                    paramsData[j][i].paramsvalue = Number(paramsData[j][i].paramsvalue);
+                }
+                else if (paramsData[j][i].paramDataType === 'bool') {
+                    paramsData[j][i].paramsvalue = Boolean(paramsData[j][i].paramsvalue);
+                }
                 editform.steps[j].params[paramsData[j][i].paramskey] = { "value": paramsData[j][i].paramsvalue, "decription": paramsData[j][i].paramsdecription };
             }
         }
         for (let j = 0; j < bodyData.length; j++) {
             for (let i = 0; i < bodyData[j].length; i++) {
+                if (bodyData[j][i].bodyDataType === 'int') {
+                    bodyData[j][i].bodyvalue = Number(bodyData[j][i].bodyvalue);
+                }
+                else if (bodyData[j][i].bodyDataType === 'bool') {
+                    bodyData[j][i].bodyvalue = Boolean(bodyData[j][i].bodyvalue);
+                }
                 editform.steps[j].body[bodyData[j][i].bodykey] = { "value": bodyData[j][i].bodyvalue, "decription": bodyData[j][i].bodydecription };
             }
         }
         for (let j = 0; j < assertData.length; j++) {
             for (let i = 0; i < assertData[j].length; i++) {
+                if (assertData[j][i].assertDataType === 'int') {
+                    assertData[j][i].assertvalue = Number(assertData[j][i].assertvalue);
+                }
+                else if (assertData[j][i].assertDataType === 'bool') {
+                    assertData[j][i].assertvalue = Boolean(assertData[j][i].assertvalue);
+                }
                 editform.steps[j].assert_result[assertData[j][i].assertkey] = { "value": assertData[j][i].assertvalue, "decription": assertData[j][i].assertdecription };
             }
         }
