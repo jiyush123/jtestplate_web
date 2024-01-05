@@ -701,25 +701,21 @@ const onSubmit = async () => {
     if (!result) return
     else {
         for (let j = 0; j < headersData.length; j++) {
-            editform.steps[j].headers = {};
             for (let i = 0; i < headersData[j].length; i++) {
                 editform.steps[j].headers[headersData[j][i].headerskey] = { "value": headersData[j][i].headersvalue, "decription": headersData[j][i].headersdecription };
             }
         }
         for (let j = 0; j < paramsData.length; j++) {
-            editform.steps[j].params = {};
             for (let i = 0; i < paramsData[j].length; i++) {
                 editform.steps[j].params[paramsData[j][i].paramskey] = { "value": paramsData[j][i].paramsvalue, "decription": paramsData[j][i].paramsdecription };
             }
         }
         for (let j = 0; j < bodyData.length; j++) {
-            editform.steps[j].body = {};
             for (let i = 0; i < bodyData[j].length; i++) {
                 editform.steps[j].body[bodyData[j][i].bodykey] = { "value": bodyData[j][i].bodyvalue, "decription": bodyData[j][i].bodydecription };
             }
         }
         for (let j = 0; j < assertData.length; j++) {
-            editform.steps[j].assert_result = {};
             for (let i = 0; i < assertData[j].length; i++) {
                 editform.steps[j].assert_result[assertData[j][i].assertkey] = { "value": assertData[j][i].assertvalue, "decription": assertData[j][i].assertdecription };
             }
@@ -859,7 +855,9 @@ const debug = async () => {
                 editform.steps[i].time = res.data.time[i];
 
                 const response = JSON.stringify(res.data.res[i].response, null, 2);
-                editform.steps[i].response = res.data.res[i].status + '\n' + res.data.res[i].status_code + '\n' + response;
+                editform.steps[i].response = 'status:' + res.data.res[i].status + '\n'
+                    + 'status_code:' + res.data.res[i].status_code + '\n'
+                    + 'response:' + response;
             }
             editform.time = parseFloat(
                 res.data.time.reduce(function (accumulator, currentValue) {
@@ -883,6 +881,12 @@ const debug = async () => {
                 message: res.msg,
                 type: 'error',
             })
+        }
+        for (let i = 0; i < editform.steps.length; i++) {
+            editform.steps[i].headers = {}; // 调试后需要重置，不然修改参数会新增多一条数据
+            editform.steps[i].params = {}; // 调试后需要重置，不然修改参数会新增多一条数据
+            editform.steps[i].body = {}; // 调试后需要重置，不然修改参数会新增多一条数据
+            editform.steps[i].assert_result = {}; // 调试后需要重置，不然修改参数会新增多一条数据
         }
     }
 }

@@ -617,25 +617,21 @@ const onSubmit = async () => {
     if (!result) return
     else {
         for (let j = 0; j < headersData.length; j++) {
-            addForm.steps[j].headers = {}; // 调试后需要重置，不然修改参数会新增多一条数据
             for (let i = 0; i < headersData[j].length; i++) {
                 addForm.steps[j].headers[headersData[j][i].headerskey] = { "value": headersData[j][i].headersvalue, "decription": headersData[j][i].headersdecription };
             }
         }
         for (let j = 0; j < paramsData.length; j++) {
-            addForm.steps[j].params = {};
             for (let i = 0; i < paramsData[j].length; i++) {
                 addForm.steps[j].params[paramsData[j][i].paramskey] = { "value": paramsData[j][i].paramsvalue, "decription": paramsData[j][i].paramsdecription };
             }
         }
         for (let j = 0; j < bodyData.length; j++) {
-            addForm.steps[j].body = {};
             for (let i = 0; i < bodyData[j].length; i++) {
                 addForm.steps[j].body[bodyData[j][i].bodykey] = { "value": bodyData[j][i].bodyvalue, "decription": bodyData[j][i].bodydecription };
             }
         }
         for (let j = 0; j < assertData.length; j++) {
-            addForm.steps[j].assert_result = {};
             for (let i = 0; i < assertData[j].length; i++) {
                 addForm.steps[j].assert_result[assertData[j][i].assertkey] = { "value": assertData[j][i].assertvalue, "decription": assertData[j][i].assertdecription };
             }
@@ -769,17 +765,19 @@ const debug = async () => {
                     }
                 }
                 // 步骤断言结果是否包含error，包含将步骤结果设置为error，并用例变成error
-                if (res.data.res[i].result.includes('error')){
+                if (res.data.res[i].result.includes('error')) {
                     addForm.steps[i].result = 'error';
                     addForm.result = 'error';
                 }
-                else{
+                else {
                     addForm.steps[i].result = 'success';
                 }
-                
+
                 addForm.steps[i].time = res.data.time[i];
                 const response = JSON.stringify(res.data.res[i].response, null, 2);
-                addForm.steps[i].response = res.data.res[i].status + '\n' + res.data.res[i].status_code + '\n' + response;
+                addForm.steps[i].response = 'status:' + res.data.res[i].status + '\n'
+                    + 'status_code:' + res.data.res[i].status_code + '\n'
+                    + 'response:' + response;
             }
             addForm.time = parseFloat(
                 res.data.time.reduce(function (accumulator, currentValue) {
@@ -805,6 +803,12 @@ const debug = async () => {
                 message: res.msg,
                 type: 'error',
             })
+        }
+        for (let i = 0; i < addForm.steps.length; i++) {
+            addForm.steps[i].headers = {}; // 调试后需要重置，不然修改参数会新增多一条数据
+            addForm.steps[i].params = {}; // 调试后需要重置，不然修改参数会新增多一条数据
+            addForm.steps[i].body = {}; // 调试后需要重置，不然修改参数会新增多一条数据
+            addForm.steps[i].assert_result = {}; // 调试后需要重置，不然修改参数会新增多一条数据
         }
     }
 }
