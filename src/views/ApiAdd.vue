@@ -134,21 +134,59 @@
         </el-form-item>
         <el-button type="primary" @click="addBody" style="margin-left: 50px;margin-bottom: 10px;">新增body参数</el-button>
         <el-form-item label="响应">
-            <el-input v-model="addform.api_response" type="textarea" />
+            <el-input v-model="addform.response" type="textarea" />
         </el-form-item>
 
         <el-form-item>
+            <el-button type="primary" @click="goToSelectEnv">调试</el-button>
+            <el-button @click="drawer = true">打开调试结果</el-button>
             <el-button type="primary" @click="onSubmit(ruleFormRef)">保存</el-button>
             <el-button @click="cancelBtn">取消</el-button>
         </el-form-item>
     </el-form>
+    <!-- 弹窗 -->
+    <el-dialog v-model="Dialog" title="选择运行环境" width="40%" align-center @close="cancelDialog(formRef)">
+        <el-form :model="formdata" label-width="80px" ref="formRef">
+            <el-form-item label="运行环境" prop="host" :rules="[
+                { required: true, message: '请选择运行环境' },
+            ]">
+                <el-select v-model="formdata.host" filterable placeholder="请选择" style="width: 400px;">
+                    <el-option v-for="item in envOptions" :key="item.id"
+                        :label="item.name + '    ' + item.protocol + '://' + item.host + ':' + item.port"
+                        :value="item.protocol + '://' + item.host + ':' + item.port">
+
+                        <span style="float: left">{{ item.name }}</span>
+                        <span style="float: right;font-size: 13px;">
+                            {{ item.protocol + '://' + item.host + ':' + item.port }}
+                        </span>
+                    </el-option>
+                </el-select>
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="cancelDialog(formRef)">取消</el-button>
+                <el-button type="primary" @click="debug">
+                    运行
+                </el-button>
+            </span>
+        </template>
+    </el-dialog>
+    <!-- 调试结果侧边弹窗 -->
+    <el-drawer v-model="drawer" title="调试结果">
+        <span>status:{{ debug_res.status }}</span><br>
+        <span>status_code:{{ debug_res.status_code }}</span><br>
+        <span>response:</span>
+        <pre>{{ debug_res.response }}</pre>
+    </el-drawer>
 </template>
+
+
 
 <style>
 .apiform {
     width: 60%;
     margin: auto
-
 }
 
 .apiform .el-table .el-input {
@@ -162,11 +200,25 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import { addAPI, getModuleList } from '../http/api'
+import { addAPI, getModuleList, debugAPI, getEnvironmentList } from '../http/api'
 import { ElMessage } from 'element-plus'
 import router from "../router/index"
 
 const moduleOptions = ref(null);
+// 这里是弹窗选择环境的参数
+const Dialog = ref(false);
+const formRef = ref(null);
+const formdata = reactive({
+    host: ''
+})
+const envOptions = ref(null);
+// 这里是调试结果弹窗
+const drawer = ref(false);
+const debug_res = reactive({
+    status: '',
+    status_code:'',
+    response:''
+})
 
 const headersData = reactive(
     []
@@ -220,11 +272,11 @@ const onSubmit = async () => {
             }
             else if (paramsData[i].paramDataType === 'bool') {
                 if (paramsData[i].paramsvalue === 'false') {
-                        paramsData[i].paramsvalue = false;
-                    }
-                    else {
-                        paramsData[i].paramsvalue = true;
-                    }
+                    paramsData[i].paramsvalue = false;
+                }
+                else {
+                    paramsData[i].paramsvalue = true;
+                }
             }
             addform.params[paramsData[i].paramskey] = { "value": paramsData[i].paramsvalue, "decription": paramsData[i].paramsdecription };
         }
@@ -235,10 +287,10 @@ const onSubmit = async () => {
             else if (bodyData[i].bodyDataType === 'bool') {
                 if (bodyData[i].bodyvalue === 'false') {
                     bodyData[i].bodyvalue = false;
-                    }
-                    else {
-                        bodyData[i].bodyvalue = true;
-                    }
+                }
+                else {
+                    bodyData[i].bodyvalue = true;
+                }
             }
             addform.body[bodyData[i].bodykey] = { "value": bodyData[i].bodyvalue, "decription": bodyData[i].bodydecription };
         }
@@ -321,6 +373,111 @@ const getModuleFun = async () => {
             message: '请求失败',
             type: 'error',
         })
+    }
+}
+
+const goToSelectEnv = () => {
+
+    Dialog.value = true;
+    getEnvironmentFun();
+}
+
+const getEnvironmentFun = async () => {
+    // 发送到后端获取环境列表数据
+    const res = await getEnvironmentList({ 'size': 100, 'page': 1 });
+    if (res.status == true) {
+        envOptions.value = res.data;
+    }
+    else {
+        ElMessage({
+            showClose: true,
+            center: true,
+            message: '请求失败',
+            type: 'error',
+        })
+    }
+}
+
+const cancelDialog = (formEl) => {
+    // 取消弹窗，重置
+    Dialog.value = false;
+    if (!formEl) return
+    formEl.resetFields();
+}
+
+const debug = async () => {
+    addform.host = formdata.host;
+    if (addform.host === undefined) {
+        ElMessage({
+            showClose: true,
+            center: true,
+            message: '请选择运行环境',
+            type: 'error',
+        })
+        return
+    }
+    const result = await assertForm();
+    if (!result) return
+    else {
+        for (let i = 0; i < headersData.length; i++) {
+            addform.headers[headersData[i].headerskey] = { "value": headersData[i].headersvalue };
+        }
+        for (let i = 0; i < paramsData.length; i++) {
+            if (paramsData[i].paramDataType === 'int') {
+                paramsData[i].paramsvalue = Number(paramsData[i].paramsvalue);
+            }
+            else if (paramsData[i].paramDataType === 'bool') {
+                if (paramsData[i].paramsvalue === 'false') {
+                    paramsData[i].paramsvalue = false;
+                }
+                else {
+                    paramsData[i].paramsvalue = true;
+                }
+            }
+            addform.params[paramsData[i].paramskey] = { "value": paramsData[i].paramsvalue };
+        }
+        for (let i = 0; i < bodyData.length; i++) {
+            if (bodyData[i].paramDataType === 'int') {
+                bodyData[i].paramsvalue = Number(bodyData[i].bodyvalue);
+            }
+            else if (bodyData[i].bodyDataType === 'bool') {
+                if (bodyData[i].bodyvalue === 'false') {
+                    bodyData[i].bodyvalue = false;
+                }
+                else {
+                    bodyData[i].bodyvalue = true;
+                }
+            }
+            addform.body[bodyData[i].bodykey] = { "value": bodyData[i].bodyvalue };
+        }
+        // 发送调试
+        const res = await debugAPI(addform);
+        if (res.status) {
+            const response = JSON.stringify(res.response, null, 2);
+            debug_res.response = response;
+            debug_res.status_code = res.status_code;
+            debug_res.status = res.status;
+            
+            drawer.value = true;
+            ElMessage({
+                showClose: true,
+                center: true,
+                message: res.msg,
+                type: 'success',
+            })
+        }
+        else {
+            ElMessage({
+                showClose: true,
+                center: true,
+                message: res.msg,
+                type: 'error',
+            })
+        }
+        addform.headers = {}; // 调试后需要重置，不然修改参数会新增多一条数据
+        addform.params = {}; // 调试后需要重置，不然修改参数会新增多一条数据
+        addform.body = {}; // 调试后需要重置，不然修改参数会新增多一条数据
+        cancelDialog();
     }
 }
 
