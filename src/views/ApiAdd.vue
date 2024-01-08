@@ -67,18 +67,26 @@
         <el-button type="primary" @click="addHeader" style="margin-left: 50px;margin-bottom: 10px;">新增请求头参数</el-button>
         <!-- 请求参数 -->
         <el-form-item label="Params">
-            <el-table :data="paramsData" border style="width: 700px">
-                <el-table-column prop="paramskey" label="Keys" width='200'>
+            <el-table :data="paramsData" border style="width: 100%">
+                <el-table-column prop="paramskey" label="Keys">
                     <template #default="scope">
                         <el-input v-model="paramsData[scope.$index].paramskey" />
                     </template>
                 </el-table-column>
-                <el-table-column prop="paramsvalue" label="Values" width='200'>
+                <el-table-column prop="paramsvalue" label="Values">
                     <template #default="scope">
-                        <el-input v-model="paramsData[scope.$index].paramsvalue" />
+                        <el-input v-model="paramsData[scope.$index].paramsvalue" class="input-with-select">
+                            <template #prepend>
+                                <el-select v-model="paramsData[scope.$index].paramDataType" style="width: 100px">
+                                    <el-option label="string" value="string" />
+                                    <el-option label="int" value="int" />
+                                    <el-option label="bool" value="bool" />
+                                </el-select>
+                            </template>
+                        </el-input>
                     </template>
                 </el-table-column>
-                <el-table-column prop="paramsdecription" label="描述" width='200'>
+                <el-table-column prop="paramsdecription" label="描述">
                     <template #default="scope">
                         <el-input v-model="paramsData[scope.$index].paramsdecription" />
                     </template>
@@ -93,18 +101,26 @@
         <el-button type="primary" @click="addParams" style="margin-left: 50px;margin-bottom: 10px;">新增params参数</el-button>
         <!-- 请求体 -->
         <el-form-item label="Body">
-            <el-table :data="bodyData" border style="width: 700px">
-                <el-table-column prop="bodykey" label="Keys" width='200'>
+            <el-table :data="bodyData" border style="width: 100%">
+                <el-table-column prop="bodykey" label="Keys">
                     <template #default="scope">
                         <el-input v-model="bodyData[scope.$index].bodykey" />
                     </template>
                 </el-table-column>
-                <el-table-column prop="bodyvalue" label="Values" width='200'>
+                <el-table-column prop="bodyvalue" label="Values">
                     <template #default="scope">
-                        <el-input v-model="bodyData[scope.$index].bodyvalue" />
+                        <el-input v-model="bodyData[scope.$index].bodyvalue" class="input-with-select">
+                            <template #prepend>
+                                <el-select v-model="bodyData[scope.$index].bodyDataType" style="width: 100px">
+                                    <el-option label="string" value="string" />
+                                    <el-option label="int" value="int" />
+                                    <el-option label="bool" value="bool" />
+                                </el-select>
+                            </template>
+                        </el-input>
                     </template>
                 </el-table-column>
-                <el-table-column prop="bodydecription" label="描述" width='200'>
+                <el-table-column prop="bodydecription" label="描述">
                     <template #default="scope">
                         <el-input v-model="bodyData[scope.$index].bodydecription" />
                     </template>
@@ -130,12 +146,17 @@
 
 <style>
 .apiform {
-    margin: 50px 200px auto 200px;
+    width: 60%;
+    margin: auto
 
 }
 
 .apiform .el-table .el-input {
     width: 95%;
+}
+
+.input-with-select .el-input-group__prepend {
+    background-color: var(--el-fill-color-blank);
 }
 </style>
 
@@ -194,9 +215,31 @@ const onSubmit = async () => {
             addform.headers[headersData[i].headerskey] = { "value": headersData[i].headersvalue, "decription": headersData[i].headersdecription };
         }
         for (let i = 0; i < paramsData.length; i++) {
+            if (paramsData[i].paramDataType === 'int') {
+                paramsData[i].paramsvalue = Number(paramsData[i].paramsvalue);
+            }
+            else if (paramsData[i].paramDataType === 'bool') {
+                if (paramsData[i].paramsvalue === 'false') {
+                        paramsData[i].paramsvalue = false;
+                    }
+                    else {
+                        paramsData[i].paramsvalue = true;
+                    }
+            }
             addform.params[paramsData[i].paramskey] = { "value": paramsData[i].paramsvalue, "decription": paramsData[i].paramsdecription };
         }
         for (let i = 0; i < bodyData.length; i++) {
+            if (bodyData[i].bodyDataType === 'int') {
+                bodyData[i].bodyvalue = Number(bodyData[i].bodyvalue);
+            }
+            else if (bodyData[i].bodyDataType === 'bool') {
+                if (bodyData[i].bodyvalue === 'false') {
+                    bodyData[i].bodyvalue = false;
+                    }
+                    else {
+                        bodyData[i].bodyvalue = true;
+                    }
+            }
             addform.body[bodyData[i].bodykey] = { "value": bodyData[i].bodyvalue, "decription": bodyData[i].bodydecription };
         }
         if (headersData.length === 0) {
@@ -247,6 +290,7 @@ const delHeader = (index) => {
 
 const addParams = () => {
     paramsData.push({
+        paramDataType: 'string'
     })
 }
 
@@ -256,6 +300,7 @@ const delParam = (index) => {
 
 const addBody = () => {
     bodyData.push({
+        bodyDataType: 'string'
     })
 }
 

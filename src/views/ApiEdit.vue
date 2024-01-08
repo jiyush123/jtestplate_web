@@ -77,7 +77,6 @@
                 <el-button type="primary" @click="addHeader"
                     style="margin-left: 50px;margin-bottom: 10px;">新增请求头参数</el-button>
                 <el-form-item label="Params">
-                    <!-- 用表格实现Params参数定义 -->
                     <el-table :data="paramsData" border style="width: 700px">
                         <el-table-column prop="paramskey" label="Keys" width='200'>
                             <template #default="scope">
@@ -86,8 +85,16 @@
                         </el-table-column>
                         <el-table-column prop="paramsvalue" label="Values" width='200'>
                             <template #default="scope">
-                                <el-input v-model="paramsData[scope.$index].paramsvalue" />
+                        <el-input v-model="paramsData[scope.$index].paramsvalue" class="input-with-select">
+                            <template #prepend>
+                                <el-select v-model="paramsData[scope.$index].paramDataType" style="width: 100px">
+                                    <el-option label="string" value="string" />
+                                    <el-option label="int" value="int" />
+                                    <el-option label="bool" value="bool" />
+                                </el-select>
                             </template>
+                        </el-input>
+                    </template>
                         </el-table-column>
                         <el-table-column prop="paramsdecription" label="描述" width='200'>
                             <template #default="scope">
@@ -112,8 +119,16 @@
                         </el-table-column>
                         <el-table-column prop="bodyvalue" label="Values" width='200'>
                             <template #default="scope">
-                                <el-input v-model="bodyData[scope.$index].bodyvalue" />
+                        <el-input v-model="bodyData[scope.$index].bodyvalue" class="input-with-select">
+                            <template #prepend>
+                                <el-select v-model="bodyData[scope.$index].bodyDataType" style="width: 100px">
+                                    <el-option label="string" value="string" />
+                                    <el-option label="int" value="int" />
+                                    <el-option label="bool" value="bool" />
+                                </el-select>
                             </template>
+                        </el-input>
+                    </template>
                         </el-table-column>
                         <el-table-column prop="bodydecription" label="描述" width='200'>
                             <template #default="scope">
@@ -250,7 +265,11 @@
     </el-tabs>
 </template>
 
-<style></style>
+<style>
+.input-with-select .el-input-group__prepend {
+    background-color: var(--el-fill-color-blank);
+}
+</style>
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
@@ -286,6 +305,14 @@ let status = new Map();
 status.set('未开始', '1');
 status.set('进行中', '2');
 status.set('已完成', '3');
+
+// 创建一个数据类型作映射
+let data_type = new Map();
+
+// 添加键值对，让获取的数据类型匹配列表选项
+data_type.set('number', 'int');
+data_type.set('string', 'string');
+data_type.set('boolean', 'bool');
 
 const editform = reactive({
     name: '',
@@ -342,15 +369,18 @@ const getInfo = async () => {
             let value = res.data.params[key];
             paramsData.push({
                 paramskey: key,
+                paramDataType: data_type.get(typeof(value.value)),
                 paramsvalue: value.value,
                 paramsdecription: value.decription
             });
+            console.log(paramsData);
         }
         // 请求体
         for (let key in res.data.body) {
             let value = res.data.body[key];
             bodyData.push({
                 bodykey: key,
+                bodyDataType: data_type.get(typeof(value.value)),
                 bodyvalue: value.value,
                 bodydecription: value.decription
             });
@@ -397,9 +427,31 @@ const onSubmit = async () => {
             editform.headers[headersData[i].headerskey] = { "value": headersData[i].headersvalue, "decription": headersData[i].headersdecription };
         }
         for (let i = 0; i < paramsData.length; i++) {
+            if (paramsData[i].paramDataType === 'int') {
+                paramsData[i].paramsvalue = Number(paramsData[i].paramsvalue);
+            }
+            else if (paramsData[i].paramDataType === 'bool') {
+                if (paramsData[i].paramsvalue === 'false') {
+                        paramsData[i].paramsvalue = false;
+                    }
+                    else {
+                        paramsData[i].paramsvalue = true;
+                    }
+            }
             editform.params[paramsData[i].paramskey] = { "value": paramsData[i].paramsvalue, "decription": paramsData[i].paramsdecription };
         }
         for (let i = 0; i < bodyData.length; i++) {
+            if (bodyData[i].bodyDataType === 'int') {
+                bodyData[i].bodyvalue = Number(bodyData[i].bodyvalue);
+            }
+            else if (bodyData[i].bodyDataType === 'bool') {
+                if (bodyData[i].bodyvalue === 'false') {
+                    bodyData[i].bodyvalue = false;
+                    }
+                    else {
+                        bodyData[i].bodyvalue = true;
+                    }
+            }
             editform.body[bodyData[i].bodykey] = { "value": bodyData[i].bodyvalue, "decription": bodyData[i].bodydecription };
         }
         // 发送到后端新增用户数据
@@ -440,6 +492,7 @@ const delHeader = (index) => {
 
 const addParams = () => {
     paramsData.push({
+        paramDataType: 'string'
     })
 }
 
@@ -449,6 +502,7 @@ const delParam = (index) => {
 
 const addBody = () => {
     bodyData.push({
+        bodyDataType: 'string'
     })
 }
 
