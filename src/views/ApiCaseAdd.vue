@@ -162,8 +162,7 @@
                                             <el-input v-model="paramsData[index][scope.$index].paramsvalue"
                                                 class="input-with-select">
                                                 <template #prepend>
-                                                    <el-select v-model="paramsData[index][scope.$index].paramDataType"
-                                                        style="width: 100px">
+                                                    <el-select v-model="paramsData[index][scope.$index].paramDataType">
                                                         <el-option label="string" value="string" />
                                                         <el-option label="int" value="int" />
                                                         <el-option label="bool" value="bool" />
@@ -199,8 +198,7 @@
                                             <el-input v-model="bodyData[index][scope.$index].bodyvalue"
                                                 class="input-with-select">
                                                 <template #prepend>
-                                                    <el-select v-model="bodyData[index][scope.$index].bodyDataType"
-                                                        style="width: 100px">
+                                                    <el-select v-model="bodyData[index][scope.$index].bodyDataType">
                                                         <el-option label="string" value="string" />
                                                         <el-option label="int" value="int" />
                                                         <el-option label="bool" value="bool" />
@@ -239,8 +237,7 @@
                                             <el-input v-model="assertData[index][scope.$index].assertvalue"
                                                 class="input-with-select">
                                                 <template #prepend>
-                                                    <el-select v-model="assertData[index][scope.$index].assertDataType"
-                                                        style="width: 100px">
+                                                    <el-select v-model="assertData[index][scope.$index].assertDataType">
                                                         <el-option label="string" value="string" />
                                                         <el-option label="int" value="int" />
                                                         <el-option label="bool" value="bool" />
@@ -254,7 +251,7 @@
                                             <el-input v-model="assertData[index][scope.$index].assertdecription" />
                                         </template>
                                     </el-table-column>
-                                    <el-table-column prop="assertresult" label="结果">
+                                    <el-table-column prop="assertresult" label="结果" width="100">
                                         <template #default="scope">
                                             <el-input v-model="assertData[index][scope.$index].assertresult" disabled />
                                         </template>
@@ -324,7 +321,7 @@
 
 <style>
 .api_case_form {
-    width: 60%;
+    width: 70%;
     margin: auto
 }
 
@@ -357,6 +354,10 @@
 .input-with-select .el-input-group__prepend {
     background-color: var(--el-fill-color-blank);
 }
+
+.input-with-select .el-select{
+    width: 80px;
+}
 </style>
 
 <script setup>
@@ -376,6 +377,14 @@ const envdata = reactive({
 })
 
 const env = reactive({})
+
+// 创建一个数据类型作映射
+let data_type = new Map();
+
+// 添加键值对，让获取的数据类型匹配列表选项
+data_type.set('number', 'int');
+data_type.set('string', 'string');
+data_type.set('boolean', 'bool');
 
 const goToSelectEnv = () => {
     envDialog.value = true;
@@ -608,6 +617,7 @@ const SelectApi = async (id) => {
             let value = res.data.params[key];
             params.push({
                 paramskey: key,
+                paramDataType: data_type.get(typeof(value.value)),
                 paramsvalue: value.value,
                 paramsdecription: value.decription
             })
@@ -618,6 +628,7 @@ const SelectApi = async (id) => {
             let value = res.data.body[key];
             bodys.push({
                 bodykey: key,
+                bodyDataType: data_type.get(typeof(value.value)),
                 bodyvalue: value.value,
                 bodydecription: value.decription
             })
@@ -665,7 +676,12 @@ const onSubmit = async () => {
                     paramsData[j][i].paramsvalue = Number(paramsData[j][i].paramsvalue);
                 }
                 else if (paramsData[j][i].paramDataType === 'bool') {
-                    paramsData[j][i].paramsvalue = Boolean(paramsData[j][i].paramsvalue);
+                    if (paramsData[j][i].paramsvalue === 'false') {
+                        paramsData[j][i].paramsvalue = false;
+                    }
+                    else {
+                        paramsData[j][i].paramsvalue = true;
+                    }
                 }
                 addForm.steps[j].params[paramsData[j][i].paramskey] = { "value": paramsData[j][i].paramsvalue, "decription": paramsData[j][i].paramsdecription };
             }
@@ -676,7 +692,12 @@ const onSubmit = async () => {
                     bodyData[j][i].bodyvalue = Number(bodyData[j][i].bodyvalue);
                 }
                 else if (bodyData[j][i].bodyDataType === 'bool') {
-                    bodyData[j][i].bodyvalue = Boolean(bodyData[j][i].bodyvalue);
+                    if (bodyData[j][i].bodyvalue === 'false') {
+                        bodyData[j][i].bodyvalue = false;
+                    }
+                    else {
+                        bodyData[j][i].bodyvalue = true;
+                    }
                 }
                 addForm.steps[j].body[bodyData[j][i].bodykey] = { "value": bodyData[j][i].bodyvalue, "decription": bodyData[j][i].bodydecription };
             }
@@ -687,7 +708,12 @@ const onSubmit = async () => {
                     assertData[j][i].assertvalue = Number(assertData[j][i].assertvalue);
                 }
                 else if (assertData[j][i].assertDataType === 'bool') {
-                    assertData[j][i].assertvalue = Boolean(assertData[j][i].assertvalue);
+                    if (assertData[j][i].assertvalue === 'false') {
+                        assertData[j][i].assertvalue = false;
+                    }
+                    else {
+                        assertData[j][i].assertvalue = true;
+                    }
                 }
                 addForm.steps[j].assert_result[assertData[j][i].assertkey] = { "value": assertData[j][i].assertvalue, "decription": assertData[j][i].assertdecription };
             }
@@ -771,7 +797,12 @@ const debug = async () => {
                     paramsData[j][i].paramsvalue = Number(paramsData[j][i].paramsvalue);
                 }
                 else if (paramsData[j][i].paramDataType === 'bool') {
-                    paramsData[j][i].paramsvalue = Boolean(paramsData[j][i].paramsvalue);
+                    if (paramsData[j][i].paramsvalue === 'false') {
+                        paramsData[j][i].paramsvalue = false;
+                    }
+                    else {
+                        paramsData[j][i].paramsvalue = true;
+                    }
                 }
                 addForm.steps[j].params[paramsData[j][i].paramskey] = { "value": paramsData[j][i].paramsvalue, "decription": paramsData[j][i].paramsdecription };
             }
@@ -782,7 +813,12 @@ const debug = async () => {
                     bodyData[j][i].bodyvalue = Number(bodyData[j][i].bodyvalue);
                 }
                 else if (bodyData[j][i].bodyDataType === 'bool') {
-                    bodyData[j][i].bodyvalue = Boolean(bodyData[j][i].bodyvalue);
+                    if (bodyData[j][i].bodyvalue === 'false') {
+                        bodyData[j][i].bodyvalue = false;
+                    }
+                    else {
+                        bodyData[j][i].bodyvalue = true;
+                    }
                 }
                 addForm.steps[j].body[bodyData[j][i].bodykey] = { "value": bodyData[j][i].bodyvalue, "decription": bodyData[j][i].bodydecription };
             }
@@ -793,7 +829,12 @@ const debug = async () => {
                     assertData[j][i].assertvalue = Number(assertData[j][i].assertvalue);
                 }
                 else if (assertData[j][i].assertDataType === 'bool') {
-                    assertData[j][i].assertvalue = Boolean(assertData[j][i].assertvalue);
+                    if (assertData[j][i].assertvalue === 'false') {
+                        assertData[j][i].assertvalue = false;
+                    }
+                    else {
+                        assertData[j][i].assertvalue = true;
+                    }
                 }
                 addForm.steps[j].assert_result[assertData[j][i].assertkey] = {
                     "value": assertData[j][i].assertvalue,
@@ -827,6 +868,8 @@ const debug = async () => {
         }
         // 发送到后端调试
         const res = await debugAPICase(addForm);
+        // 重置调试结果
+        addForm.result = '';
         if (res.status) {
             for (let i = 0; i < addForm.steps.length; i++) {
                 // 断言结果赋值
