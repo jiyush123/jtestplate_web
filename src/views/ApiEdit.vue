@@ -4,11 +4,8 @@
         <el-breadcrumb-item>编辑接口</el-breadcrumb-item>
     </el-breadcrumb>
     <el-divider />
-    <!-- 下面是TAB标签 -->
-    <el-tabs v-model="activeName" type="card" class="demo-tabs">
-        <el-tab-pane label="API信息" name="info">
             <!-- 下面是页面表单 -->
-            <el-form :model="editform" label-width="120px" ref="ruleFormRef">
+            <el-form :model="editform" label-width="120px" ref="ruleFormRef" class="apiform">
                 <el-form-item label="接口名称" prop="name" :rules="[
                     { required: true, message: '接口名称不能为空' },
                     { min: 3, max: 30, message: '长度需要为3-30个字符' },
@@ -85,16 +82,16 @@
                         </el-table-column>
                         <el-table-column prop="paramsvalue" label="Values" width='200'>
                             <template #default="scope">
-                        <el-input v-model="paramsData[scope.$index].paramsvalue" class="input-with-select">
-                            <template #prepend>
-                                <el-select v-model="paramsData[scope.$index].paramDataType" style="width: 100px">
-                                    <el-option label="string" value="string" />
-                                    <el-option label="int" value="int" />
-                                    <el-option label="bool" value="bool" />
-                                </el-select>
+                                <el-input v-model="paramsData[scope.$index].paramsvalue" class="input-with-select">
+                                    <template #prepend>
+                                        <el-select v-model="paramsData[scope.$index].paramDataType">
+                                            <el-option label="string" value="string" />
+                                            <el-option label="int" value="int" />
+                                            <el-option label="bool" value="bool" />
+                                        </el-select>
+                                    </template>
+                                </el-input>
                             </template>
-                        </el-input>
-                    </template>
                         </el-table-column>
                         <el-table-column prop="paramsdecription" label="描述" width='200'>
                             <template #default="scope">
@@ -119,16 +116,16 @@
                         </el-table-column>
                         <el-table-column prop="bodyvalue" label="Values" width='200'>
                             <template #default="scope">
-                        <el-input v-model="bodyData[scope.$index].bodyvalue" class="input-with-select">
-                            <template #prepend>
-                                <el-select v-model="bodyData[scope.$index].bodyDataType" style="width: 100px">
-                                    <el-option label="string" value="string" />
-                                    <el-option label="int" value="int" />
-                                    <el-option label="bool" value="bool" />
-                                </el-select>
+                                <el-input v-model="bodyData[scope.$index].bodyvalue" class="input-with-select">
+                                    <template #prepend>
+                                        <el-select v-model="bodyData[scope.$index].bodyDataType">
+                                            <el-option label="string" value="string" />
+                                            <el-option label="int" value="int" />
+                                            <el-option label="bool" value="bool" />
+                                        </el-select>
+                                    </template>
+                                </el-input>
                             </template>
-                        </el-input>
-                    </template>
                         </el-table-column>
                         <el-table-column prop="bodydecription" label="描述" width='200'>
                             <template #default="scope">
@@ -145,129 +142,69 @@
                 <el-button type="primary" @click="addBody"
                     style="margin-left: 50px;margin-bottom: 10px;">新增body参数</el-button>
                 <el-form-item label="响应">
-                    <el-input v-model="editform.api_response" type="textarea" autosize />
+                    <el-input v-model="editform.response" type="textarea" autosize />
                 </el-form-item>
 
                 <el-form-item>
+                    <el-button type="primary" @click="goToSelectEnv">调试</el-button>
+                    <el-button @click="drawer = true">打开调试结果</el-button>
                     <el-button type="primary" @click="onSubmit(ruleFormRef)">保存</el-button>
                     <el-button @click="cancelBtn">取消</el-button>
                 </el-form-item>
             </el-form>
-            <!-- 上面是表单，下面是下一个标签页 -->
-        </el-tab-pane>
-        <el-tab-pane label="调试" name="debug">
-            <el-form :model="debugform" label-width="120px" ref="debugFormRef">
-                <el-form-item label="调试环境" prop="host" :rules="[
-                    { required: true, message: '请选择调试环境' },
-                ]">
-                    <el-select v-model="debugform.host" filterable placeholder="请选择" style="width: 400px;">
-                        <el-option v-for="item in envOptions" :key="item.id"
-                            :label="item.name + '    ' + item.protocol + '://' + item.host + ':' + item.port"
-                            :value="item.protocol + '://' + item.host + ':' + item.port">
+    <!-- 弹窗 -->
+    <el-dialog v-model="Dialog" title="选择运行环境" width="40%" align-center @close="cancelDialog(formRef)">
+        <el-form :model="formdata" label-width="80px" ref="formRef">
+            <el-form-item label="运行环境" prop="host" :rules="[
+                { required: true, message: '请选择运行环境' },
+            ]">
+                <el-select v-model="formdata.host" filterable placeholder="请选择" style="width: 400px;">
+                    <el-option v-for="item in envOptions" :key="item.id"
+                        :label="item.name + '    ' + item.protocol + '://' + item.host + ':' + item.port"
+                        :value="item.protocol + '://' + item.host + ':' + item.port">
 
-                            <span style="float: left">{{ item.name }}</span>
-                            <span style="float: right;font-size: 13px;">
-                                {{ item.protocol + '://' + item.host + ':' + item.port }}
-                            </span>
-                        </el-option>
-                    </el-select>
-                </el-form-item>
-
-                <el-form-item label="请求方式" prop="method" :rules="[
-                    { required: true, message: '请选择请求方式' },
-                ]">
-                    <el-radio-group v-model="debugform.method">
-                        <el-radio label="GET" />
-                        <el-radio label="POST" />
-                    </el-radio-group>
-                </el-form-item>
-                <el-form-item label="路径" prop="uri" :rules="[
-                    { required: true, message: '路径不能为空' },
-                ]">
-                    <el-input v-model="debugform.uri" style="width: 50%;" />
-                </el-form-item>
-
-                <el-form-item label="Headers">
-                    <el-table :data="headersData" border style="width: 700px">
-                        <el-table-column prop="headerskey" label="Keys" width='300'>
-                            <template #default="scope">
-                                <el-input v-model="headersData[scope.$index].headerskey" />
-                            </template>
-                        </el-table-column>
-                        <el-table-column prop="headersvalue" label="Values" width='300'>
-                            <template #default="scope">
-                                <el-input v-model="headersData[scope.$index].headersvalue" />
-                            </template>
-                        </el-table-column>
-                        <el-table-column width='100'>
-                            <template #default="scope">
-                                <el-button type="danger" @click="delHeader(scope.$index)">删除</el-button>
-                            </template>
-                        </el-table-column>
-                    </el-table>
-                </el-form-item>
-                <el-button type="primary" @click="addHeader"
-                    style="margin-left: 50px;margin-bottom: 10px;">新增请求头参数</el-button>
-                <el-form-item label="Params">
-                    <el-table :data="paramsData" border style="width: 700px">
-                        <el-table-column prop="paramskey" label="Keys" width='300'>
-                            <template #default="scope">
-                                <el-input v-model="paramsData[scope.$index].paramskey" />
-                            </template>
-                        </el-table-column>
-                        <el-table-column prop="paramsvalue" label="Values" width='300'>
-                            <template #default="scope">
-                                <el-input v-model="paramsData[scope.$index].paramsvalue" />
-                            </template>
-                        </el-table-column>
-
-                        <el-table-column width='100'>
-                            <template #default="scope">
-                                <el-button type="danger" @click="delParam(scope.$index)">删除</el-button>
-                            </template>
-                        </el-table-column>
-                    </el-table>
-                </el-form-item>
-                <el-button type="primary" @click="addParams"
-                    style="margin-left: 50px;margin-bottom: 10px;">新增params参数</el-button>
-                <el-form-item label="Body">
-                    <el-table :data="bodyData" border style="width: 700px">
-                        <el-table-column prop="bodykey" label="Keys" width='300'>
-                            <template #default="scope">
-                                <el-input v-model="bodyData[scope.$index].bodykey" />
-                            </template>
-                        </el-table-column>
-                        <el-table-column prop="bodyvalue" label="Values" width='300'>
-                            <template #default="scope">
-                                <el-input v-model="bodyData[scope.$index].bodyvalue" />
-                            </template>
-                        </el-table-column>
-                        <el-table-column width='100'>
-                            <template #default="scope">
-                                <el-button type="danger" @click="delBody(scope.$index)">删除</el-button>
-                            </template>
-                        </el-table-column>
-                    </el-table>
-                </el-form-item>
-                <el-button type="primary" @click="addBody"
-                    style="margin-left: 50px;margin-bottom: 10px;">新增body参数</el-button>
-                <el-form-item label="响应结果">
-                    <el-input v-model="debugform.api_response" type="textarea" autosize />
-                </el-form-item>
-
-                <el-form-item>
-                    <el-button type="primary" @click="debug(ruleFormRef)">调试</el-button>
-                    <el-button @click="cancelBtn">取消</el-button>
-                </el-form-item>
-            </el-form>
-
-        </el-tab-pane>
-    </el-tabs>
+                        <span style="float: left">{{ item.name }}</span>
+                        <span style="float: right;font-size: 13px;">
+                            {{ item.protocol + '://' + item.host + ':' + item.port }}
+                        </span>
+                    </el-option>
+                </el-select>
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="cancelDialog(formRef)">取消</el-button>
+                <el-button type="primary" @click="debug">
+                    运行
+                </el-button>
+            </span>
+        </template>
+    </el-dialog>
+    <!-- 调试结果侧边弹窗 -->
+    <el-drawer v-model="drawer" title="调试结果">
+        <span>status:{{ debug_res.status }}</span><br>
+        <span>status_code:{{ debug_res.status_code }}</span><br>
+        <span>response:</span>
+        <pre>{{ debug_res.response }}</pre>
+    </el-drawer>
 </template>
 
 <style>
+.apiform {
+    width: 70%;
+    margin: auto
+}
+
+.apiform .el-table .el-input {
+    width: 95%;
+}
+
 .input-with-select .el-input-group__prepend {
     background-color: var(--el-fill-color-blank);
+}
+
+.input-with-select .el-select{
+    width: 90px;
 }
 </style>
 
@@ -282,9 +219,21 @@ const route = useRoute();
 const id_params = route.params;
 
 const moduleOptions = ref(null);
-const envOptions = ref(null);
 
-const activeName = ref('info');
+// 这里是弹窗选择环境的参数
+const Dialog = ref(false);
+const formRef = ref(null);
+const formdata = reactive({
+    host: ''
+})
+const envOptions = ref(null);
+// 这里是调试结果弹窗
+const drawer = ref(false);
+const debug_res = reactive({
+    status: '',
+    status_code: '',
+    response: ''
+})
 
 const headersData = reactive(
     []
@@ -328,19 +277,6 @@ const editform = reactive({
     updated_user: ""
 });
 
-const debugform = reactive({
-    host: '',
-    method: '',
-    uri: '',
-    headers: {},
-    params: {},
-    body: {},
-    api_response: '',
-    updated_user: "admin",
-    updated_time: '',
-});
-
-
 // 获取接口信息
 const getInfo = async () => {
     const res = await getAPIInfo(id_params);
@@ -352,9 +288,7 @@ const getInfo = async () => {
         editform.module = res.data.mod_id;
         editform.method = res.data.method;
         editform.uri = res.data.uri;
-        // 调试字段
-        debugform.method = res.data.method;
-        debugform.uri = res.data.uri;
+        editform.response = res.data.response;
         // 请求头
         for (let key in res.data.headers) {
             let value = res.data.headers[key];
@@ -369,18 +303,17 @@ const getInfo = async () => {
             let value = res.data.params[key];
             paramsData.push({
                 paramskey: key,
-                paramDataType: data_type.get(typeof(value.value)),
+                paramDataType: data_type.get(typeof (value.value)),
                 paramsvalue: value.value,
                 paramsdecription: value.decription
             });
-            console.log(paramsData);
         }
         // 请求体
         for (let key in res.data.body) {
             let value = res.data.body[key];
             bodyData.push({
                 bodykey: key,
-                bodyDataType: data_type.get(typeof(value.value)),
+                bodyDataType: data_type.get(typeof (value.value)),
                 bodyvalue: value.value,
                 bodydecription: value.decription
             });
@@ -398,20 +331,10 @@ const getInfo = async () => {
 }
 
 const ruleFormRef = ref(null);
-const debugFormRef = ref(null);
 // 这个方法是等待表单验证结果，因为返回的是promise.reject,所以要用try去捕捉异常再返回布尔值
 const assertForm = async () => {
     try {
         await ruleFormRef.value.validate();
-        return true
-    } catch (e) {
-        return false
-    }
-}
-
-const debugFormAssert = async () => {
-    try {
-        await debugFormRef.value.validate();
         return true
     } catch (e) {
         return false
@@ -432,11 +355,11 @@ const onSubmit = async () => {
             }
             else if (paramsData[i].paramDataType === 'bool') {
                 if (paramsData[i].paramsvalue === 'false') {
-                        paramsData[i].paramsvalue = false;
-                    }
-                    else {
-                        paramsData[i].paramsvalue = true;
-                    }
+                    paramsData[i].paramsvalue = false;
+                }
+                else {
+                    paramsData[i].paramsvalue = true;
+                }
             }
             editform.params[paramsData[i].paramskey] = { "value": paramsData[i].paramsvalue, "decription": paramsData[i].paramsdecription };
         }
@@ -447,10 +370,10 @@ const onSubmit = async () => {
             else if (bodyData[i].bodyDataType === 'bool') {
                 if (bodyData[i].bodyvalue === 'false') {
                     bodyData[i].bodyvalue = false;
-                    }
-                    else {
-                        bodyData[i].bodyvalue = true;
-                    }
+                }
+                else {
+                    bodyData[i].bodyvalue = true;
+                }
             }
             editform.body[bodyData[i].bodykey] = { "value": bodyData[i].bodyvalue, "decription": bodyData[i].bodydecription };
         }
@@ -510,29 +433,96 @@ const delBody = (index) => {
     bodyData.splice(index, 1);
 }
 
+const goToSelectEnv = () => {
+
+    Dialog.value = true;
+    getEnvironmentFun();
+}
+
+const getEnvironmentFun = async () => {
+    // 发送到后端获取环境列表数据
+    const res = await getEnvironmentList({ 'size': 100, 'page': 1 });
+    if (res.status == true) {
+        envOptions.value = res.data;
+    }
+    else {
+        ElMessage({
+            showClose: true,
+            center: true,
+            message: '请求失败',
+            type: 'error',
+        })
+    }
+}
+
+const cancelDialog = (formEl) => {
+    // 取消弹窗，重置
+    Dialog.value = false;
+    if (!formEl) return
+    formEl.resetFields();
+}
+
 const debug = async () => {
-    const result = await debugFormAssert();
+    editform.host = formdata.host;
+    if (editform.host === undefined) {
+        ElMessage({
+            showClose: true,
+            center: true,
+            message: '请选择运行环境',
+            type: 'error',
+        })
+        return
+    }
+    const result = await assertForm();
     if (!result) return
     else {
         for (let i = 0; i < headersData.length; i++) {
-            debugform.headers[headersData[i].headerskey] = { "value": headersData[i].headersvalue };
+            editform.headers[headersData[i].headerskey] = { "value": headersData[i].headersvalue };
         }
         for (let i = 0; i < paramsData.length; i++) {
-            debugform.params[paramsData[i].paramskey] = { "value": paramsData[i].paramsvalue };
+            if (paramsData[i].paramDataType === 'int') {
+                paramsData[i].paramsvalue = Number(paramsData[i].paramsvalue);
+            }
+            else if (paramsData[i].paramDataType === 'bool') {
+                if (paramsData[i].paramsvalue === 'false') {
+                    paramsData[i].paramsvalue = false;
+                }
+                else {
+                    paramsData[i].paramsvalue = true;
+                }
+            }
+            editform.params[paramsData[i].paramskey] = { "value": paramsData[i].paramsvalue };
         }
         for (let i = 0; i < bodyData.length; i++) {
-            debugform.body[bodyData[i].bodykey] = { "value": bodyData[i].bodyvalue };
+            if (bodyData[i].paramDataType === 'int') {
+                bodyData[i].paramsvalue = Number(bodyData[i].bodyvalue);
+            }
+            else if (bodyData[i].bodyDataType === 'bool') {
+                if (bodyData[i].bodyvalue === 'false') {
+                    bodyData[i].bodyvalue = false;
+                }
+                else {
+                    bodyData[i].bodyvalue = true;
+                }
+            }
+            editform.body[bodyData[i].bodykey] = { "value": bodyData[i].bodyvalue };
         }
         // 发送调试
-        const res = await debugAPI(debugform);
+        const res = await debugAPI(editform);
         if (res.status) {
+            const response = JSON.stringify(res.response, null, 2);
+            debug_res.response = response;
+            debug_res.status_code = res.status_code;
+            debug_res.status = res.status;
+
+            drawer.value = true;
             ElMessage({
                 showClose: true,
                 center: true,
                 message: res.msg,
                 type: 'success',
             })
-            debugform.api_response = res.status_code + '\n' + res.response;
+            editform.api_response = res.status_code + '\n' + res.response;
         }
         else {
             ElMessage({
@@ -542,6 +532,10 @@ const debug = async () => {
                 type: 'error',
             })
         }
+        editform.headers = {}; // 调试后需要重置，不然修改参数会新增多一条数据
+        editform.params = {}; // 调试后需要重置，不然修改参数会新增多一条数据
+        editform.body = {}; // 调试后需要重置，不然修改参数会新增多一条数据
+        cancelDialog();
     }
 }
 
@@ -561,26 +555,9 @@ const getModuleFun = async () => {
     }
 }
 
-const getEnvironmentFun = async () => {
-    // 发送到后端获取环境列表数据
-    const res = await getEnvironmentList({ 'size': 100, 'page': 1 });
-    if (res.status == true) {
-        envOptions.value = res.data;
-    }
-    else {
-        ElMessage({
-            showClose: true,
-            center: true,
-            message: '请求失败',
-            type: 'error',
-        })
-    }
-}
-
 onMounted(() => {
     getModuleFun();
     getInfo();
-    getEnvironmentFun();
     setTimeout(() => {
     }, 1000)
 })

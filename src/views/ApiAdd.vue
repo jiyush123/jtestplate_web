@@ -77,7 +77,7 @@
                     <template #default="scope">
                         <el-input v-model="paramsData[scope.$index].paramsvalue" class="input-with-select">
                             <template #prepend>
-                                <el-select v-model="paramsData[scope.$index].paramDataType" style="width: 100px">
+                                <el-select v-model="paramsData[scope.$index].paramDataType">
                                     <el-option label="string" value="string" />
                                     <el-option label="int" value="int" />
                                     <el-option label="bool" value="bool" />
@@ -111,7 +111,7 @@
                     <template #default="scope">
                         <el-input v-model="bodyData[scope.$index].bodyvalue" class="input-with-select">
                             <template #prepend>
-                                <el-select v-model="bodyData[scope.$index].bodyDataType" style="width: 100px">
+                                <el-select v-model="bodyData[scope.$index].bodyDataType">
                                     <el-option label="string" value="string" />
                                     <el-option label="int" value="int" />
                                     <el-option label="bool" value="bool" />
@@ -185,7 +185,7 @@
 
 <style>
 .apiform {
-    width: 60%;
+    width: 70%;
     margin: auto
 }
 
@@ -195,6 +195,9 @@
 
 .input-with-select .el-input-group__prepend {
     background-color: var(--el-fill-color-blank);
+}
+.input-with-select .el-select{
+    width: 90px;
 }
 </style>
 
