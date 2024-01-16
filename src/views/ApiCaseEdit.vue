@@ -272,6 +272,33 @@
                             </el-form-item>
                             <el-button type="primary" @click="addAssert(index)"
                                 style="margin-left: 50px;margin-bottom: 10px;">新增断言</el-button>
+                                <!-- 提取参数 -->
+                            <el-form-item label="提取参数">
+                                <el-table :data="extractData[index]" border style="width: 100%">
+                                    <el-table-column prop="extractkey" label="Keys">
+                                        <template #default="scope">
+                                            <el-input v-model="extractData[index][scope.$index].extractkey" />
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column prop="extractvalue" label="Values">
+                                        <template #default="scope">
+                                            <el-input v-model="extractData[index][scope.$index].extractvalue" />
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column prop="extractdecription" label="描述">
+                                        <template #default="scope">
+                                            <el-input v-model="extractData[index][scope.$index].extractdecription" />
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column width='100'>
+                                        <template #default="scope">
+                                            <el-button type="danger" @click="delExtract(index, scope.$index)">删除</el-button>
+                                        </template>
+                                    </el-table-column>
+                                </el-table>
+                            </el-form-item>
+                            <el-button type="primary" @click="addExtract(index)"
+                                style="margin-left: 50px;margin-bottom: 10px;">新增提取参数</el-button>
                         </el-collapse-item>
                     </el-collapse>
                 </div>
@@ -506,6 +533,7 @@ const editform = reactive({
         result: '',
         response: '',
         assert_result: {},
+        extract: {},
     }],
     updated_user: localStorage.getItem('name'),
     time: '',
@@ -527,11 +555,13 @@ const AddStep = () => {
         result: '',
         response: '',
         assert_result: {},
+        extract: {},
     });
     headersData.push([]);
     paramsData.push([]);
     bodyData.push([]);
     assertData.push([]);
+    extractData.push([]);
 }
 
 const removeDomain = (step) => {
@@ -542,6 +572,7 @@ const removeDomain = (step) => {
         paramsData.splice(index, 1);
         bodyData.splice(index, 1);
         assertData.splice(index, 1);
+        extractData.splice(index, 1);
     }
 }
 
@@ -559,6 +590,10 @@ const bodyData = reactive(
 );
 
 const assertData = reactive(
+    [[]]
+);
+
+const extractData = reactive(
     [[]]
 );
 
@@ -599,6 +634,15 @@ const addAssert = (index) => {
 
 const delAssert = (index, delindex) => {
     assertData[index].splice(delindex, 1);
+}
+
+const addExtract = (index) => {
+    extractData[index].push({
+    })
+}
+
+const delExtract = (index, delindex) => {
+    extractData[index].splice(delindex, 1);
 }
 
 const cancelBtn = () => {
@@ -677,6 +721,7 @@ const getCaseInfo = async () => {
         paramsData.pop();
         bodyData.pop();
         assertData.pop();
+        extractData.pop();
         // 测试步骤赋值
         for (let i = 0; i < res.data.steps.length; i++) {
             AddStep();
@@ -719,6 +764,15 @@ const getCaseInfo = async () => {
                     assertDataType: data_type.get(typeof(value.value)),
                     assertvalue: value.value,
                     assertdecription: value.decription
+                });
+            }
+
+            for (let key in steps[i].extract) {
+                let value = steps[i].extract[key];
+                extractData[i].push({
+                    extractkey: key,
+                    extractvalue: value.value,
+                    extractdecription: value.decription
                 });
             }
         }
@@ -803,6 +857,11 @@ const onSubmit = async () => {
                 editform.steps[j].assert_result[assertData[j][i].assertkey] = { "value": assertData[j][i].assertvalue, "decription": assertData[j][i].assertdecription };
             }
         }
+        for (let j = 0; j < extractData.length; j++) {
+            for (let i = 0; i < extractData[j].length; i++) {
+                editform.steps[j].extract[extractData[j][i].extractkey] = { "value": extractData[j][i].extractvalue, "decription": extractData[j][i].extractdecription };
+            }
+        }
 
         for (let i = 0; i < headersData.length; i++) {
             if (headersData[i].length === 0) {
@@ -822,6 +881,11 @@ const onSubmit = async () => {
         for (let i = 0; i < assertData.length; i++) {
             if (assertData[i].length === 0) {
                 editform.steps[i].assert_result = null;
+            }
+        }
+        for (let i = 0; i < extractData.length; i++) {
+            if (extractData[i].length === 0) {
+                editform.steps[i].extract = null;
             }
         }
 
@@ -924,6 +988,11 @@ const debug = async () => {
                 editform.steps[j].assert_result[assertData[j][i].assertkey] = { "value": assertData[j][i].assertvalue, "decription": assertData[j][i].assertdecription };
             }
         }
+        for (let j = 0; j < extractData.length; j++) {
+            for (let i = 0; i < extractData[j].length; i++) {
+                editform.steps[j].extract[extractData[j][i].extractkey] = { "value": extractData[j][i].extractvalue, "decription": extractData[j][i].extractdecription };
+            }
+        }
         for (let i = 0; i < headersData.length; i++) {
             if (headersData[i].length === 0) {
                 editform.steps[i].headers = null;
@@ -942,6 +1011,11 @@ const debug = async () => {
         for (let i = 0; i < assertData.length; i++) {
             if (assertData[i].length === 0) {
                 editform.steps[i].assertData = null;
+            }
+        }
+        for (let i = 0; i < extractData.length; i++) {
+            if (extractData[i].length === 0) {
+                editform.steps[i].extractData = null;
             }
         }
 
@@ -1005,6 +1079,7 @@ const debug = async () => {
             editform.steps[i].params = {}; // 调试后需要重置，不然修改参数会新增多一条数据
             editform.steps[i].body = {}; // 调试后需要重置，不然修改参数会新增多一条数据
             editform.steps[i].assert_result = {}; // 调试后需要重置，不然修改参数会新增多一条数据
+            editform.steps[i].extract = {}; // 调试后需要重置，不然修改参数会新增多一条数据
         }
     }
 }
