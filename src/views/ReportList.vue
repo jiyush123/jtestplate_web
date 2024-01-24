@@ -30,7 +30,7 @@
         <el-table-column prop="created_time" label="创建时间"/>
         <el-table-column label="操作" width="200" fixed="right">
             <template #default="scope">
-                <!-- <el-button type="primary" size="small" @click="updateDialog(scope.row.id)">详情</el-button> -->
+                <el-button type="primary" size="small" @click="goToInfo(scope.row.id)">详情</el-button>
                 <el-popconfirm width="220" :hide-after="hideAfter" confirm-button-text="确定" cancel-button-text="取消"
                     title="是否确定删除?" @confirm="delFun(scope.row.id)">
                     <template #reference>
@@ -53,6 +53,7 @@
 import { reactive, ref, onMounted } from 'vue'
 import { getReportList, delReport } from '../http/api'
 import { ElMessage } from 'element-plus'
+import router from "../router/index"
 
 const currentPage1 = ref(1);
 const pageSize1 = ref(10);
@@ -125,6 +126,10 @@ const delFun = async (Did) => {
             type: 'error',
         })
     }
+}
+
+const goToInfo = (id) => {
+    router.push({ name: 'reportinfo', params: { id } });
 }
 
 onMounted(() => {

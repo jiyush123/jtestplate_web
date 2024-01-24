@@ -87,6 +87,15 @@ const routes = [
         }
       },
       {
+        path: '/report/info/:id',
+        name: 'reportinfo',
+        component: () => import(/* webpackChunkName: "reportinfo" */ '../views/ReportInfo.vue'),
+        meta: {
+          isShow: false,
+          title: "报告详情",
+        }
+      },
+      {
         path: '/environment/list',
         name: 'environmentlist',
         component: () => import(/* webpackChunkName: "environmentlist" */ '../views/EnvironmentList.vue'),

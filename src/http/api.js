@@ -352,3 +352,15 @@ export const delReport = (data) => {
         }
     });
 }
+
+export const getReportInfo = (params) => {
+    return $http({
+        method: "get",
+        url: "http://127.0.0.1:8000/report/detail/",
+        params: params,
+        data: {},
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
