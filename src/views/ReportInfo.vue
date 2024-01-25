@@ -13,13 +13,50 @@
             <el-tag v-else-if="report_data.result === '失败'" type="danger">{{ report_data.result }}</el-tag>
             <el-tag v-else type="info">{{ report_data.result }}</el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="执行情况" span="2"><div ref="chartContainer" style="width: 100%; height: 300px;"></div></el-descriptions-item>
-        <el-descriptions-item label="用例">{{ report_data.cases }}</el-descriptions-item>
+        <el-descriptions-item label="执行情况" span="2">
+            <div ref="chartContainer" style="width: 100%; height: 300px;"></div>
+        </el-descriptions-item>
     </el-descriptions>
-    
+
+    <!-- 用例详情 -->
+    <el-descriptions title='用例详情' border :column="4">
+    </el-descriptions>
+    <div v-for="(case_data, index) in cases_data" :key="index" style="margin:10px">
+        <el-collapse>
+            <el-collapse-item :name="index">
+                <template #title>
+                    <el-text class="mx-1 casetitle">用例ID:{{ case_data.case_id }}</el-text>
+                    <el-text class="mx-1 casetitle" style="width: 200px;">用例名称:{{ case_data.case_name }}</el-text>
+                    <el-text class="mx-1 casetitle" style="width: 200px;">执行时间:{{ case_data.run_time }} ms</el-text>
+                    <el-tag v-if="case_data.case_result === true" type="success">成功</el-tag>
+                    <el-tag v-else type="danger">失败</el-tag>
+                </template>
+                <!-- 步骤详情 -->
+                <template #default>
+                    <el-descriptions title='步骤详情' border :column="3">
+                        <!-- 获取步骤信息 -->
+                        <div v-for="(case_data, index) in cases_data" :key="index">
+        <el-descriptions-item label="步骤名称">{{  }}</el-descriptions-item>
+        <el-descriptions-item label="执行时长">{{  }}</el-descriptions-item>
+        <el-descriptions-item label="结果">
+            <el-tag v-if="report_data.result === '成功'" type="success">{{ report_data.result }}</el-tag>
+            <el-tag v-else-if="report_data.result === '失败'" type="danger">{{ report_data.result }}</el-tag>
+            <el-tag v-else type="info">{{ report_data.result }}</el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item label="响应内容" span="3">{{  }}</el-descriptions-item>
+        <el-descriptions-item label="断言结果" span="3">{{  }}</el-descriptions-item>
+    </div>   
+    </el-descriptions>
+                </template>
+            </el-collapse-item>
+        </el-collapse>
+    </div>
 </template>
 <style>
-
+.casetitle {
+    margin-right: 50px;
+    text-align: left;
+}
 </style>
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
@@ -64,8 +101,8 @@ const chart = () => {
                         }
                     },
                     data: [
-                        { value: report_data.success_nums, name: '成功',itemStyle: {color:'#33CC33'} },
-                        { value: report_data.error_nums, name: '失败',itemStyle: {color:'red'} }, {
+                        { value: report_data.success_nums, name: '成功', itemStyle: { color: '#33CC33' } },
+                        { value: report_data.error_nums, name: '失败', itemStyle: { color: 'red' } }, {
                             // make an record to fill the bottom 50%
                             value: report_data.success_nums + report_data.error_nums,
                             itemStyle: {
@@ -99,13 +136,16 @@ const report_data = reactive({
     end_time: '',
     success_nums: '',
     error_nums: '',
-    cases: {},
     status: '',
     result: '',
     created_user: '',
     created_time: '',
     total_time: null,
 });
+
+const cases_data = reactive(
+    []
+)
 
 // 创建一个新的 Map 对象作映射
 let status = new Map();
@@ -122,7 +162,14 @@ const getInfo = async () => {
         report_data.end_time = res.data.end_time;
         report_data.success_nums = res.data.success_nums;
         report_data.error_nums = res.data.error_nums;
-        report_data.cases = res.data.cases;
+        for (let i = 0; i < res.data.cases.length; i++) {
+            cases_data.push({
+                case_id: res.data.cases[i].case_id,
+                case_name: res.data.cases[i].case_name,
+                run_time: res.data.cases[i].run_time,
+                case_result: res.data.cases[i].case_result,
+            })
+        }
         report_data.result = res.data.result;
         report_data.status = status.get(res.data.status);
         report_data.created_user = res.data.created_user;
@@ -139,7 +186,7 @@ const getInfo = async () => {
     }
 }
 
-onMounted(async() => {
+onMounted(async () => {
     await getInfo();
     chart();
     setTimeout(() => {
