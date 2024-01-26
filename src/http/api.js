@@ -364,3 +364,15 @@ export const getReportInfo = (params) => {
         }
     });
 }
+
+export const getReportCaseInfo = (params) => {
+    return $http({
+        method: "get",
+        url: "http://127.0.0.1:8000/report/case/detail/",
+        params: params,
+        data: {},
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
