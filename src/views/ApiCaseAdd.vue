@@ -941,17 +941,17 @@ const debug = async () => {
                     addForm.steps[i].result = 'success';
                 }
                 else {
-                    for (let j = 0; j < res.data.res[i].result.length; j++) {
-                        assertData[i][j].assertresult = res.data.res[i].result[j];
+                    for (let j = 0; j < res.data.asserts_info[i].length; j++) {
+                        assertData[i][j].assertresult = res.data.asserts_info[i][j].assert_result;
+                        // 步骤断言结果是否包含error，包含将步骤结果设置为error，并用例变成error
+                        if (assertData[i][j].assertresult === 'error'){
+                            addForm.steps[i].result = 'error';
+                            addForm.result = 'error';
+                        }
                     }
-                }
-                // 步骤断言结果是否包含error，包含将步骤结果设置为error，并用例变成error
-                if (res.data.res[i].result.includes('error')) {
-                    addForm.steps[i].result = 'error';
-                    addForm.result = 'error';
-                }
-                else {
-                    addForm.steps[i].result = 'success';
+                    if (addForm.steps[i].result !== 'error'){
+                        addForm.steps[i].result = 'success';
+                    }
                 }
 
                 addForm.steps[i].time = res.data.time[i];

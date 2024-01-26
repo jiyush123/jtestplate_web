@@ -1032,18 +1032,19 @@ const debug = async () => {
                     editform.steps[i].result = 'success';
                 }
                 else {
-                    for (let j = 0; j < res.data.res[i].result.length; j++) {
-                        assertData[i][j].assertresult = res.data.res[i].result[j];
+                    for (let j = 0; j < res.data.asserts_info[i].length; j++) {
+                        assertData[i][j].assertresult = res.data.asserts_info[i][j].assert_result;
+                    // 步骤断言结果是否包含error，包含将步骤结果设置为error，并用例变成error
+                    if (assertData[i][j].assertresult === 'error'){
+                        editform.steps[i].result = 'error';
+                        editform.result = 'error';
+                        }
+                    }
+                    if (editform.steps[i].result !== 'error'){
+                        editform.steps[i].result = 'success';
                     }
                 }
-                // 步骤断言结果是否包含error，包含将步骤结果设置为error，并用例变成error
-                if (res.data.res[i].result.includes('error')) {
-                    editform.steps[i].result = 'error';
-                    editform.result = 'error';
-                }
-                else {
-                    editform.steps[i].result = 'success';
-                }
+                
                 editform.steps[i].time = res.data.time[i];
 
                 const response = JSON.stringify(res.data.res[i].response, null, 2);
