@@ -22,7 +22,7 @@
     <el-descriptions title='用例详情' border :column="4">
     </el-descriptions>
     <div v-for="(case_data, index) in cases_data" :key="index" style="margin:10px">
-        <el-collapse>
+        <el-collapse @click="getReportCaseInfoFun(index)">
             <el-collapse-item :name="index">
                 <template #title>
                     <el-text class="mx-1 casetitle">用例ID:{{ case_data.case_id }}</el-text>
@@ -35,18 +35,18 @@
                 <template #default>
                     <el-descriptions title='步骤详情' border :column="3">
                         <!-- 获取步骤信息 -->
-                        <div v-for="(case_data, index) in cases_data" :key="index">
-        <el-descriptions-item label="步骤名称">{{  }}</el-descriptions-item>
-        <el-descriptions-item label="执行时长">{{  }}</el-descriptions-item>
-        <el-descriptions-item label="结果">
-            <el-tag v-if="report_data.result === '成功'" type="success">{{ report_data.result }}</el-tag>
-            <el-tag v-else-if="report_data.result === '失败'" type="danger">{{ report_data.result }}</el-tag>
-            <el-tag v-else type="info">{{ report_data.result }}</el-tag>
-        </el-descriptions-item>
-        <el-descriptions-item label="响应内容" span="3">{{  }}</el-descriptions-item>
-        <el-descriptions-item label="断言结果" span="3">{{  }}</el-descriptions-item>
-    </div>   
-    </el-descriptions>
+                        <div v-for="(step_data, index) in cases_data[index].steps_data" :key="index">
+                            <el-descriptions-item label="步骤名称">{{ step_data.step_name }}</el-descriptions-item>
+                            <el-descriptions-item label="执行时长">{{ step_data.run_time }} ms</el-descriptions-item>
+                            <el-descriptions-item label="结果">
+                                <el-tag v-if="step_data.step_result === 1" type="success">成功</el-tag>
+                                <el-tag v-else-if="step_data.step_result === 2" type="danger">失败</el-tag>
+                                <el-tag v-else type="info">无</el-tag>
+                            </el-descriptions-item>
+                            <el-descriptions-item label="响应内容" span="3">{{ step_data.step_response }}</el-descriptions-item>
+                            <el-descriptions-item label="断言结果" span="3">{{ step_data.assert_info }}</el-descriptions-item>
+                        </div>
+                    </el-descriptions>
                 </template>
             </el-collapse-item>
         </el-collapse>
@@ -60,7 +60,7 @@
 </style>
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import { getReportInfo } from '../http/api'
+import { getReportInfo, getReportCaseInfo } from '../http/api'
 import { ElMessage } from 'element-plus'
 
 import { useRoute } from 'vue-router'
@@ -168,6 +168,7 @@ const getInfo = async () => {
                 case_name: res.data.cases[i].case_name,
                 run_time: res.data.cases[i].run_time,
                 case_result: res.data.cases[i].case_result,
+                steps_data: [],
             })
         }
         report_data.result = res.data.result;
@@ -184,6 +185,45 @@ const getInfo = async () => {
             type: 'error',
         })
     }
+}
+let cases_id_click = [];
+const getReportCaseInfoFun = async (index) => {
+    // 如何case_id点击过，则不请求
+    let case_id = cases_data[index].case_id;
+    if (cases_id_click.includes(case_id)) {
+        return
+    }
+    else {
+        cases_id_click.push(case_id);
+        // 记录点击了哪个面板后再请求
+        const report_id = id_params.id;
+        const params = {'case_id': case_id,
+                        'report_id':report_id}
+        const res = await getReportCaseInfo(params);
+        if (res.status) {
+            // 回显用例详情
+            for (let i = 0; i < res.data.length; i++) {
+                cases_data[index].steps_data.push({
+                step_name:res.data[i].step_name,
+                run_time: res.data[i].run_time,
+                step_response: res.data[i].step_response,
+                assert_info: res.data[i].assert_info,
+                step_result: res.data[i].step_result
+            })
+            console.log(cases_data[index].steps_data);
+        }
+
+        }
+        else {
+            ElMessage({
+                showClose: true,
+                center: true,
+                message: res.msg,
+                type: 'error',
+            })
+        }
+    }
+
 }
 
 onMounted(async () => {
