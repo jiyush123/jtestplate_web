@@ -16,9 +16,6 @@
                 <el-aside width="200px">
                     <el-col>
                         <el-menu :router="true" default-active="1" class="el-menu-vertical-demo">
-                            <el-menu-item index="/home">
-                                <span>首页</span>
-                            </el-menu-item>
 
                             <el-menu-item :route="i.path" v-for="i in tablist" :key="i.name" :index="i.name" :visible="i.meta.isShow">
                                 <template #title>{{ i.meta.title }}</template>
