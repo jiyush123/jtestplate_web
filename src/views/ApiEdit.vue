@@ -522,7 +522,6 @@ const debug = async () => {
                 message: res.msg,
                 type: 'success',
             })
-            editform.api_response = res.status_code + '\n' + res.response;
         }
         else {
             ElMessage({
