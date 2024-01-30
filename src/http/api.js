@@ -328,7 +328,7 @@ export const runAPICase = (data) => {
         }
     });
 }
-
+// 报告接口
 export const getReportList = (params) => {
     return $http({
         method: "get",
@@ -369,6 +369,30 @@ export const getReportCaseInfo = (params) => {
     return $http({
         method: "get",
         url: "http://127.0.0.1:8000/report/case/detail/",
+        params: params,
+        data: {},
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
+// 首页统计接口
+export const getAPIAcount = (params) => {
+    return $http({
+        method: "get",
+        url: "http://127.0.0.1:8000/api/acount/",
+        params: params,
+        data: {},
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
+
+export const getAPICaseAcount = (params) => {
+    return $http({
+        method: "get",
+        url: "http://127.0.0.1:8000/apicase/acount/",
         params: params,
         data: {},
         headers: {
