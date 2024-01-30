@@ -14,6 +14,15 @@ const routes = [
     },
     children: [
       {
+        path: '/home',
+        name: 'HomePage',
+        component: () => import(/* webpackChunkName: "homepage" */ '../views/HomePage.vue'),
+        meta: {
+          isShow: true,
+          title: "首页",
+        }
+      },
+      {
         path: '/user/list',
         name: 'userlist',
         component: () => import(/* webpackChunkName: "userlist" */ '../views/UserList.vue'),
