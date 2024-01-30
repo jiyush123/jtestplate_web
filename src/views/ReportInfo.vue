@@ -33,9 +33,9 @@
                 </template>
                 <!-- 步骤详情 -->
                 <template #default>
-                    <el-descriptions title='步骤详情' border :column="3">
+                    <div v-for="(step_data, index) in cases_data[index].steps_data" :key="index">
+                    <el-descriptions :title="'步骤'+(index+1)" border :column="3">
                         <!-- 获取步骤信息 -->
-                        <div v-for="(step_data, index) in cases_data[index].steps_data" :key="index">
                             <el-descriptions-item label="步骤名称">{{ step_data.step_name }}</el-descriptions-item>
                             <el-descriptions-item label="执行时长">{{ step_data.run_time }} ms</el-descriptions-item>
                             <el-descriptions-item label="结果">
@@ -44,9 +44,13 @@
                                 <el-tag v-else type="info">无</el-tag>
                             </el-descriptions-item>
                             <el-descriptions-item label="响应内容" span="3">{{ step_data.step_response }}</el-descriptions-item>
-                            <el-descriptions-item label="断言结果" span="3">{{ step_data.assert_info }}</el-descriptions-item>
+                            <div v-for="(info, index) in step_data.assert_info" :key="index">
+                                <el-descriptions-item label="预期结果">{{ info.assert_expect }}</el-descriptions-item>
+                                <el-descriptions-item label="实际结果">{{ info.assert_value }}</el-descriptions-item>
+                                <el-descriptions-item label="断言结果">{{ info.assert_result }}</el-descriptions-item>
+                            </div>
+                        </el-descriptions>
                         </div>
-                    </el-descriptions>
                 </template>
             </el-collapse-item>
         </el-collapse>
