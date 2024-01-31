@@ -25,8 +25,8 @@
         <el-table-column label="操作">
             <template #default="scope">
                 <el-button type="primary" size="small" @click="updateDialog(scope.row.id)">编辑</el-button>
-                <el-popconfirm width="220" :hide-after="hideAfter" confirm-button-text="确定" cancel-button-text="取消" title="是否确定删除?"
-                    @confirm="delFun(scope.row.id)">
+                <el-popconfirm width="220" :hide-after="hideAfter" confirm-button-text="确定" cancel-button-text="取消"
+                    title="是否确定删除?" @confirm="delFun(scope.row.id)">
                     <template #reference>
                         <el-button ref="delBtn" type="danger" size="small">删除</el-button>
                     </template>
@@ -34,12 +34,8 @@
             </template>
         </el-table-column>
     </el-table>
-    <div class="demo-pagination-block">
-        <div class="demonstration"></div>
-        <el-pagination v-model:current-page="currentPage1" v-model:page-size="pageSize1" :page-sizes="[10, 20, 50, 100]"
-            :background="true" layout="total, prev, pager, next, sizes, jumper" :total="data.total"
-            @size-change="handleSizeChange" @current-change="handleCurrentChange" />
-    </div>
+    <!-- 分页模板 -->
+    <PaginationModule :total="data.total" :getListFun="getUserListFun" />
     <!-- 弹窗 -->
     <el-dialog v-model="Dialog" :title="dialog_title" width="40%" align-center @close="cancelDialog(formRef)">
         <el-form :model="formdata" label-width="80px" ref="formRef">
@@ -84,9 +80,8 @@
 import { reactive, ref, onMounted } from 'vue'
 import { getUserList, getUserInfo, addUser, delUser, updateUser } from '../http/api'
 import { ElMessage } from 'element-plus'
+import PaginationModule from './PaginationModule.vue'
 
-const currentPage1 = ref(1);
-const pageSize1 = ref(10);
 const hideAfter = ref(0);
 const data = reactive({
     table: [],
@@ -148,8 +143,10 @@ const assertForm = async () => {
     }
 }
 
-const getUserListFun = async () => {
+const getUserListFun = async (paramdata) => {
     // 发送到后端获取列表数据
+    params.page = paramdata.page;
+    params.size = paramdata.size;
     const res = await getUserList(params);
     if (res.status == true) {
         data.table = res.data;
@@ -165,26 +162,18 @@ const getUserListFun = async () => {
     }
 }
 
-const handleSizeChange = (val) => {
-    params.size = val;
-    getUserListFun()
-}
-const handleCurrentChange = (val) => {
-    params.page = val;
-    getUserListFun()
-}
 const queryList = () => {
-    if (queryForm.name == '') {
+    if (queryForm.name === '') {
         delete params.name;
     } else {
         params.name = queryForm.name;
     }
-    if (queryForm.username == '') {
+    if (queryForm.username === '') {
         delete params.username;
     } else {
         params.username = queryForm.username;
     }
-    getUserListFun()
+    getUserListFun(params)
 }
 
 
@@ -215,8 +204,7 @@ const onSubmit = async () => {
                 message: res.msg,
                 type: 'success',
             })
-            console.log(4);
-            getUserListFun();
+            getUserListFun(params);
         }
         else {
             ElMessage({
@@ -239,8 +227,7 @@ const delFun = async (Did) => {
             message: res.msg,
             type: 'success',
         })
-        console.log(5);
-        getUserListFun();
+        getUserListFun(params);
     }
     else {
         ElMessage({
@@ -276,7 +263,7 @@ const updateSubmit = async () => {
             message: res.msg,
             type: 'success',
         })
-        getUserListFun();
+        getUserListFun(params);
     }
     else {
         ElMessage({
@@ -289,7 +276,7 @@ const updateSubmit = async () => {
 }
 
 onMounted(() => {
-    getUserListFun();
+    getUserListFun(params);
     setTimeout(() => {
     }, 1000)
 })
