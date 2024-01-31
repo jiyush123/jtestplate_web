@@ -113,6 +113,24 @@ const routes = [
           title: "环境管理",
         }
       },
+      {
+        path: '/monaco/test',
+        name: 'monaco',
+        component: () => import(/* webpackChunkName: "monaco" */ '../views/MonacoEdit.vue'),
+        meta: {
+          isShow: true,
+          title: "编辑器测试",
+        }
+      },
+      {
+        path: '/monaco/test1',
+        name: 'monaco1',
+        component: () => import(/* webpackChunkName: "monaco1" */ '../views/TestMonacoEdit.vue'),
+        meta: {
+          isShow: true,
+          title: "编辑器嵌入页面",
+        }
+      },
       // {
       //   path: '/websocket/test',
       //   name: 'websocket',
