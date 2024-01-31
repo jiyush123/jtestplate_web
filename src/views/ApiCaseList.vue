@@ -68,12 +68,8 @@
             </template>
         </el-table-column>
     </el-table>
-    <div class="demo-pagination-block">
-        <div class="demonstration"></div>
-        <el-pagination v-model:current-page="currentPage1" v-model:page-size="pageSize1" :page-sizes="[10, 20, 50, 100]"
-            :background="true" layout="total, prev, pager, next, sizes, jumper" :total="data.total"
-            @size-change="handleSizeChange" @current-change="handleCurrentChange" />
-    </div>
+    <!-- 分页模板 -->
+    <PaginationModule :total="data.total" :getListFun="getAPICaseListFun" />
     <!-- 弹窗 -->
     <el-dialog v-model="Dialog" title="选择运行环境" width="40%" align-center @close="cancelDialog(formRef)">
         <el-form :model="formdata" label-width="80px" ref="formRef">
@@ -114,6 +110,7 @@ import { reactive, ref, onMounted } from 'vue'
 import { getAPICaseList, delAPICase, runAPICase, getEnvironmentList } from '../http/api'
 import { ElMessage } from 'element-plus'
 import router from "../router/index"
+import PaginationModule from './PaginationModule.vue'
 
 const Dialog = ref(false);
 const case_info = ref([]);
@@ -122,8 +119,6 @@ const batch_run = ref(false);
 const case_id = ref(null);
 const envOptions = ref(null);
 
-const currentPage1 = ref(1);
-const pageSize1 = ref(10);
 const hideAfter = ref(0);
 let data = reactive({
     table: [],
@@ -169,25 +164,17 @@ const queryList = () => {
     } else {
         params.status = queryForm.status;
     }
-    getAPICaseListFun()
+    getAPICaseListFun(params)
 }
 
-const getAPICaseListFun = async () => {
-
+const getAPICaseListFun = async (paramdata) => {
+    params.page = paramdata.page;
+    params.size = paramdata.size;
     // 发送到后端获取列表数据
     const res = await getAPICaseList(params);
     data.table = res.data;
     data.total = res.total
 
-}
-
-const handleSizeChange = (val) => {
-    params.size = val;
-    getAPICaseListFun()
-}
-const handleCurrentChange = (val) => {
-    params.page = val;
-    getAPICaseListFun()
 }
 
 const goToAdd = () => {
@@ -240,7 +227,7 @@ const delFun = async (Did) => {
             message: res.msg,
             type: 'success',
         })
-        getAPICaseListFun();
+        getAPICaseListFun(params);
     }
     else {
         ElMessage({
@@ -320,7 +307,7 @@ const handleSelect = (selection) => {
 
 
 onMounted(() => {
-    getAPICaseListFun();
+    getAPICaseListFun(params);
     setTimeout(() => {
     }, 1000)
 })

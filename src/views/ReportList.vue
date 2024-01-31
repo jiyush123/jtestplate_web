@@ -40,12 +40,8 @@
             </template>
         </el-table-column>
     </el-table>
-    <div class="demo-pagination-block">
-        <div class="demonstration"></div>
-        <el-pagination v-model:current-page="currentPage1" v-model:page-size="pageSize1" :page-sizes="[10, 20, 50, 100]"
-            :background="true" layout="total, prev, pager, next, sizes, jumper" :total="data.total"
-            @size-change="handleSizeChange" @current-change="handleCurrentChange" />
-    </div>
+    <!-- 分页模板 -->
+    <PaginationModule :total="data.total" :getListFun="getReportListFun" />
 </template>
 <style></style>
 
@@ -54,9 +50,8 @@ import { reactive, ref, onMounted } from 'vue'
 import { getReportList, delReport } from '../http/api'
 import { ElMessage } from 'element-plus'
 import router from "../router/index"
+import PaginationModule from './PaginationModule.vue'
 
-const currentPage1 = ref(1);
-const pageSize1 = ref(10);
 const hideAfter = ref(0);
 const data = reactive({
     table: [],
@@ -72,8 +67,10 @@ const params = {
 }
 
 
-const getReportListFun = async () => {
+const getReportListFun = async (paramdata) => {
     // 发送到后端获取列表数据
+    params.page = paramdata.page;
+    params.size = paramdata.size;
     const res = await getReportList(params);
     if (res.status == true) {
         data.table = res.data;
@@ -89,21 +86,13 @@ const getReportListFun = async () => {
     }
 }
 
-const handleSizeChange = (val) => {
-    params.size = val;
-    getReportListFun()
-}
-const handleCurrentChange = (val) => {
-    params.page = val;
-    getReportListFun()
-}
 const queryList = () => {
     if (queryForm.name == '') {
         delete params.name;
     } else {
         params.name = queryForm.name;
     }
-    getReportListFun()
+    getReportListFun(params)
 }
 
 const delFun = async (Did) => {
@@ -116,7 +105,7 @@ const delFun = async (Did) => {
             message: res.msg,
             type: 'success',
         })
-        getReportListFun();
+        getReportListFun(params);
     }
     else {
         ElMessage({
@@ -133,7 +122,7 @@ const goToInfo = (id) => {
 }
 
 onMounted(() => {
-    getReportListFun();
+    getReportListFun(params);
     setTimeout(() => {
     }, 1000)
 })

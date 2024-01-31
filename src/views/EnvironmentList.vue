@@ -32,12 +32,8 @@
             </template>
         </el-table-column>
     </el-table>
-    <div class="demo-pagination-block">
-        <div class="demonstration"></div>
-        <el-pagination v-model:current-page="currentPage1" v-model:page-size="pageSize1" :page-sizes="[10, 20, 50, 100]"
-            :background="true" layout="total, prev, pager, next, sizes, jumper" :total="data.total"
-            @size-change="handleSizeChange" @current-change="handleCurrentChange" />
-    </div>
+    <!-- 分页模板 -->
+    <PaginationModule :total="data.total" :getListFun="getEnvironmentListFun" />
     <!-- 弹窗 -->
     <el-dialog v-model="Dialog" :title="dialog_title" width="40%" align-center @close="cancelDialog(formRef)">
         <el-form :model="formdata" label-width="80px" ref="formRef">
@@ -89,9 +85,8 @@
 import { reactive, ref, onMounted } from 'vue'
 import { getEnvironmentList, getEnvironmentInfo, addEnvironment, delEnvironment, updateEnvironment } from '../http/api'
 import { ElMessage } from 'element-plus'
+import PaginationModule from './PaginationModule.vue'
 
-const currentPage1 = ref(1);
-const pageSize1 = ref(10);
 const hideAfter = ref(0);
 const data = reactive({
     table: [],
@@ -152,8 +147,10 @@ const cancelDialog = (formEl) =>{
     formEl.resetFields();
 }
 
-const getEnvironmentListFun = async () => {
+const getEnvironmentListFun = async (paramdata) => {
     // 发送到后端获取列表数据
+    params.page = paramdata.page;
+    params.size = paramdata.size;
     const res = await getEnvironmentList(params);
     if (res.status == true) {
         data.table = res.data;
@@ -169,21 +166,13 @@ const getEnvironmentListFun = async () => {
     }
 }
 
-const handleSizeChange = (val) => {
-    params.size = val;
-    getEnvironmentListFun()
-}
-const handleCurrentChange = (val) => {
-    params.page = val;
-    getEnvironmentListFun()
-}
 const queryList = () => {
     if (queryForm.name == '') {
         delete params.name;
     } else {
         params.name = queryForm.name;
     }
-    getEnvironmentListFun()
+    getEnvironmentListFun(params)
 }
 
 const Submit = () =>{
@@ -211,7 +200,7 @@ const onSubmit = async () => {
                 message: res.msg,
                 type: 'success',
             })
-            getEnvironmentListFun();
+            getEnvironmentListFun(params);
         }
         else {
             ElMessage({
@@ -234,7 +223,7 @@ const delFun = async (Did) => {
             message: res.msg,
             type: 'success',
         })
-        getEnvironmentListFun();
+        getEnvironmentListFun(params);
     }
     else {
         ElMessage({
@@ -272,7 +261,7 @@ const updateSubmit = async () => {
             message: res.msg,
             type: 'success',
         })
-        getEnvironmentListFun();
+        getEnvironmentListFun(params);
     }
     else {
         ElMessage({
@@ -285,7 +274,7 @@ const updateSubmit = async () => {
 }
 
 onMounted(() => {
-    getEnvironmentListFun();
+    getEnvironmentListFun(params);
     setTimeout(() => {
     }, 1000)
 })
