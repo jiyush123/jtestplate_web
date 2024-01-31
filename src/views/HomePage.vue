@@ -71,7 +71,7 @@
                             <div>
                                 <el-text class="mx-1 classification" type="info">通过率:
                                     <el-tooltip class="box-item" effect="light" content="最后一次执行成功的用例/用例总数*100%"
-                                        placement="top-start" show-arrow="false">
+                                        placement="top-start">
                                         <el-icon>
                                             <InfoFilled />
                                         </el-icon>
