@@ -114,15 +114,6 @@ const routes = [
         }
       },
       {
-        path: '/monaco/test',
-        name: 'monaco',
-        component: () => import(/* webpackChunkName: "monaco" */ '../views/MonacoEdit.vue'),
-        meta: {
-          isShow: true,
-          title: "编辑器测试",
-        }
-      },
-      {
         path: '/monaco/test1',
         name: 'monaco1',
         component: () => import(/* webpackChunkName: "monaco1" */ '../views/TestMonacoEdit.vue'),
