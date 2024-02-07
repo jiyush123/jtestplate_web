@@ -4,7 +4,7 @@
         <el-breadcrumb-item>新增接口测试用例</el-breadcrumb-item>
     </el-breadcrumb>
     <el-divider />
-    <el-form :model="addForm" label-width="120px" ref="ruleFormRef" class="api_case_form">
+    <el-form :model="addForm" label-width="auto" ref="ruleFormRef" class="api_case_form">
         <el-form-item label="测试用例名称" prop="name" :rules="[
             { required: true, message: '测试用例名称不能为空' },
             { min: 3, max: 30, message: '长度需要为3-30个字符' },
@@ -78,15 +78,14 @@
         <!-- 测试步骤 -->
         <draggable v-model="addForm.steps">
             <transition-group>
-                <div v-for="(step, index) in addForm.steps" :key="index" style="margin:10px">
+                <div v-for="(step, index) in addForm.steps" :key="`step_${index}`" style="margin:10px">
                     <el-collapse>
                         <el-collapse-item :name="index">
+
                             <template #title>
                                 {{ step.title + (index + 1) }}
                                 <el-button type="primary" @click="APIDialog(index)" style="margin:auto;"
                                     @click.stop>选择接口</el-button>
-                                    <el-button type="primary" @click="addBefore(index)" style="margin:auto;"
-                                    @click.stop>添加前置处理</el-button>
                                 <el-form-item label="步骤名称" :prop="'steps.' + index + '.name'"
                                     style="margin:auto; width: 300px;" :rules="[
                                         { required: true, message: '步骤名称不能为空' },
@@ -110,191 +109,201 @@
                                 <el-button class="mt-2" type="danger" @click.prevent="removeDomain(step)"
                                     @click.stop>删除步骤</el-button>
                             </template>
-                            <MonacoEdit v-if="step.before===1"/>
 
-                            <el-form-item label="请求方式" :prop="'steps.' + index + '.method'" :rules="[
-                                { required: true, message: '请选择请求方式' },
-                            ]">
-                                <el-radio-group v-model="step.method">
-                                    <el-radio label="GET" />
-                                    <el-radio label="POST" />
-                                </el-radio-group>
-                            </el-form-item>
+                            <!-- 请求方式，路径 -->
+                            
                             <el-form-item label="路径" :prop="'steps.' + index + '.uri'" :rules="[
                                 { required: true, message: '路径不能为空' },
                             ]">
-                                <el-input v-model="step.uri" />
+                                <el-input v-model="step.uri" class="input-with-select">
+                                    <template #prepend>
+                                    <el-select v-model="step.method" style="width: 100px">
+                                        <el-option label="GET" value="GET" />
+                                        <el-option label="POST" value="POST" />
+                                    </el-select>
+                                </template>
+                                </el-input>
                             </el-form-item>
-                            <!-- 请求头 -->
-                            <el-form-item label="Headers">
-                                <el-table :data="headersData[index]" border style="width: 100%">
-                                    <el-table-column prop="headerskey" label="Keys">
-                                        <template #default="scope">
-                                            <el-input v-model="headersData[index][scope.$index].headerskey" />
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column prop="headersvalue" label="Values">
-                                        <template #default="scope">
-                                            <el-input v-model="headersData[index][scope.$index].headersvalue" />
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column prop="headersdecription" label="描述">
-                                        <template #default="scope">
-                                            <el-input v-model="headersData[index][scope.$index].headersdecription" />
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column width="100">
-                                        <template #default="scope">
-                                            <el-button type="danger" @click="delHeader(index, scope.$index)">删除</el-button>
-                                        </template>
-                                    </el-table-column>
-                                </el-table>
-                            </el-form-item>
-                            <el-button type="primary" @click="addHeader(index)"
-                                style="margin-left: 50px;margin-bottom: 10px;">新增请求头参数</el-button>
-                            <!-- 请求参数 -->
-                            <el-form-item label="Params">
-                                <el-table :data="paramsData[index]" border style="width: 100%">
-                                    <el-table-column prop="paramskey" label="Keys">
-                                        <template #default="scope">
-                                            <el-input v-model="paramsData[index][scope.$index].paramskey" />
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column prop="paramsvalue" label="Values">
-                                        <template #default="scope">
-                                            <el-input v-model="paramsData[index][scope.$index].paramsvalue"
-                                                class="input-with-select">
-                                                <template #prepend>
-                                                    <el-select v-model="paramsData[index][scope.$index].paramDataType">
-                                                        <el-option label="string" value="string" />
-                                                        <el-option label="int" value="int" />
-                                                        <el-option label="bool" value="bool" />
-                                                    </el-select>
-                                                </template>
-                                            </el-input>
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column prop="paramsdecription" label="描述">
-                                        <template #default="scope">
-                                            <el-input v-model="paramsData[index][scope.$index].paramsdecription" />
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column width='100'>
-                                        <template #default="scope">
-                                            <el-button type="danger" @click="delParam(index, scope.$index)">删除</el-button>
-                                        </template>
-                                    </el-table-column>
-                                </el-table>
-                            </el-form-item>
-                            <el-button type="primary" @click="addParams(index)"
-                                style="margin-left: 50px;margin-bottom: 10px;">新增params参数</el-button>
-                            <!-- 请求体 -->
-                            <el-form-item label="Body">
-                                <el-table :data="bodyData[index]" border style="width: 100%">
-                                    <el-table-column prop="bodykey" label="Keys">
-                                        <template #default="scope">
-                                            <el-input v-model="bodyData[index][scope.$index].bodykey" />
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column prop="bodyvalue" label="Values">
-                                        <template #default="scope">
-                                            <el-input v-model="bodyData[index][scope.$index].bodyvalue"
-                                                class="input-with-select">
-                                                <template #prepend>
-                                                    <el-select v-model="bodyData[index][scope.$index].bodyDataType">
-                                                        <el-option label="string" value="string" />
-                                                        <el-option label="int" value="int" />
-                                                        <el-option label="bool" value="bool" />
-                                                    </el-select>
-                                                </template>
-                                            </el-input>
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column prop="bodydecription" label="描述">
-                                        <template #default="scope">
-                                            <el-input v-model="bodyData[index][scope.$index].bodydecription" />
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column width='100'>
-                                        <template #default="scope">
-                                            <el-button type="danger" @click="delBody(index, scope.$index)">删除</el-button>
-                                        </template>
-                                    </el-table-column>
-                                </el-table>
-                            </el-form-item>
-                            <el-button type="primary" @click="addBody(index)"
-                                style="margin-left: 50px;margin-bottom: 10px;">新增body参数</el-button>
-                            <el-form-item label="响应" :prop="'steps.' + index + '.response'">
-                                <el-input v-model="step.response" type="textarea" autosize disabled />
-                            </el-form-item>
-                            <!-- 断言 -->
-                            <el-form-item label="断言">
-                                <el-table :data="assertData[index]" border style="width: 100%">
-                                    <el-table-column prop="assertkey" label="响应值">
-                                        <template #default="scope">
-                                            <el-input v-model="assertData[index][scope.$index].assertkey" />
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column prop="assertvalue" label="期望值">
-                                        <template #default="scope">
-                                            <el-input v-model="assertData[index][scope.$index].assertvalue"
-                                                class="input-with-select">
-                                                <template #prepend>
-                                                    <el-select v-model="assertData[index][scope.$index].assertDataType">
-                                                        <el-option label="string" value="string" />
-                                                        <el-option label="int" value="int" />
-                                                        <el-option label="bool" value="bool" />
-                                                    </el-select>
-                                                </template>
-                                            </el-input>
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column prop="assertdecription" label="描述">
-                                        <template #default="scope">
-                                            <el-input v-model="assertData[index][scope.$index].assertdecription" />
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column prop="assertresult" label="结果" width="100">
-                                        <template #default="scope">
-                                            <el-input v-model="assertData[index][scope.$index].assertresult" disabled />
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column width='100'>
-                                        <template #default="scope">
-                                            <el-button type="danger" @click="delAssert(index, scope.$index)">删除</el-button>
-                                        </template>
-                                    </el-table-column>
-                                </el-table>
-                            </el-form-item>
-                            <el-button type="primary" @click="addAssert(index)"
-                                style="margin-left: 50px;margin-bottom: 10px;">新增断言</el-button>
-                                <!-- 提取参数 -->
-                            <el-form-item label="提取参数">
-                                <el-table :data="extractData[index]" border style="width: 100%">
-                                    <el-table-column prop="extractkey" label="Keys">
-                                        <template #default="scope">
-                                            <el-input v-model="extractData[index][scope.$index].extractkey" />
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column prop="extractvalue" label="Values">
-                                        <template #default="scope">
-                                            <el-input v-model="extractData[index][scope.$index].extractvalue" />
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column prop="extractdecription" label="描述">
-                                        <template #default="scope">
-                                            <el-input v-model="extractData[index][scope.$index].extractdecription" />
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column width='100'>
-                                        <template #default="scope">
-                                            <el-button type="danger" @click="delExtract(index, scope.$index)">删除</el-button>
-                                        </template>
-                                    </el-table-column>
-                                </el-table>
-                            </el-form-item>
-                            <el-button type="primary" @click="addExtract(index)"
-                                style="margin-left: 50px;margin-bottom: 10px;">新增提取参数</el-button>
+                            
+                                <!-- TAB -->
+                                <el-tabs type="border-card">
+                                    <!-- 调试params封装子组件 -->
+                                    <el-tab-pane label="Params">
+                                        <request-params v-model:params="step.params"/>
+
+                                    </el-tab-pane>
+
+                                    <el-tab-pane label="Body">
+                                        <el-form-item>
+                                            <el-table :data="bodyData[index]" border style="width: 100%">
+                                                <el-table-column prop="bodykey" label="Keys">
+                                                    <template #default="scope">
+                                                        <el-input v-model="bodyData[index][scope.$index].bodykey" />
+                                                    </template>
+                                                </el-table-column>
+                                                <el-table-column prop="bodyvalue" label="Values">
+                                                    <template #default="scope">
+                                                        <el-input v-model="bodyData[index][scope.$index].bodyvalue"
+                                                            class="input-with-select">
+                                                            <template #prepend>
+                                                                <el-select
+                                                                    v-model="bodyData[index][scope.$index].bodyDataType">
+                                                                    <el-option label="string" value="string" />
+                                                                    <el-option label="int" value="int" />
+                                                                    <el-option label="bool" value="bool" />
+                                                                </el-select>
+                                                            </template>
+                                                        </el-input>
+                                                    </template>
+                                                </el-table-column>
+                                                <el-table-column prop="bodydecription" label="描述">
+                                                    <template #default="scope">
+                                                        <el-input v-model="bodyData[index][scope.$index].bodydecription" />
+                                                    </template>
+                                                </el-table-column>
+                                                <el-table-column width='100'>
+                                                    <template #default="scope">
+                                                        <el-button type="danger"
+                                                            @click="delBody(index, scope.$index)">删除</el-button>
+                                                    </template>
+                                                </el-table-column>
+                                            </el-table>
+                                        </el-form-item>
+                                        <el-button type="primary" @click="addBody(index)"
+                                            style="margin-left: 50px;margin-bottom: 10px;">新增body参数</el-button>
+                                    </el-tab-pane>
+
+                                    <el-tab-pane label="Headers">
+                                        <el-form-item>
+                                            <el-table :data="headersData[index]" border style="width: 100%">
+                                                <el-table-column prop="headerskey" label="Keys">
+                                                    <template #default="scope">
+                                                        <el-input v-model="headersData[index][scope.$index].headerskey" />
+                                                    </template>
+                                                </el-table-column>
+                                                <el-table-column prop="headersvalue" label="Values">
+                                                    <template #default="scope">
+                                                        <el-input v-model="headersData[index][scope.$index].headersvalue" />
+                                                    </template>
+                                                </el-table-column>
+                                                <el-table-column prop="headersdecription" label="描述">
+                                                    <template #default="scope">
+                                                        <el-input
+                                                            v-model="headersData[index][scope.$index].headersdecription" />
+                                                    </template>
+                                                </el-table-column>
+                                                <el-table-column width="100">
+                                                    <template #default="scope">
+                                                        <el-button type="danger"
+                                                            @click="delHeader(index, scope.$index)">删除</el-button>
+                                                    </template>
+                                                </el-table-column>
+                                            </el-table>
+                                        </el-form-item>
+                                        <el-button type="primary" @click="addHeader(index)"
+                                            style="margin-left: 50px;margin-bottom: 10px;">新增请求头参数</el-button>
+                                    </el-tab-pane>
+
+                                    <el-tab-pane label="断言">
+                                        <el-form-item>
+                                            <el-table :data="assertData[index]" border style="width: 100%">
+                                                <el-table-column prop="assertkey" label="响应值">
+                                                    <template #default="scope">
+                                                        <el-input v-model="assertData[index][scope.$index].assertkey" />
+                                                    </template>
+                                                </el-table-column>
+                                                <el-table-column prop="assertvalue" label="期望值">
+                                                    <template #default="scope">
+                                                        <el-input v-model="assertData[index][scope.$index].assertvalue"
+                                                            class="input-with-select">
+                                                            <template #prepend>
+                                                                <el-select
+                                                                    v-model="assertData[index][scope.$index].assertDataType">
+                                                                    <el-option label="string" value="string" />
+                                                                    <el-option label="int" value="int" />
+                                                                    <el-option label="bool" value="bool" />
+                                                                </el-select>
+                                                            </template>
+                                                        </el-input>
+                                                    </template>
+                                                </el-table-column>
+                                                <el-table-column prop="assertdecription" label="描述">
+                                                    <template #default="scope">
+                                                        <el-input
+                                                            v-model="assertData[index][scope.$index].assertdecription" />
+                                                    </template>
+                                                </el-table-column>
+                                                <el-table-column prop="assertresult" label="结果" width="100">
+                                                    <template #default="scope">
+                                                        <el-input v-model="assertData[index][scope.$index].assertresult"
+                                                            disabled />
+                                                    </template>
+                                                </el-table-column>
+                                                <el-table-column width='100'>
+                                                    <template #default="scope">
+                                                        <el-button type="danger"
+                                                            @click="delAssert(index, scope.$index)">删除</el-button>
+                                                    </template>
+                                                </el-table-column>
+                                            </el-table>
+                                        </el-form-item>
+                                        <el-button type="primary" @click="addAssert(index)"
+                                            style="margin-left: 50px;margin-bottom: 10px;">新增断言</el-button>
+                                    </el-tab-pane>
+
+                                    <el-tab-pane label="提取参数">
+                                        <el-form-item>
+                                            <el-table :data="extractData[index]" border style="width: 100%">
+                                                <el-table-column prop="extractkey" label="Keys">
+                                                    <template #default="scope">
+                                                        <el-input v-model="extractData[index][scope.$index].extractkey" />
+                                                    </template>
+                                                </el-table-column>
+                                                <el-table-column prop="extractvalue" label="Values">
+                                                    <template #default="scope">
+                                                        <el-input v-model="extractData[index][scope.$index].extractvalue" />
+                                                    </template>
+                                                </el-table-column>
+                                                <el-table-column prop="extractdecription" label="描述">
+                                                    <template #default="scope">
+                                                        <el-input
+                                                            v-model="extractData[index][scope.$index].extractdecription" />
+                                                    </template>
+                                                </el-table-column>
+                                                <el-table-column width='100'>
+                                                    <template #default="scope">
+                                                        <el-button type="danger"
+                                                            @click="delExtract(index, scope.$index)">删除</el-button>
+                                                    </template>
+                                                </el-table-column>
+                                            </el-table>
+                                        </el-form-item>
+                                        <el-button type="primary" @click="addExtract(index)"
+                                            style="margin-left: 50px;margin-bottom: 10px;">新增提取参数</el-button>
+                                    </el-tab-pane>
+
+                                    <el-tab-pane label="前置处理">
+                                        <el-form-item>
+
+                                            <monaco-edit v-model:code="step.beforecode" />
+
+                                        </el-form-item>
+                                    </el-tab-pane>
+                                    <el-tab-pane label="后置处理">
+                                        <el-form-item>
+
+                                            <monaco-edit v-model:code="step.aftercode" />
+
+                                        </el-form-item>
+                                    </el-tab-pane>
+                                </el-tabs>
+                                <!-- 返回响应 -->
+                                <el-form-item label="返回响应" :prop="'steps.' + index + '.response'">
+                                    <el-input v-model="step.response" type="textarea" autosize disabled />
+                                </el-form-item>
+
+
+
                         </el-collapse-item>
                     </el-collapse>
                 </div>
@@ -385,8 +394,12 @@
     background-color: var(--el-fill-color-blank);
 }
 
-.input-with-select .el-select{
+.input-with-select .el-select {
     width: 80px;
+}
+
+.input-with-select .el-input-group__prepend {
+  background-color: var(--el-fill-color-blank);
 }
 </style>
 
@@ -397,6 +410,7 @@ import { getAPIList, getAPIInfo, addAPICase, getEnvironmentList, debugAPICase } 
 import { ElMessage } from 'element-plus';
 import { VueDraggableNext as Draggable } from 'vue-draggable-next';
 import MonacoEdit from './MonacoEdit.vue';
+import RequestParams from './RequestParams.vue';
 
 
 
@@ -514,7 +528,7 @@ const addForm = reactive({
         title: "步骤",
         sort: null,
         name: '',
-        method: '',
+        method: 'GET',
         uri: '',
         headers: {},
         params: {},
@@ -524,7 +538,8 @@ const addForm = reactive({
         response: '',
         assert_result: {},
         extract: {},
-        before:0,
+        beforecode: ref(''),
+        aftercode: ref(''),
     }],
     created_user: localStorage.getItem('name'),
     updated_user: localStorage.getItem('name'),
@@ -538,7 +553,7 @@ const AddStep = () => {
         title: "步骤",
         sort: null,
         name: '',
-        method: '',
+        method: 'GET',
         uri: '',
         headers: {},
         params: {},
@@ -548,7 +563,8 @@ const AddStep = () => {
         response: '',
         assert_result: {},
         extract: {},
-        before:0,
+        beforecode: ref(''),
+        aftercode: ref(''),
     });
     headersData.push([]);
     paramsData.push([]);
@@ -597,16 +613,6 @@ const addHeader = (index) => {
 
 const delHeader = (index, delindex) => {
     headersData[index].splice(delindex, 1);
-}
-
-const addParams = (index) => {
-    paramsData[index].push({
-        paramDataType: 'string'
-    })
-}
-
-const delParam = (index, delindex) => {
-    paramsData[index].splice(delindex, 1);
 }
 
 const addBody = (index) => {
@@ -668,7 +674,7 @@ const SelectApi = async (id) => {
             let value = res.data.params[key];
             params.push({
                 paramskey: key,
-                paramDataType: data_type.get(typeof(value.value)),
+                paramDataType: data_type.get(typeof (value.value)),
                 paramsvalue: value.value,
                 paramsdecription: value.decription
             })
@@ -679,7 +685,7 @@ const SelectApi = async (id) => {
             let value = res.data.body[key];
             bodys.push({
                 bodykey: key,
-                bodyDataType: data_type.get(typeof(value.value)),
+                bodyDataType: data_type.get(typeof (value.value)),
                 bodyvalue: value.value,
                 bodydecription: value.decription
             })
@@ -713,6 +719,7 @@ const assertForm = async () => {
 }
 
 const onSubmit = async () => {
+    console.log(addForm)
     const result = await assertForm()
     if (!result) return
     else {
@@ -951,12 +958,12 @@ const debug = async () => {
                     for (let j = 0; j < res.data.asserts_info[i].length; j++) {
                         assertData[i][j].assertresult = res.data.asserts_info[i][j].assert_result;
                         // 步骤断言结果是否包含error，包含将步骤结果设置为error，并用例变成error
-                        if (assertData[i][j].assertresult === 'error'){
+                        if (assertData[i][j].assertresult === 'error') {
                             addForm.steps[i].result = 'error';
                             addForm.result = 'error';
                         }
                     }
-                    if (addForm.steps[i].result !== 'error'){
+                    if (addForm.steps[i].result !== 'error') {
                         addForm.steps[i].result = 'success';
                     }
                 }
@@ -1002,7 +1009,5 @@ const debug = async () => {
     }
 }
 
-const addBefore =(index)=>{
-    addForm.steps[index].before = 1;
-}
+
 </script>
