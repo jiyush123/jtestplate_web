@@ -520,21 +520,7 @@ const editform = reactive({
     name: '',
     level: '',
     status: 1,
-    steps: [{
-        title: "步骤",
-        sort: null,
-        name: '',
-        method: '',
-        uri: '',
-        headers: {},
-        params: {},
-        body: {},
-        time: '',
-        result: '',
-        response: '',
-        assert_result: {},
-        extract: {},
-    }],
+    steps: [],
     updated_user: localStorage.getItem('name'),
     time: '',
     result: '',
@@ -577,24 +563,24 @@ const removeDomain = (step) => {
 }
 
 const headersData = reactive(
-    [[]]
+    []
 );
 
 const paramsData = reactive(
-    [[]]
+    []
 );
 
 const bodyData = reactive(
     // 默认为空，需要再点击添加，否则为空时保存的是空对象，有些接口需要空对象时添加一个空行即可
-    [[]]
+    []
 );
 
 const assertData = reactive(
-    [[]]
+    []
 );
 
 const extractData = reactive(
-    [[]]
+    []
 );
 
 const addHeader = (index) => {
@@ -716,12 +702,12 @@ const getCaseInfo = async () => {
         editform.status = status.get(res.data.case.status);
         editform.level = res.data.case.level;
 
-        editform.steps.pop();
-        headersData.pop();
-        paramsData.pop();
-        bodyData.pop();
-        assertData.pop();
-        extractData.pop();
+        // editform.steps.pop();
+        // headersData.pop();
+        // paramsData.pop();
+        // bodyData.pop();
+        // assertData.pop();
+        // extractData.pop();
         // 测试步骤赋值
         for (let i = 0; i < res.data.steps.length; i++) {
             AddStep();
