@@ -1,6 +1,4 @@
 <template>
-    <!-- <el-form :model="params" label-width="120px">
-    <el-form-item> -->
     <el-table :data="paramsData" border style="width: 100%">
         <el-table-column prop="paramskey" label="Keys">
             <template #default="scope">
@@ -31,9 +29,7 @@
             </template>
         </el-table-column>
     </el-table>
-    <!-- </el-form-item>
-</el-form> -->
-    <el-button type="primary" @click="addParams()" style="margin-left: 50px;margin-bottom: 10px;">新增params参数</el-button>
+    <el-button type="primary" @click="addParams()" style="margin-top: 10px;">新增params参数</el-button>
 </template>
 <style>
 .input-with-select .el-input-group__prepend {
@@ -41,17 +37,17 @@
 }
 
 .input-with-select .el-select {
-    width: 80px;
+    width: 85px;
 }
 </style>
 <script setup>
-import { reactive, watch, defineEmits, defineProps,onMounted } from 'vue';
+import { reactive, defineProps, defineExpose, onMounted } from 'vue';
 // 接收父组件传过来的数据结构addForm.steps[i].params  {key:{value:xxx,des:xxx},key:{value:xxx,des:xxx}}
 
 const props = defineProps({
     params: Object,
 })
-const emit = defineEmits(['update:params'])
+// const emit = defineEmits(['update:params'])
 
 const paramsData = reactive(
     []
@@ -88,36 +84,51 @@ const getParams = () => {
     }
 }
 
-const formatParams = (paramsData) => {
+const formatParams = () => {
     let params = {};
-    for (let i = 0; i < paramsData.length; i++) {
-        if (paramsData[i].paramDataType === 'int') {
-            paramsData[i].paramsvalue = Number(paramsData[i].paramsvalue);
-        }
-        else if (paramsData[i].paramDataType === 'bool') {
-            if (paramsData[i].paramsvalue === 'false') {
-                paramsData[i].paramsvalue = false;
+    // 首先使用 Object.keys(addform.params).length === 0 检查addform.params是否没有任何属性，
+    // 接着通过addform.params.constructor === Object确认它确实是一个对象（而不是其他类型）。
+    // 如果满足这两个条件，则将addform.params设置为null，数据库存null，否则存null
+    if (paramsData.length === 0) {
+        params = null
+    }
+    // 如果需要一个{}，则添加一个不输入key的参数
+    else if (paramsData.length === 1 && paramsData[0].paramskey === undefined) {
+        params = {}
+    }
+    else {
+        for (let i = 0; i < paramsData.length; i++) {
+            if (paramsData[i].paramDataType === 'int') {
+                paramsData[i].paramsvalue = Number(paramsData[i].paramsvalue);
             }
-            else {
-                paramsData[i].paramsvalue = true;
+            else if (paramsData[i].paramDataType === 'bool') {
+                if (paramsData[i].paramsvalue === 'false') {
+                    paramsData[i].paramsvalue = false;
+                }
+                else {
+                    paramsData[i].paramsvalue = true;
+                }
             }
+            params[paramsData[i].paramskey] = { "value": paramsData[i].paramsvalue, "decription": paramsData[i].paramsdecription };
         }
-        params[paramsData[i].paramskey] = { "value": paramsData[i].paramsvalue,"decription":paramsData[i].paramsdecription };
     }
     return params
 }
 
 // defineExpose({get:()=>formatParams(paramsData)})
+defineExpose({ getParams, formatParams })
 
-watch(() => paramsData, (paramsData) => {
-    emit('update:params', formatParams(paramsData))
-},
-    { deep: true } // 开启深度监听
-)
+
+// watch(() => paramsData, (paramsData) => {
+//     emit('update:params', formatParams(paramsData))
+// },
+//     { deep: true } // 开启深度监听
+// )
 
 onMounted(() => {
     getParams();
     setTimeout(() => {
     }, 1000)
 })
+
 </script>
