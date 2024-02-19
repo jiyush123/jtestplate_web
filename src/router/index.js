@@ -119,7 +119,16 @@ const routes = [
         component: () => import(/* webpackChunkName: "monaco1" */ '../views/TestMonacoEdit.vue'),
         meta: {
           isShow: true,
-          title: "编辑器嵌入页面",
+          title: "调试用例子组件",
+        }
+      },
+      {
+        path: '/test/apiadd',
+        name: 'testapiadd',
+        component: () => import(/* webpackChunkName: "testapiadd" */ '../views/TestAPIAdd.vue'),
+        meta: {
+          isShow: true,
+          title: "调试新增api子组件",
         }
       },
       // {
