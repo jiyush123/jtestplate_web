@@ -2,17 +2,17 @@
     <el-table :data="headersData" border style="width: 100%">
         <el-table-column prop="headerskey" label="Keys">
             <template #default="scope">
-                <el-input v-model="headersData[scope.$index].headerskey" />
+                <el-input v-model="headersData[scope.$index].headerskey" @input="emit('update:headers', changeHeaders())"/>
             </template>
         </el-table-column>
         <el-table-column prop="headersvalue" label="Values">
             <template #default="scope">
-                <el-input v-model="headersData[scope.$index].headersvalue" class="input-with-select">
+                <el-input v-model="headersData[scope.$index].headersvalue" class="input-with-select" @input="emit('update:headers', changeHeaders())">
                     <template #prepend>
                         <el-select v-model="headersData[scope.$index].headersDataType">
-                            <el-option label="string" value="string" />
-                            <el-option label="int" value="int" />
-                            <el-option label="bool" value="bool" />
+                            <el-option label="string" value="string" @input="emit('update:headers', changeHeaders())"/>
+                            <el-option label="int" value="int" @input="emit('update:headers', changeHeaders())"/>
+                            <el-option label="bool" value="bool" @input="emit('update:headers', changeHeaders())"/>
                         </el-select>
                     </template>
                 </el-input>
@@ -20,7 +20,7 @@
         </el-table-column>
         <el-table-column prop="headersdecription" label="描述">
             <template #default="scope">
-                <el-input v-model="headersData[scope.$index].headersdecription" />
+                <el-input v-model="headersData[scope.$index].headersdecription" @input="emit('update:headers', changeHeaders())"/>
             </template>
         </el-table-column>
         <el-table-column width='100'>
@@ -41,13 +41,13 @@
 }
 </style>
 <script setup>
-import { reactive, defineProps, defineExpose, onMounted } from 'vue';
+import { reactive, defineProps, defineEmits, defineExpose, onMounted } from 'vue';
 // 接收父组件传过来的数据结构addForm.steps[i].headers  {key:{value:xxx,des:xxx},key:{value:xxx,des:xxx}}
 
 const props = defineProps({
     headers: Object,
 })
-// const emit = defineEmits(['update:headers'])
+const emit = defineEmits(['update:headers'])
 
 const headersData = reactive(
     []
@@ -72,7 +72,8 @@ const delheaders = (delindex) => {
     headersData.splice(delindex, 1);
 }
 
-const getheaders = () => {
+const getHeaders = () => {
+    headersData.length = 0;
     for (let key in props.headers) {
         let value = props.headers[key];
         headersData.push({
@@ -84,37 +85,49 @@ const getheaders = () => {
     }
 }
 
-const formatHeaders = () => {
+const changeHeaders = () => {
     let headers = {};
+    
     if (headersData.length === 0) {
         headers = null
     }
+    // 如果需要一个{}，则添加一个不输入key的参数
     else if (headersData.length === 1 && headersData[0].headerskey === undefined) {
         headers = {}
     }
     else {
         for (let i = 0; i < headersData.length; i++) {
-            if (headersData[i].headersDataType === 'int') {
-                headersData[i].headersvalue = Number(headersData[i].headersvalue);
-            }
-            else if (headersData[i].headersDataType === 'bool') {
-                if (headersData[i].headersvalue === 'false') {
-                    headersData[i].headersvalue = false;
-                }
-                else {
-                    headersData[i].headersvalue = true;
-                }
-            }
-            headers[headersData[i].headerskey] = { "value": headersData[i].headersvalue, "decription": headersData[i].headersdecription };
+            headers[headersData[i].headerskey] = { "datatype": headersData[i].headersDataType, "value": headersData[i].headersvalue, "decription": headersData[i].headersdecription };
         }
     }
     return headers
 }
 
-defineExpose({ getheaders, formatHeaders })
+const formatHeaders = () => {
+    let headers = props.headers;
+    if (Object.keys(headers).length > 0) {
+        for (let key in headers) {
+            if (headers[key].datatype === 'int') {
+                headers[key].value = Number(headers[key].value);
+            }
+            else if (headers[key].datatype === 'bool') {
+        if (headers[key].value === 'false') {
+            headers[key].value = false;
+        }
+        else {
+            headers[key].value = true;
+        }
+    }
+    headers[key] = { "value": headers[key].value, "decription": headers[key].decription };
+}
+    }
+return headers
+}
+
+defineExpose({ getHeaders,formatHeaders })
 
 onMounted(() => {
-    getheaders();
+    getHeaders();
     setTimeout(() => {
     }, 1000)
 })

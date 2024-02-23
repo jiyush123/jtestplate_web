@@ -49,36 +49,12 @@
             <el-tab-pane label="Body">
                 <request-body ref="reqbody" v-model:body="addform.body" />
 
+
             </el-tab-pane>
 
             <el-tab-pane label="Headers">
                 <request-header ref="reqheader" v-model:headers="addform.headers" />
-                <!-- <el-form-item>
-                    <el-table :data="headersData" border style="width: 100%">
-                        <el-table-column prop="headerskey" label="Keys">
-                            <template #default="scope">
-                                <el-input v-model="headersData[scope.$index].headerskey" />
-                            </template>
-                        </el-table-column>
-                        <el-table-column prop="headersvalue" label="Values">
-                            <template #default="scope">
-                                <el-input v-model="headersData[scope.$index].headersvalue" />
-                            </template>
-                        </el-table-column>
-                        <el-table-column prop="headersdecription" label="描述">
-                            <template #default="scope">
-                                <el-input v-model="headersData[scope.$index].headersdecription" />
-                            </template>
-                        </el-table-column>
-                        <el-table-column width="100">
-                            <template #default="scope">
-                                <el-button type="danger" @click="delHeader(scope.$index)">删除</el-button>
-                            </template>
-                        </el-table-column>
-                    </el-table>
-                </el-form-item>
-                <el-button type="primary" @click="addHeader"
-                    style="margin-left: 50px;margin-bottom: 10px;">新增请求头参数</el-button> -->
+
             </el-tab-pane>
 
         </el-tabs>
@@ -302,32 +278,41 @@ const debug = async () => {
         addform.headers = reqheader.value.formatHeaders();
         // 发送调试
         const res = await debugAPI(addform);
-        console.log(res)
-        if (res[0].status) {
-            const response = JSON.stringify(res[0].response, null, 2);
-            debug_res.response = response;
-            debug_res.status_code = res[0].status_code;
-            debug_res.status = res[0].status;
+        try {
+            if (res[0].status) {
+                const response = JSON.stringify(res[0].response, null, 2);
+                debug_res.response = response;
+                debug_res.status_code = res[0].status_code;
+                debug_res.status = res[0].status;
 
-            drawer.value = true;
-            ElMessage({
-                showClose: true,
-                center: true,
-                message: res[0].msg,
-                type: 'success',
-            })
+                drawer.value = true;
+                ElMessage({
+                    showClose: true,
+                    center: true,
+                    message: res[0].msg,
+                    type: 'success',
+                })
+            }
+            else {
+                ElMessage({
+                    showClose: true,
+                    center: true,
+                    message: res[0].msg,
+                    type: 'error',
+                })
+            }
         }
-        else {
+        catch {
             ElMessage({
                 showClose: true,
                 center: true,
-                message: res[0].msg,
+                message: '请求异常',
                 type: 'error',
             })
         }
-        addform.headers = {}; // 调试后需要重置，不然修改参数会新增多一条数据
-        addform.params = {}; // 调试后需要重置，不然修改参数会新增多一条数据
-        addform.body = {}; // 调试后需要重置，不然修改参数会新增多一条数据
+        // addform.headers = {}; // 调试后需要重置，不然修改参数会新增多一条数据
+        // addform.params = {}; // 调试后需要重置，不然修改参数会新增多一条数据
+        // addform.body = {}; // 调试后需要重置，不然修改参数会新增多一条数据
         cancelDialog();
     }
 }

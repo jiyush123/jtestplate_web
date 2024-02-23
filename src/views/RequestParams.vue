@@ -2,17 +2,18 @@
     <el-table :data="paramsData" border style="width: 100%">
         <el-table-column prop="paramskey" label="Keys">
             <template #default="scope">
-                <el-input v-model="paramsData[scope.$index].paramskey" />
+                <el-input v-model="paramsData[scope.$index].paramskey" @input="emit('update:params', changeParams())" />
             </template>
         </el-table-column>
         <el-table-column prop="paramsvalue" label="Values">
             <template #default="scope">
-                <el-input v-model="paramsData[scope.$index].paramsvalue" class="input-with-select">
+                <el-input class="input-with-select" v-model="paramsData[scope.$index].paramsvalue"
+                    @input="emit('update:params', changeParams())">
                     <template #prepend>
                         <el-select v-model="paramsData[scope.$index].paramDataType">
-                            <el-option label="string" value="string" />
-                            <el-option label="int" value="int" />
-                            <el-option label="bool" value="bool" />
+                            <el-option label="string" value="string" @click="emit('update:params', changeParams())" />
+                            <el-option label="int" value="int" @click="emit('update:params', changeParams())" />
+                            <el-option label="bool" value="bool" @click="emit('update:params', changeParams())" />
                         </el-select>
                     </template>
                 </el-input>
@@ -20,7 +21,7 @@
         </el-table-column>
         <el-table-column prop="paramsdecription" label="描述">
             <template #default="scope">
-                <el-input v-model="paramsData[scope.$index].paramsdecription" />
+                <el-input v-model="paramsData[scope.$index].paramsdecription" @input="emit('update:params', changeParams())" />
             </template>
         </el-table-column>
         <el-table-column width='100'>
@@ -41,15 +42,15 @@
 }
 </style>
 <script setup>
-import { reactive, defineProps, defineExpose, onMounted } from 'vue';
+import { reactive, defineProps, defineEmits, defineExpose, onMounted } from 'vue';
 // 接收父组件传过来的数据结构addForm.steps[i].params  {key:{value:xxx,des:xxx},key:{value:xxx,des:xxx}}
 
 const props = defineProps({
     params: Object,
 })
-// const emit = defineEmits(['update:params'])
+const emit = defineEmits(['update:params'])
 
-const paramsData = reactive(
+let paramsData = reactive(
     []
 );
 
@@ -73,6 +74,7 @@ const delParam = (delindex) => {
 }
 
 const getParams = () => {
+    paramsData.length = 0;
     for (let key in props.params) {
         let value = props.params[key];
         paramsData.push({
@@ -84,7 +86,7 @@ const getParams = () => {
     }
 }
 
-const formatParams = () => {
+const changeParams = () => {
     let params = {};
     // 首先使用 Object.keys(addform.params).length === 0 检查addform.params是否没有任何属性，
     // 接着通过addform.params.constructor === Object确认它确实是一个对象（而不是其他类型）。
@@ -98,32 +100,37 @@ const formatParams = () => {
     }
     else {
         for (let i = 0; i < paramsData.length; i++) {
-            if (paramsData[i].paramDataType === 'int') {
-                paramsData[i].paramsvalue = Number(paramsData[i].paramsvalue);
-            }
-            else if (paramsData[i].paramDataType === 'bool') {
-                if (paramsData[i].paramsvalue === 'false') {
-                    paramsData[i].paramsvalue = false;
-                }
-                else {
-                    paramsData[i].paramsvalue = true;
-                }
-            }
-            params[paramsData[i].paramskey] = { "value": paramsData[i].paramsvalue, "decription": paramsData[i].paramsdecription };
+            params[paramsData[i].paramskey] = { "datatype": paramsData[i].paramDataType, "value": paramsData[i].paramsvalue, "decription": paramsData[i].paramsdecription };
         }
     }
     return params
 }
 
-// defineExpose({get:()=>formatParams(paramsData)})
+const formatParams = () => {// params = {key1:{datatype:xxx,value:xxx,decription:xxx},key2:{datatype:xxx,value:xxx,decription:xxx}}
+    let params = props.params;
+    if (Object.keys(params).length > 0) {
+        for (let key in params) {
+            if (params[key].datatype === 'int') {
+                params[key].value = Number(params[key].value);
+            }
+            else if (params[key].datatype === 'bool') {
+        if (params[key].value === 'false') {
+            params[key].value = false;
+        }
+        else {
+            params[key].value = true;
+        }
+    }
+    params[key] = { "value": params[key].value, "decription": params[key].decription };
+}
+    }
+return params
+}
+
 defineExpose({ getParams, formatParams })
 
-
-// watch(() => paramsData, (paramsData) => {
-//     emit('update:params', formatParams(paramsData))
-// },
-//     { deep: true } // 开启深度监听
-// )
+// const params = toRefs(props).params;
+// watch(params, () => { console.log('更新') }, { deep: true })
 
 onMounted(() => {
     getParams();

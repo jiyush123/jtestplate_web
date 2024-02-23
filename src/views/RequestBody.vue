@@ -2,17 +2,17 @@
     <el-table :data="bodyData" border style="width: 100%">
         <el-table-column prop="bodykey" label="Keys">
             <template #default="scope">
-                <el-input v-model="bodyData[scope.$index].bodykey" />
+                <el-input v-model="bodyData[scope.$index].bodykey" @input="emit('update:body', changeBody())"/>
             </template>
         </el-table-column>
         <el-table-column prop="bodyvalue" label="Values">
             <template #default="scope">
-                <el-input v-model="bodyData[scope.$index].bodyvalue" class="input-with-select">
+                <el-input v-model="bodyData[scope.$index].bodyvalue" class="input-with-select" @input="emit('update:body', changeBody())">
                     <template #prepend>
                         <el-select v-model="bodyData[scope.$index].bodyDataType">
-                            <el-option label="string" value="string" />
-                            <el-option label="int" value="int" />
-                            <el-option label="bool" value="bool" />
+                            <el-option label="string" value="string" @input="emit('update:body', changeBody())"/>
+                            <el-option label="int" value="int" @input="emit('update:body', changeBody())"/>
+                            <el-option label="bool" value="bool" @input="emit('update:body', changeBody())"/>
                         </el-select>
                     </template>
                 </el-input>
@@ -20,7 +20,7 @@
         </el-table-column>
         <el-table-column prop="bodydecription" label="描述">
             <template #default="scope">
-                <el-input v-model="bodyData[scope.$index].bodydecription" />
+                <el-input v-model="bodyData[scope.$index].bodydecription" @input="emit('update:body', changeBody())"/>
             </template>
         </el-table-column>
         <el-table-column width='100'>
@@ -41,13 +41,13 @@
 }
 </style>
 <script setup>
-import { reactive, defineProps, defineExpose, onMounted } from 'vue';
+import { reactive, defineProps, defineEmits, defineExpose, onMounted } from 'vue';
 // 接收父组件传过来的数据结构addForm.steps[i].body  {key:{value:xxx,des:xxx},key:{value:xxx,des:xxx}}
 
 const props = defineProps({
     body: Object,
 })
-// const emit = defineEmits(['update:body'])
+const emit = defineEmits(['update:body'])
 
 const bodyData = reactive(
     []
@@ -72,7 +72,8 @@ const delbody = (delindex) => {
     bodyData.splice(delindex, 1);
 }
 
-const getbody = () => {
+const getBody = () => {
+    bodyData.length = 0;
     for (let key in props.body) {
         let value = props.body[key];
         bodyData.push({
@@ -84,37 +85,49 @@ const getbody = () => {
     }
 }
 
-const formatBody = () => {
+const changeBody = () => {
     let body = {};
+    
     if (bodyData.length === 0) {
         body = null
     }
+    // 如果需要一个{}，则添加一个不输入key的参数
     else if (bodyData.length === 1 && bodyData[0].bodykey === undefined) {
         body = {}
     }
     else {
         for (let i = 0; i < bodyData.length; i++) {
-            if (bodyData[i].bodyDataType === 'int') {
-                bodyData[i].bodyvalue = Number(bodyData[i].bodyvalue);
-            }
-            else if (bodyData[i].bodyDataType === 'bool') {
-                if (bodyData[i].bodyvalue === 'false') {
-                    bodyData[i].bodyvalue = false;
-                }
-                else {
-                    bodyData[i].bodyvalue = true;
-                }
-            }
-            body[bodyData[i].bodykey] = { "value": bodyData[i].bodyvalue, "decription": bodyData[i].bodydecription };
+            body[bodyData[i].bodykey] = { "datatype": bodyData[i].bodyDataType, "value": bodyData[i].bodyvalue, "decription": bodyData[i].bodydecription };
         }
     }
     return body
 }
 
-defineExpose({ getbody, formatBody })
+const formatBody = () => {
+    let body = props.body;
+    if (Object.keys(body).length > 0) {
+        for (let key in body) {
+            if (body[key].datatype === 'int') {
+                body[key].value = Number(body[key].value);
+            }
+            else if (body[key].datatype === 'bool') {
+        if (body[key].value === 'false') {
+            body[key].value = false;
+        }
+        else {
+            body[key].value = true;
+        }
+    }
+    body[key] = { "value": body[key].value, "decription": body[key].decription };
+}
+    }
+return body
+}
+
+defineExpose({ getBody,formatBody })
 
 onMounted(() => {
-    getbody();
+    getBody();
     setTimeout(() => {
     }, 1000)
 })
