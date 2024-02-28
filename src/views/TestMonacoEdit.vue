@@ -144,6 +144,11 @@
                                 </el-tab-pane>
 
                                 <el-tab-pane label="断言">
+                                    <request-assert :ref=assertRef(index) v-model:assert="step.assert_result" />
+
+                                </el-tab-pane>
+
+                                <!-- <el-tab-pane label="断言">
                                     <el-form-item>
                                         <el-table :data="assertData[index]" border style="width: 100%">
                                             <el-table-column prop="assertkey" label="响应值">
@@ -187,37 +192,12 @@
                                     </el-form-item>
                                     <el-button type="primary" @click="addAssert(index)"
                                         style="margin-left: 50px;margin-bottom: 10px;">新增断言</el-button>
-                                </el-tab-pane>
+                                </el-tab-pane> -->
+
 
                                 <el-tab-pane label="提取参数">
-                                    <el-form-item>
-                                        <el-table :data="extractData[index]" border style="width: 100%">
-                                            <el-table-column prop="extractkey" label="Keys">
-                                                <template #default="scope">
-                                                    <el-input v-model="extractData[index][scope.$index].extractkey" />
-                                                </template>
-                                            </el-table-column>
-                                            <el-table-column prop="extractvalue" label="Values">
-                                                <template #default="scope">
-                                                    <el-input v-model="extractData[index][scope.$index].extractvalue" />
-                                                </template>
-                                            </el-table-column>
-                                            <el-table-column prop="extractdecription" label="描述">
-                                                <template #default="scope">
-                                                    <el-input
-                                                        v-model="extractData[index][scope.$index].extractdecription" />
-                                                </template>
-                                            </el-table-column>
-                                            <el-table-column width='100'>
-                                                <template #default="scope">
-                                                    <el-button type="danger"
-                                                        @click="delExtract(index, scope.$index)">删除</el-button>
-                                                </template>
-                                            </el-table-column>
-                                        </el-table>
-                                    </el-form-item>
-                                    <el-button type="primary" @click="addExtract(index)"
-                                        style="margin-left: 50px;margin-bottom: 10px;">新增提取参数</el-button>
+                                    <request-extract :ref=extractRef(index) v-model:extract="step.extract" />
+
                                 </el-tab-pane>
 
                                 <el-tab-pane label="前置处理">
@@ -327,22 +307,10 @@
 .debugBtn {
     justify-content: flex-end;
 }
-
-.input-with-select .el-input-group__prepend {
-    background-color: var(--el-fill-color-blank);
-}
-
-.input-with-select .el-select {
-    width: 80px;
-}
-
-.input-with-select .el-input-group__prepend {
-    background-color: var(--el-fill-color-blank);
-}
 </style>
 
 <script setup>
-import { ref, reactive,nextTick } from 'vue';
+import { ref, reactive, nextTick } from 'vue';
 import router from "../router/index";
 import { getAPIList, getAPIInfo, addAPICase, getEnvironmentList, debugAPICase } from '../http/api';
 import { ElMessage } from 'element-plus';
@@ -351,6 +319,8 @@ import MonacoEdit from './MonacoEdit.vue';
 import RequestParams from './RequestParams.vue';
 import RequestBody from './RequestBody.vue';
 import RequestHeader from './RequestHeader.vue';
+import RequestExtract from './RequestExtract.vue';
+import RequestAssert from './RequestAssert.vue';
 
 
 
@@ -364,14 +334,6 @@ const envdata = reactive({
 })
 
 const env = reactive({})
-
-// 创建一个数据类型作映射
-let data_type = new Map();
-
-// 添加键值对，让获取的数据类型匹配列表选项
-data_type.set('number', 'int');
-data_type.set('string', 'string');
-data_type.set('boolean', 'bool');
 
 const goToSelectEnv = () => {
     envDialog.value = true;
@@ -507,46 +469,13 @@ const AddStep = () => {
         beforecode: ref(''),
         aftercode: ref(''),
     });
-    assertData.push([]);
-    extractData.push([]);
 }
 
 const removeDomain = (step) => {
     const index = addForm.steps.indexOf(step)
     if (index !== -1) {
         addForm.steps.splice(index, 1);
-        assertData.splice(index, 1);
-        extractData.splice(index, 1);
     }
-}
-
-
-
-const assertData = reactive(
-    [[]]
-);
-
-const extractData = reactive(
-    [[]]
-);
-
-const addAssert = (index) => {
-    assertData[index].push({
-        assertDataType: 'string'
-    })
-}
-
-const delAssert = (index, delindex) => {
-    assertData[index].splice(delindex, 1);
-}
-
-const addExtract = (index) => {
-    extractData[index].push({
-    })
-}
-
-const delExtract = (index, delindex) => {
-    extractData[index].splice(delindex, 1);
 }
 
 const cancelBtn = () => {
@@ -571,6 +500,20 @@ const headerschildRefs = ref({});
 const headersRef = (index) => {
     return (el) => {
         headerschildRefs.value[index] = el;
+    }
+}
+
+const extractchildRefs = ref({});
+const extractRef = (index) => {
+    return (el) => {
+        extractchildRefs.value[index] = el;
+    }
+}
+
+const assertchildRefs = ref({});
+const assertRef = (index) => {
+    return (el) => {
+        assertchildRefs.value[index] = el;
     }
 }
 
@@ -608,6 +551,8 @@ const SelectApi = async (id) => {
             body[key] = { 'value': value.value, 'decription': value.decription }
         }
         addForm.steps[APIDialog_id.value].body = body;
+        await nextTick();
+        bodychildRefs.value[APIDialog_id.value].getBody();
         // 重置耗时，结果，响应
         addForm.steps[APIDialog_id.value].time = '';
         addForm.steps[APIDialog_id.value].result = '';
@@ -645,39 +590,7 @@ const onSubmit = async () => {
             addForm.steps[i].params = paramschildRefs.value[i].formatParams();
             addForm.steps[i].body = bodychildRefs.value[i].formatBody();
             addForm.steps[i].headers = headerschildRefs.value[i].formatHeaders();
-        }
-        
-        for (let j = 0; j < assertData.length; j++) {
-            for (let i = 0; i < assertData[j].length; i++) {
-                if (assertData[j][i].assertDataType === 'int') {
-                    assertData[j][i].assertvalue = Number(assertData[j][i].assertvalue);
-                }
-                else if (assertData[j][i].assertDataType === 'bool') {
-                    if (assertData[j][i].assertvalue === 'false') {
-                        assertData[j][i].assertvalue = false;
-                    }
-                    else {
-                        assertData[j][i].assertvalue = true;
-                    }
-                }
-                addForm.steps[j].assert_result[assertData[j][i].assertkey] = { "value": assertData[j][i].assertvalue, "decription": assertData[j][i].assertdecription };
-            }
-        }
-        for (let j = 0; j < extractData.length; j++) {
-            for (let i = 0; i < extractData[j].length; i++) {
-                addForm.steps[j].extract[extractData[j][i].extractkey] = { "value": extractData[j][i].extractvalue, "decription": extractData[j][i].extractdecription };
-            }
-        }
-        
-        for (let i = 0; i < assertData.length; i++) {
-            if (assertData[i].length === 0) {
-                addForm.steps[i].assert_result = null;
-            }
-        }
-        for (let i = 0; i < extractData.length; i++) {
-            if (extractData[i].length === 0) {
-                addForm.steps[i].extract = null;
-            }
+            addForm.steps[i].assert_result = assertchildRefs.value[i].formatAssert();
         }
 
         for (let i = 0; i < addForm.steps.length; i++) {
@@ -714,6 +627,13 @@ const onSubmit = async () => {
 }
 
 const debug = async () => {
+    delete addForm.result;
+    delete addForm.time;
+    for (let i = 0; i < addForm.steps.length; i++) {
+        delete addForm.steps[i].response;
+        delete addForm.steps[i].result;
+        delete addForm.steps[i].time;
+    }
     addForm.env = env.host;
     if (addForm.env === undefined) {
         ElMessage({
@@ -731,42 +651,7 @@ const debug = async () => {
             addForm.steps[i].params = paramschildRefs.value[i].formatParams();
             addForm.steps[i].body = bodychildRefs.value[i].formatBody();
             addForm.steps[i].headers = headerschildRefs.value[i].formatHeaders();
-        }
-        
-        for (let j = 0; j < assertData.length; j++) {
-            for (let i = 0; i < assertData[j].length; i++) {
-                if (assertData[j][i].assertDataType === 'int') {
-                    assertData[j][i].assertvalue = Number(assertData[j][i].assertvalue);
-                }
-                else if (assertData[j][i].assertDataType === 'bool') {
-                    if (assertData[j][i].assertvalue === 'false') {
-                        assertData[j][i].assertvalue = false;
-                    }
-                    else {
-                        assertData[j][i].assertvalue = true;
-                    }
-                }
-                addForm.steps[j].assert_result[assertData[j][i].assertkey] = {
-                    "value": assertData[j][i].assertvalue,
-                    "decription": assertData[j][i].assertdecription
-                };
-            }
-        }
-        for (let j = 0; j < extractData.length; j++) {
-            for (let i = 0; i < extractData[j].length; i++) {
-                addForm.steps[j].extract[extractData[j][i].extractkey] = { "value": extractData[j][i].extractvalue, "decription": extractData[j][i].extractdecription };
-            }
-        }
-
-        for (let i = 0; i < assertData.length; i++) {
-            if (assertData[i].length === 0) {
-                addForm.steps[i].assertData = null;
-            }
-        }
-        for (let i = 0; i < extractData.length; i++) {
-            if (extractData[i].length === 0) {
-                addForm.steps[i].extractData = null;
-            }
+            addForm.steps[i].assert_result = assertchildRefs.value[i].formatAssert();
         }
 
         for (let i = 0; i < addForm.steps.length; i++) {
@@ -779,14 +664,18 @@ const debug = async () => {
         if (res.status) {
             for (let i = 0; i < addForm.steps.length; i++) {
                 // 断言结果赋值
-                if (assertData[i].length === 0) {
+                // 先检查 addForm.steps[i] 是否存在，接着确认 .assert_result 是否存在且是一个对象，最后才检查其键的数量。
+                // 这有助于防止因 undefined 或 null 值引发的错误。
+                if (addForm.steps[i] && addForm.steps[i].assert_result && typeof addForm.steps[i].assert_result === 'object'
+                    && Object.keys(addForm.steps[i].assert_result).length === 0) {
                     addForm.steps[i].result = 'success';
                 }
                 else {
-                    for (let j = 0; j < res.data.asserts_info[i].length; j++) {
-                        assertData[i][j].assertresult = res.data.asserts_info[i][j].assert_result;
+                    //{key:{value:xxx,result:xxx}}
+                    for (let key in addForm.steps[i].assert_result) {
+                        addForm.steps[i].assert_result[key].result = res.data.res[i].assert_info[key].result;
                         // 步骤断言结果是否包含error，包含将步骤结果设置为error，并用例变成error
-                        if (assertData[i][j].assertresult === 'error') {
+                        if (addForm.steps[i].assert_result[key].result === 'error') {
                             addForm.steps[i].result = 'error';
                             addForm.result = 'error';
                         }
@@ -794,6 +683,7 @@ const debug = async () => {
                     if (addForm.steps[i].result !== 'error') {
                         addForm.steps[i].result = 'success';
                     }
+                    assertchildRefs.value[i].assertResult()
                 }
 
                 addForm.steps[i].time = res.data.time[i];
@@ -827,19 +717,17 @@ const debug = async () => {
                 type: 'error',
             })
         }
-        for (let i = 0; i < addForm.steps.length; i++) {
-            addForm.steps[i].assert_result = {}; // 调试后需要重置，不然修改参数会新增多一条数据
-            addForm.steps[i].extract = {}; // 调试后需要重置，不然修改参数会新增多一条数据
-        }
     }
 }
 
-const onDragEnd=()=>{
+const onDragEnd = () => {
     // 拖动结束重新对子组件赋值回显
-    for(let i = 0; i < addForm.steps.length; i++){
+    for (let i = 0; i < addForm.steps.length; i++) {
         paramschildRefs.value[i].getParams();
         bodychildRefs.value[i].getBody();
         headerschildRefs.value[i].getHeaders();
+        extractchildRefs.value[i].getExtract();
+        assertchildRefs.value[i].getAssert();
     }
 }
 
