@@ -148,53 +148,6 @@
 
                                 </el-tab-pane>
 
-                                <!-- <el-tab-pane label="断言">
-                                    <el-form-item>
-                                        <el-table :data="assertData[index]" border style="width: 100%">
-                                            <el-table-column prop="assertkey" label="响应值">
-                                                <template #default="scope">
-                                                    <el-input v-model="assertData[index][scope.$index].assertkey" />
-                                                </template>
-                                            </el-table-column>
-                                            <el-table-column prop="assertvalue" label="期望值">
-                                                <template #default="scope">
-                                                    <el-input v-model="assertData[index][scope.$index].assertvalue"
-                                                        class="input-with-select">
-                                                        <template #prepend>
-                                                            <el-select
-                                                                v-model="assertData[index][scope.$index].assertDataType">
-                                                                <el-option label="string" value="string" />
-                                                                <el-option label="int" value="int" />
-                                                                <el-option label="bool" value="bool" />
-                                                            </el-select>
-                                                        </template>
-                                                    </el-input>
-                                                </template>
-                                            </el-table-column>
-                                            <el-table-column prop="assertdecription" label="描述">
-                                                <template #default="scope">
-                                                    <el-input v-model="assertData[index][scope.$index].assertdecription" />
-                                                </template>
-                                            </el-table-column>
-                                            <el-table-column prop="assertresult" label="结果" width="100">
-                                                <template #default="scope">
-                                                    <el-input v-model="assertData[index][scope.$index].assertresult"
-                                                        disabled />
-                                                </template>
-                                            </el-table-column>
-                                            <el-table-column width='100'>
-                                                <template #default="scope">
-                                                    <el-button type="danger"
-                                                        @click="delAssert(index, scope.$index)">删除</el-button>
-                                                </template>
-                                            </el-table-column>
-                                        </el-table>
-                                    </el-form-item>
-                                    <el-button type="primary" @click="addAssert(index)"
-                                        style="margin-left: 50px;margin-bottom: 10px;">新增断言</el-button>
-                                </el-tab-pane> -->
-
-
                                 <el-tab-pane label="提取参数">
                                     <request-extract :ref=extractRef(index) v-model:extract="step.extract" />
 
