@@ -70,6 +70,7 @@ const addbody = () => {
 
 const delbody = (delindex) => {
     bodyData.splice(delindex, 1);
+    emit('update:body', changeBody())
 }
 
 const getBody = () => {

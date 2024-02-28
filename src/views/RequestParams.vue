@@ -71,6 +71,7 @@ const addParams = () => {
 
 const delParam = (delindex) => {
     paramsData.splice(delindex, 1);
+    emit('update:params', changeParams())
 }
 
 const getParams = () => {

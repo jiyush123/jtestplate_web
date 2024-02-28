@@ -70,6 +70,7 @@ const addheaders = () => {
 
 const delheaders = (delindex) => {
     headersData.splice(delindex, 1);
+    emit('update:headers', changeHeaders())
 }
 
 const getHeaders = () => {
