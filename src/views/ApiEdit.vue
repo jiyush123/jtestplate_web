@@ -33,21 +33,40 @@
                     </el-select>
                 </el-form-item>
 
-                <el-form-item label="请求方式" prop="method" :rules="[
-                    { required: true, message: '请选择请求方式' },
-                ]">
-                    <el-radio-group v-model="editform.method">
-                        <el-radio label="GET" />
-                        <el-radio label="POST" />
-                    </el-radio-group>
-                </el-form-item>
-                <el-form-item label="路径" prop="uri" :rules="[
-                    { required: true, message: '路径不能为空' },
-                ]">
-                    <el-input v-model="editform.uri" style="width: 50%;" />
-                </el-form-item>
+                <el-form-item label="路径" :prop="uri" :rules="[
+            { required: true, message: '路径不能为空' },
+        ]">
+            <el-input v-model="editform.uri" class="input-with-select">
+                <template #prepend>
+                    <el-select v-model="editform.method" style="width: 100px">
+                        <el-option label="GET" value="GET" />
+                        <el-option label="POST" value="POST" />
+                    </el-select>
+                </template>
+            </el-input>
+        </el-form-item>
+        <!-- TAB -->
+        <el-tabs type="border-card" style="min-width: 800px;margin-bottom:10px">
+            <!-- 调试params封装子组件 -->
+            <el-tab-pane label="Params">
+                <request-params ref="reqparams" v-model:params="editform.params" />
+
+            </el-tab-pane>
+
+            <el-tab-pane label="Body">
+                <request-body ref="reqbody" v-model:body="editform.body" />
+
+
+            </el-tab-pane>
+
+            <el-tab-pane label="Headers">
+                <request-header ref="reqheader" v-model:headers="editform.headers" />
+
+            </el-tab-pane>
+
+        </el-tabs>
                 <!-- 请求头 -->
-                <el-form-item label="Headers">
+                <!-- <el-form-item label="Headers">
                     <el-table :data="headersData" border style="width: 700px">
                         <el-table-column prop="headerskey" label="Keys" width='200'>
                             <template #default="scope">
@@ -143,7 +162,7 @@
                     style="margin-left: 50px;margin-bottom: 10px;">新增body参数</el-button>
                 <el-form-item label="响应">
                     <el-input v-model="editform.response" type="textarea" autosize />
-                </el-form-item>
+                </el-form-item> -->
 
                 <el-form-item>
                     <el-button type="primary" @click="goToSelectEnv">调试</el-button>
@@ -191,29 +210,28 @@
 
 <style>
 .apiform {
-    width: 70%;
+    width: 80%;
     margin: auto
-}
-
-.apiform .el-table .el-input {
-    width: 95%;
 }
 
 .input-with-select .el-input-group__prepend {
     background-color: var(--el-fill-color-blank);
 }
 
-.input-with-select .el-select{
+.input-with-select .el-select {
     width: 90px;
 }
 </style>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted,nextTick } from 'vue'
 import { getAPIInfo, editAPI, getModuleList, getEnvironmentList, debugAPI } from '../http/api'
 import { ElMessage } from 'element-plus'
 import router from "../router/index"
 import { useRoute } from 'vue-router'
+import RequestParams from './RequestParams.vue';
+import RequestBody from './RequestBody.vue';
+import RequestHeader from './RequestHeader.vue';
 
 const route = useRoute();
 const id_params = route.params;
@@ -235,18 +253,6 @@ const debug_res = reactive({
     response: ''
 })
 
-const headersData = reactive(
-    []
-);
-
-const paramsData = reactive(
-    []
-);
-
-const bodyData = reactive(
-    []
-);
-
 // 创建一个新的 Map 对象作映射
 let status = new Map();
 
@@ -255,13 +261,9 @@ status.set('未开始', '1');
 status.set('进行中', '2');
 status.set('已完成', '3');
 
-// 创建一个数据类型作映射
-let data_type = new Map();
-
-// 添加键值对，让获取的数据类型匹配列表选项
-data_type.set('number', 'int');
-data_type.set('string', 'string');
-data_type.set('boolean', 'bool');
+const reqparams = ref(null);
+const reqbody = ref(null);
+const reqheader = ref(null);
 
 const editform = reactive({
     name: '',
@@ -289,35 +291,15 @@ const getInfo = async () => {
         editform.method = res.data.method;
         editform.uri = res.data.uri;
         editform.response = res.data.response;
-        // 请求头
-        for (let key in res.data.headers) {
-            let value = res.data.headers[key];
-            headersData.push({
-                headerskey: key,
-                headersvalue: value.value,
-                headersdecription: value.decription
-            });
-        }
-        // 请求参数
-        for (let key in res.data.params) {
-            let value = res.data.params[key];
-            paramsData.push({
-                paramskey: key,
-                paramDataType: data_type.get(typeof (value.value)),
-                paramsvalue: value.value,
-                paramsdecription: value.decription
-            });
-        }
-        // 请求体
-        for (let key in res.data.body) {
-            let value = res.data.body[key];
-            bodyData.push({
-                bodykey: key,
-                bodyDataType: data_type.get(typeof (value.value)),
-                bodyvalue: value.value,
-                bodydecription: value.decription
-            });
-        }
+        editform.headers = res.data.headers;
+        editform.params = res.data.params;
+        editform.body = res.data.body;
+        await nextTick();
+        // 改变prop值时，需要nextTick才能立即同步到子组件
+        reqheader.value.getHeaders();
+        reqparams.value.getParams();
+        reqbody.value.getBody();
+        
         editform.response = res.data.response;
     }
     else {
@@ -346,37 +328,10 @@ const onSubmit = async () => {
     const result = await assertForm()
     if (!result) return
     else {
-        for (let i = 0; i < headersData.length; i++) {
-            editform.headers[headersData[i].headerskey] = { "value": headersData[i].headersvalue, "decription": headersData[i].headersdecription };
-        }
-        for (let i = 0; i < paramsData.length; i++) {
-            if (paramsData[i].paramDataType === 'int') {
-                paramsData[i].paramsvalue = Number(paramsData[i].paramsvalue);
-            }
-            else if (paramsData[i].paramDataType === 'bool') {
-                if (paramsData[i].paramsvalue === 'false') {
-                    paramsData[i].paramsvalue = false;
-                }
-                else {
-                    paramsData[i].paramsvalue = true;
-                }
-            }
-            editform.params[paramsData[i].paramskey] = { "value": paramsData[i].paramsvalue, "decription": paramsData[i].paramsdecription };
-        }
-        for (let i = 0; i < bodyData.length; i++) {
-            if (bodyData[i].bodyDataType === 'int') {
-                bodyData[i].bodyvalue = Number(bodyData[i].bodyvalue);
-            }
-            else if (bodyData[i].bodyDataType === 'bool') {
-                if (bodyData[i].bodyvalue === 'false') {
-                    bodyData[i].bodyvalue = false;
-                }
-                else {
-                    bodyData[i].bodyvalue = true;
-                }
-            }
-            editform.body[bodyData[i].bodykey] = { "value": bodyData[i].bodyvalue, "decription": bodyData[i].bodydecription };
-        }
+        editform.params = reqparams.value.formatParams();
+        editform.body = reqbody.value.formatBody();
+        editform.headers = reqheader.value.formatHeaders();
+        
         // 发送到后端新增用户数据
         editform.updated_user = localStorage.getItem('name');
         const res = await editAPI(editform);
@@ -402,35 +357,6 @@ const onSubmit = async () => {
 
 const cancelBtn = () => {
     router.push('/api/list');
-}
-
-const addHeader = () => {
-    headersData.push({
-    })
-}
-
-const delHeader = (index) => {
-    headersData.splice(index, 1);
-}
-
-const addParams = () => {
-    paramsData.push({
-        paramDataType: 'string'
-    })
-}
-
-const delParam = (index) => {
-    paramsData.splice(index, 1);
-}
-
-const addBody = () => {
-    bodyData.push({
-        bodyDataType: 'string'
-    })
-}
-
-const delBody = (index) => {
-    bodyData.splice(index, 1);
 }
 
 const goToSelectEnv = () => {
@@ -476,39 +402,12 @@ const debug = async () => {
     const result = await assertForm();
     if (!result) return
     else {
-        for (let i = 0; i < headersData.length; i++) {
-            editform.headers[headersData[i].headerskey] = { "value": headersData[i].headersvalue };
-        }
-        for (let i = 0; i < paramsData.length; i++) {
-            if (paramsData[i].paramDataType === 'int') {
-                paramsData[i].paramsvalue = Number(paramsData[i].paramsvalue);
-            }
-            else if (paramsData[i].paramDataType === 'bool') {
-                if (paramsData[i].paramsvalue === 'false') {
-                    paramsData[i].paramsvalue = false;
-                }
-                else {
-                    paramsData[i].paramsvalue = true;
-                }
-            }
-            editform.params[paramsData[i].paramskey] = { "value": paramsData[i].paramsvalue };
-        }
-        for (let i = 0; i < bodyData.length; i++) {
-            if (bodyData[i].paramDataType === 'int') {
-                bodyData[i].paramsvalue = Number(bodyData[i].bodyvalue);
-            }
-            else if (bodyData[i].bodyDataType === 'bool') {
-                if (bodyData[i].bodyvalue === 'false') {
-                    bodyData[i].bodyvalue = false;
-                }
-                else {
-                    bodyData[i].bodyvalue = true;
-                }
-            }
-            editform.body[bodyData[i].bodykey] = { "value": bodyData[i].bodyvalue };
-        }
+        editform.params = reqparams.value.formatParams();
+        editform.body = reqbody.value.formatBody();
+        editform.headers = reqheader.value.formatHeaders();
         // 发送调试
         const res = await debugAPI(editform);
+        try {
         if (res.status) {
             const response = JSON.stringify(res.response, null, 2);
             debug_res.response = response;
@@ -531,9 +430,15 @@ const debug = async () => {
                 type: 'error',
             })
         }
-        editform.headers = {}; // 调试后需要重置，不然修改参数会新增多一条数据
-        editform.params = {}; // 调试后需要重置，不然修改参数会新增多一条数据
-        editform.body = {}; // 调试后需要重置，不然修改参数会新增多一条数据
+    }
+        catch {
+            ElMessage({
+                showClose: true,
+                center: true,
+                message: '请求异常',
+                type: 'error',
+            })
+        }
         cancelDialog();
     }
 }

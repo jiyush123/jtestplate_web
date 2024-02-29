@@ -25,117 +25,39 @@
             </el-select>
         </el-form-item>
 
-
-        <el-form-item label="请求方式" prop="method" :rules="[
-            { required: true, message: '请选择请求方式' },
-        ]">
-            <el-radio-group v-model="addform.method">
-                <el-radio label="GET" />
-                <el-radio label="POST" />
-            </el-radio-group>
-        </el-form-item>
-        <el-form-item label="路径" prop="uri" :rules="[
+        <el-form-item label="路径" :prop="uri" :rules="[
             { required: true, message: '路径不能为空' },
         ]">
-            <el-input v-model="addform.uri" />
+            <el-input v-model="addform.uri" class="input-with-select">
+                <template #prepend>
+                    <el-select v-model="addform.method" style="width: 100px">
+                        <el-option label="GET" value="GET" />
+                        <el-option label="POST" value="POST" />
+                    </el-select>
+                </template>
+            </el-input>
         </el-form-item>
-        <!-- 请求头 -->
-        <el-form-item label="Headers">
-            <el-table :data="headersData" border style="width: 700px">
-                <el-table-column prop="headerskey" label="Keys" width='200'>
-                    <template #default="scope">
-                        <el-input v-model="headersData[scope.$index].headerskey" />
-                    </template>
-                </el-table-column>
-                <el-table-column prop="headersvalue" label="Values" width='200'>
-                    <template #default="scope">
-                        <el-input v-model="headersData[scope.$index].headersvalue" />
-                    </template>
-                </el-table-column>
-                <el-table-column prop="headersdecription" label="描述" width='200'>
-                    <template #default="scope">
-                        <el-input v-model="headersData[scope.$index].headersdecription" />
-                    </template>
-                </el-table-column>
-                <el-table-column width='100'>
-                    <template #default="scope">
-                        <el-button type="danger" @click="delHeader(scope.$index)">删除</el-button>
-                    </template>
-                </el-table-column>
-            </el-table>
-        </el-form-item>
-        <el-button type="primary" @click="addHeader" style="margin-left: 50px;margin-bottom: 10px;">新增请求头参数</el-button>
-        <!-- 请求参数 -->
-        <el-form-item label="Params">
-            <el-table :data="paramsData" border style="width: 100%">
-                <el-table-column prop="paramskey" label="Keys">
-                    <template #default="scope">
-                        <el-input v-model="paramsData[scope.$index].paramskey" />
-                    </template>
-                </el-table-column>
-                <el-table-column prop="paramsvalue" label="Values">
-                    <template #default="scope">
-                        <el-input v-model="paramsData[scope.$index].paramsvalue" class="input-with-select">
-                            <template #prepend>
-                                <el-select v-model="paramsData[scope.$index].paramDataType">
-                                    <el-option label="string" value="string" />
-                                    <el-option label="int" value="int" />
-                                    <el-option label="bool" value="bool" />
-                                </el-select>
-                            </template>
-                        </el-input>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="paramsdecription" label="描述">
-                    <template #default="scope">
-                        <el-input v-model="paramsData[scope.$index].paramsdecription" />
-                    </template>
-                </el-table-column>
-                <el-table-column width='100'>
-                    <template #default="scope">
-                        <el-button type="danger" @click="delParam(scope.$index)">删除</el-button>
-                    </template>
-                </el-table-column>
-            </el-table>
-        </el-form-item>
-        <el-button type="primary" @click="addParams" style="margin-left: 50px;margin-bottom: 10px;">新增params参数</el-button>
-        <!-- 请求体 -->
-        <el-form-item label="Body">
-            <el-table :data="bodyData" border style="width: 100%">
-                <el-table-column prop="bodykey" label="Keys">
-                    <template #default="scope">
-                        <el-input v-model="bodyData[scope.$index].bodykey" />
-                    </template>
-                </el-table-column>
-                <el-table-column prop="bodyvalue" label="Values">
-                    <template #default="scope">
-                        <el-input v-model="bodyData[scope.$index].bodyvalue" class="input-with-select">
-                            <template #prepend>
-                                <el-select v-model="bodyData[scope.$index].bodyDataType">
-                                    <el-option label="string" value="string" />
-                                    <el-option label="int" value="int" />
-                                    <el-option label="bool" value="bool" />
-                                </el-select>
-                            </template>
-                        </el-input>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="bodydecription" label="描述">
-                    <template #default="scope">
-                        <el-input v-model="bodyData[scope.$index].bodydecription" />
-                    </template>
-                </el-table-column>
-                <el-table-column width='100'>
-                    <template #default="scope">
-                        <el-button type="danger" @click="delBody(scope.$index)">删除</el-button>
-                    </template>
-                </el-table-column>
-            </el-table>
-        </el-form-item>
-        <el-button type="primary" @click="addBody" style="margin-left: 50px;margin-bottom: 10px;">新增body参数</el-button>
-        <el-form-item label="响应">
-            <el-input v-model="addform.response" type="textarea" />
-        </el-form-item>
+
+        <!-- TAB -->
+        <el-tabs type="border-card" style="min-width: 800px;margin-bottom:10px">
+            <!-- 调试params封装子组件 -->
+            <el-tab-pane label="Params">
+                <request-params ref="reqparams" v-model:params="addform.params" />
+
+            </el-tab-pane>
+
+            <el-tab-pane label="Body">
+                <request-body ref="reqbody" v-model:body="addform.body" />
+
+
+            </el-tab-pane>
+
+            <el-tab-pane label="Headers">
+                <request-header ref="reqheader" v-model:headers="addform.headers" />
+
+            </el-tab-pane>
+
+        </el-tabs>
 
         <el-form-item>
             <el-button type="primary" @click="goToSelectEnv">调试</el-button>
@@ -185,18 +107,15 @@
 
 <style>
 .apiform {
-    width: 70%;
+    width: 80%;
     margin: auto
-}
-
-.apiform .el-table .el-input {
-    width: 95%;
 }
 
 .input-with-select .el-input-group__prepend {
     background-color: var(--el-fill-color-blank);
 }
-.input-with-select .el-select{
+
+.input-with-select .el-select {
     width: 90px;
 }
 </style>
@@ -206,6 +125,10 @@ import { ref, reactive, onMounted } from 'vue'
 import { addAPI, getModuleList, debugAPI, getEnvironmentList } from '../http/api'
 import { ElMessage } from 'element-plus'
 import router from "../router/index"
+import RequestParams from './RequestParams.vue';
+import RequestBody from './RequestBody.vue';
+import RequestHeader from './RequestHeader.vue';
+
 
 const moduleOptions = ref(null);
 // 这里是弹窗选择环境的参数
@@ -219,28 +142,15 @@ const envOptions = ref(null);
 const drawer = ref(false);
 const debug_res = reactive({
     status: '',
-    status_code:'',
-    response:''
+    status_code: '',
+    response: ''
 })
-
-const headersData = reactive(
-    []
-);
-
-const paramsData = reactive(
-    []
-);
-
-const bodyData = reactive(
-    // 默认为空，需要再点击添加，否则为空时保存的是空对象，有些接口需要空对象时添加一个空行即可
-    []
-);
 
 const addform = reactive({
     name: '',
     description: '',
     module: '',
-    method: '',
+    method: 'GET',
     uri: '',
     headers: {},
     params: {},
@@ -266,46 +176,9 @@ const onSubmit = async () => {
     const result = await assertForm()
     if (!result) return
     else {
-        for (let i = 0; i < headersData.length; i++) {
-            addform.headers[headersData[i].headerskey] = { "value": headersData[i].headersvalue, "decription": headersData[i].headersdecription };
-        }
-        for (let i = 0; i < paramsData.length; i++) {
-            if (paramsData[i].paramDataType === 'int') {
-                paramsData[i].paramsvalue = Number(paramsData[i].paramsvalue);
-            }
-            else if (paramsData[i].paramDataType === 'bool') {
-                if (paramsData[i].paramsvalue === 'false') {
-                    paramsData[i].paramsvalue = false;
-                }
-                else {
-                    paramsData[i].paramsvalue = true;
-                }
-            }
-            addform.params[paramsData[i].paramskey] = { "value": paramsData[i].paramsvalue, "decription": paramsData[i].paramsdecription };
-        }
-        for (let i = 0; i < bodyData.length; i++) {
-            if (bodyData[i].bodyDataType === 'int') {
-                bodyData[i].bodyvalue = Number(bodyData[i].bodyvalue);
-            }
-            else if (bodyData[i].bodyDataType === 'bool') {
-                if (bodyData[i].bodyvalue === 'false') {
-                    bodyData[i].bodyvalue = false;
-                }
-                else {
-                    bodyData[i].bodyvalue = true;
-                }
-            }
-            addform.body[bodyData[i].bodykey] = { "value": bodyData[i].bodyvalue, "decription": bodyData[i].bodydecription };
-        }
-        if (headersData.length === 0) {
-            addform.headers = null;
-        }
-        if (paramsData.length === 0) {
-            addform.params = null;
-        }
-        if (bodyData.length === 0) {
-            addform.body = null;
-        }
+        addform.params = reqparams.value.formatParams();
+        addform.body = reqbody.value.formatBody();
+        addform.headers = reqheader.value.formatHeaders();
         // 发送到后端新增接口数据
         addform.created_user = localStorage.getItem('name');
         addform.updated_user = localStorage.getItem('name');
@@ -334,34 +207,9 @@ const cancelBtn = () => {
     router.push('/api/list');
 }
 
-const addHeader = () => {
-    headersData.push({
-    })
-}
-
-const delHeader = (index) => {
-    headersData.splice(index, 1);
-}
-
-const addParams = () => {
-    paramsData.push({
-        paramDataType: 'string'
-    })
-}
-
-const delParam = (index) => {
-    paramsData.splice(index, 1);
-}
-
-const addBody = () => {
-    bodyData.push({
-        bodyDataType: 'string'
-    })
-}
-
-const delBody = (index) => {
-    bodyData.splice(index, 1);
-}
+const reqparams = ref(null);
+const reqbody = ref(null);
+const reqheader = ref(null);
 
 const getModuleFun = async () => {
     // 发送到后端获取列表数据
@@ -422,64 +270,43 @@ const debug = async () => {
     const result = await assertForm();
     if (!result) return
     else {
-        for (let i = 0; i < headersData.length; i++) {
-            addform.headers[headersData[i].headerskey] = { "value": headersData[i].headersvalue };
-        }
-        for (let i = 0; i < paramsData.length; i++) {
-            if (paramsData[i].paramDataType === 'int') {
-                paramsData[i].paramsvalue = Number(paramsData[i].paramsvalue);
-            }
-            else if (paramsData[i].paramDataType === 'bool') {
-                if (paramsData[i].paramsvalue === 'false') {
-                    paramsData[i].paramsvalue = false;
-                }
-                else {
-                    paramsData[i].paramsvalue = true;
-                }
-            }
-            addform.params[paramsData[i].paramskey] = { "value": paramsData[i].paramsvalue };
-        }
-        for (let i = 0; i < bodyData.length; i++) {
-            if (bodyData[i].paramDataType === 'int') {
-                bodyData[i].paramsvalue = Number(bodyData[i].bodyvalue);
-            }
-            else if (bodyData[i].bodyDataType === 'bool') {
-                if (bodyData[i].bodyvalue === 'false') {
-                    bodyData[i].bodyvalue = false;
-                }
-                else {
-                    bodyData[i].bodyvalue = true;
-                }
-            }
-            addform.body[bodyData[i].bodykey] = { "value": bodyData[i].bodyvalue };
-        }
+        addform.params = reqparams.value.formatParams();
+        addform.body = reqbody.value.formatBody();
+        addform.headers = reqheader.value.formatHeaders();
         // 发送调试
         const res = await debugAPI(addform);
-        if (res.status) {
-            const response = JSON.stringify(res.response, null, 2);
-            debug_res.response = response;
-            debug_res.status_code = res.status_code;
-            debug_res.status = res.status;
-            
-            drawer.value = true;
-            ElMessage({
-                showClose: true,
-                center: true,
-                message: res.msg,
-                type: 'success',
-            })
+        try {
+            if (res.status) {
+                const response = JSON.stringify(res.response, null, 2);
+                debug_res.response = response;
+                debug_res.status_code = res.status_code;
+                debug_res.status = res.status;
+
+                drawer.value = true;
+                ElMessage({
+                    showClose: true,
+                    center: true,
+                    message: res.msg,
+                    type: 'success',
+                })
+            }
+            else {
+                ElMessage({
+                    showClose: true,
+                    center: true,
+                    message: res.msg,
+                    type: 'error',
+                })
+            }
         }
-        else {
+        catch {
             ElMessage({
                 showClose: true,
                 center: true,
-                message: res.msg,
+                message: '请求异常',
                 type: 'error',
             })
         }
-        addform.headers = {}; // 调试后需要重置，不然修改参数会新增多一条数据
-        addform.params = {}; // 调试后需要重置，不然修改参数会新增多一条数据
-        addform.body = {}; // 调试后需要重置，不然修改参数会新增多一条数据
         cancelDialog();
     }
 }
