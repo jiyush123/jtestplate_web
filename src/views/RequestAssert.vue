@@ -73,6 +73,7 @@ const addAssert = () => {
     assertData.push({
         assertDataType: 'string'
     })
+    emit('update:assert', changeAssert())
 }
 
 const delAssert = (delindex) => {
@@ -105,13 +106,11 @@ const assertResult = () => {
 }
 
 const changeAssert = () => {
+    console.log('变更')
     let assert = {};
 
-    if (assertData.length === 0) {
-        assert = null
-    }
     // 如果需要一个{}，则添加一个不输入key的参数
-    else if (assertData.length === 1 && assertData[0].assertkey === undefined) {
+    if (assertData.length === 1 && assertData[0].assertkey === undefined) {
         assert = {}
     }
     else {
@@ -152,7 +151,6 @@ const formatAssert = () => {
 defineExpose({ getAssert, formatAssert, assertResult })
 
 onMounted(() => {
-    getAssert();
     setTimeout(() => {
     }, 1000)
 })

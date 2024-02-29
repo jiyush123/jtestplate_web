@@ -2,17 +2,18 @@
     <el-table :data="bodyData" border style="width: 100%">
         <el-table-column prop="bodykey" label="Keys">
             <template #default="scope">
-                <el-input v-model="bodyData[scope.$index].bodykey" @input="emit('update:body', changeBody())"/>
+                <el-input v-model="bodyData[scope.$index].bodykey" @input="emit('update:body', changeBody())" />
             </template>
         </el-table-column>
         <el-table-column prop="bodyvalue" label="Values">
             <template #default="scope">
-                <el-input v-model="bodyData[scope.$index].bodyvalue" class="input-with-select" @input="emit('update:body', changeBody())">
+                <el-input v-model="bodyData[scope.$index].bodyvalue" class="input-with-select"
+                    @input="emit('update:body', changeBody())">
                     <template #prepend>
                         <el-select v-model="bodyData[scope.$index].bodyDataType">
-                            <el-option label="string" value="string" @input="emit('update:body', changeBody())"/>
-                            <el-option label="int" value="int" @input="emit('update:body', changeBody())"/>
-                            <el-option label="bool" value="bool" @input="emit('update:body', changeBody())"/>
+                            <el-option label="string" value="string" @input="emit('update:body', changeBody())" />
+                            <el-option label="int" value="int" @input="emit('update:body', changeBody())" />
+                            <el-option label="bool" value="bool" @input="emit('update:body', changeBody())" />
                         </el-select>
                     </template>
                 </el-input>
@@ -20,7 +21,7 @@
         </el-table-column>
         <el-table-column prop="bodydecription" label="描述">
             <template #default="scope">
-                <el-input v-model="bodyData[scope.$index].bodydecription" @input="emit('update:body', changeBody())"/>
+                <el-input v-model="bodyData[scope.$index].bodydecription" @input="emit('update:body', changeBody())" />
             </template>
         </el-table-column>
         <el-table-column width='100'>
@@ -66,6 +67,7 @@ const addbody = () => {
     bodyData.push({
         bodyDataType: 'string'
     })
+    emit('update:body', changeBody())
 }
 
 const delbody = (delindex) => {
@@ -88,12 +90,9 @@ const getBody = () => {
 
 const changeBody = () => {
     let body = {};
-    
-    if (bodyData.length === 0) {
-        body = null
-    }
+
     // 如果需要一个{}，则添加一个不输入key的参数
-    else if (bodyData.length === 1 && bodyData[0].bodykey === undefined) {
+    if (bodyData.length === 1 && bodyData[0].bodykey === undefined) {
         body = {}
     }
     else {
@@ -105,30 +104,35 @@ const changeBody = () => {
 }
 
 const formatBody = () => {
-    let body = props.body;
-    if (Object.keys(body).length > 0) {
-        for (let key in body) {
-            if (body[key].datatype === 'int') {
-                body[key].value = Number(body[key].value);
+    let body = {};
+    if (bodyData.length === 0) {
+        body = null
+    }
+    else {
+        body = props.body;
+        if (Object.keys(body).length > 0) {
+            for (let key in body) {
+                if (body[key].datatype === 'int') {
+                    body[key].value = Number(body[key].value);
+                }
+                else if (body[key].datatype === 'bool') {
+                    if (body[key].value === 'false') {
+                        body[key].value = false;
+                    }
+                    else {
+                        body[key].value = true;
+                    }
+                }
+                body[key] = { "value": body[key].value, "decription": body[key].decription };
             }
-            else if (body[key].datatype === 'bool') {
-        if (body[key].value === 'false') {
-            body[key].value = false;
-        }
-        else {
-            body[key].value = true;
         }
     }
-    body[key] = { "value": body[key].value, "decription": body[key].decription };
-}
-    }
-return body
+    return body
 }
 
-defineExpose({ getBody,formatBody })
+defineExpose({ getBody, formatBody })
 
 onMounted(() => {
-    getBody();
     setTimeout(() => {
     }, 1000)
 })

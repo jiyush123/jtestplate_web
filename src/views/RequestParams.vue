@@ -21,7 +21,8 @@
         </el-table-column>
         <el-table-column prop="paramsdecription" label="描述">
             <template #default="scope">
-                <el-input v-model="paramsData[scope.$index].paramsdecription" @input="emit('update:params', changeParams())" />
+                <el-input v-model="paramsData[scope.$index].paramsdecription"
+                    @input="emit('update:params', changeParams())" />
             </template>
         </el-table-column>
         <el-table-column width='100'>
@@ -67,6 +68,7 @@ const addParams = () => {
     paramsData.push({
         paramDataType: 'string'
     })
+    emit('update:params', changeParams())
 }
 
 const delParam = (delindex) => {
@@ -92,11 +94,9 @@ const changeParams = () => {
     // 首先使用 Object.keys(addform.params).length === 0 检查addform.params是否没有任何属性，
     // 接着通过addform.params.constructor === Object确认它确实是一个对象（而不是其他类型）。
     // 如果满足这两个条件，则将addform.params设置为null，数据库存null，否则存null
-    if (paramsData.length === 0) {
-        params = null
-    }
+
     // 如果需要一个{}，则添加一个不输入key的参数
-    else if (paramsData.length === 1 && paramsData[0].paramskey === undefined) {
+    if (paramsData.length === 1 && paramsData[0].paramskey === undefined) {
         params = {}
     }
     else {
@@ -108,33 +108,35 @@ const changeParams = () => {
 }
 
 const formatParams = () => {// params = {key1:{datatype:xxx,value:xxx,decription:xxx},key2:{datatype:xxx,value:xxx,decription:xxx}}
-    let params = props.params;
-    if (Object.keys(params).length > 0) {
-        for (let key in params) {
-            if (params[key].datatype === 'int') {
-                params[key].value = Number(params[key].value);
+    let params = {};
+    if (paramsData.length === 0) {
+        params = null
+    }
+    else {
+        params = props.params;
+        if (Object.keys(params).length > 0) {
+            for (let key in params) {
+                if (params[key].datatype === 'int') {
+                    params[key].value = Number(params[key].value);
+                }
+                else if (params[key].datatype === 'bool') {
+                    if (params[key].value === 'false') {
+                        params[key].value = false;
+                    }
+                    else {
+                        params[key].value = true;
+                    }
+                }
+                params[key] = { "value": params[key].value, "decription": params[key].decription };
             }
-            else if (params[key].datatype === 'bool') {
-        if (params[key].value === 'false') {
-            params[key].value = false;
-        }
-        else {
-            params[key].value = true;
         }
     }
-    params[key] = { "value": params[key].value, "decription": params[key].decription };
-}
-    }
-return params
+    return params
 }
 
 defineExpose({ getParams, formatParams })
 
-// const params = toRefs(props).params;
-// watch(params, () => { console.log('更新') }, { deep: true })
-
 onMounted(() => {
-    getParams();
     setTimeout(() => {
     }, 1000)
 })

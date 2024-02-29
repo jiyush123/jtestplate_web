@@ -2,17 +2,18 @@
     <el-table :data="headersData" border style="width: 100%">
         <el-table-column prop="headerskey" label="Keys">
             <template #default="scope">
-                <el-input v-model="headersData[scope.$index].headerskey" @input="emit('update:headers', changeHeaders())"/>
+                <el-input v-model="headersData[scope.$index].headerskey" @input="emit('update:headers', changeHeaders())" />
             </template>
         </el-table-column>
         <el-table-column prop="headersvalue" label="Values">
             <template #default="scope">
-                <el-input v-model="headersData[scope.$index].headersvalue" class="input-with-select" @input="emit('update:headers', changeHeaders())">
+                <el-input v-model="headersData[scope.$index].headersvalue" class="input-with-select"
+                    @input="emit('update:headers', changeHeaders())">
                     <template #prepend>
                         <el-select v-model="headersData[scope.$index].headersDataType">
-                            <el-option label="string" value="string" @input="emit('update:headers', changeHeaders())"/>
-                            <el-option label="int" value="int" @input="emit('update:headers', changeHeaders())"/>
-                            <el-option label="bool" value="bool" @input="emit('update:headers', changeHeaders())"/>
+                            <el-option label="string" value="string" @input="emit('update:headers', changeHeaders())" />
+                            <el-option label="int" value="int" @input="emit('update:headers', changeHeaders())" />
+                            <el-option label="bool" value="bool" @input="emit('update:headers', changeHeaders())" />
                         </el-select>
                     </template>
                 </el-input>
@@ -20,7 +21,8 @@
         </el-table-column>
         <el-table-column prop="headersdecription" label="描述">
             <template #default="scope">
-                <el-input v-model="headersData[scope.$index].headersdecription" @input="emit('update:headers', changeHeaders())"/>
+                <el-input v-model="headersData[scope.$index].headersdecription"
+                    @input="emit('update:headers', changeHeaders())" />
             </template>
         </el-table-column>
         <el-table-column width='100'>
@@ -66,6 +68,7 @@ const addheaders = () => {
     headersData.push({
         headersDataType: 'string'
     })
+    emit('update:headers', changeHeaders())
 }
 
 const delheaders = (delindex) => {
@@ -88,12 +91,9 @@ const getHeaders = () => {
 
 const changeHeaders = () => {
     let headers = {};
-    
-    if (headersData.length === 0) {
-        headers = null
-    }
+
     // 如果需要一个{}，则添加一个不输入key的参数
-    else if (headersData.length === 1 && headersData[0].headerskey === undefined) {
+    if (headersData.length === 1 && headersData[0].headerskey === undefined) {
         headers = {}
     }
     else {
@@ -105,30 +105,35 @@ const changeHeaders = () => {
 }
 
 const formatHeaders = () => {
-    let headers = props.headers;
-    if (Object.keys(headers).length > 0) {
-        for (let key in headers) {
-            if (headers[key].datatype === 'int') {
-                headers[key].value = Number(headers[key].value);
+    let headers = {};
+    if (headersData.length === 0) {
+        headers = null
+    }
+    else {
+        headers = props.headers;
+        if (Object.keys(headers).length > 0) {
+            for (let key in headers) {
+                if (headers[key].datatype === 'int') {
+                    headers[key].value = Number(headers[key].value);
+                }
+                else if (headers[key].datatype === 'bool') {
+                    if (headers[key].value === 'false') {
+                        headers[key].value = false;
+                    }
+                    else {
+                        headers[key].value = true;
+                    }
+                }
+                headers[key] = { "value": headers[key].value, "decription": headers[key].decription };
             }
-            else if (headers[key].datatype === 'bool') {
-        if (headers[key].value === 'false') {
-            headers[key].value = false;
-        }
-        else {
-            headers[key].value = true;
         }
     }
-    headers[key] = { "value": headers[key].value, "decription": headers[key].decription };
-}
-    }
-return headers
+    return headers
 }
 
-defineExpose({ getHeaders,formatHeaders })
+defineExpose({ getHeaders, formatHeaders })
 
 onMounted(() => {
-    getHeaders();
     setTimeout(() => {
     }, 1000)
 })
