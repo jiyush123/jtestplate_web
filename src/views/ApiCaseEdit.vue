@@ -5,7 +5,7 @@
     </el-breadcrumb>
     <el-divider />
 
-    <el-form :model="editform" label-width="120px" ref="ruleFormRef" class="api_case_form">
+    <el-form :model="editform" label-width="auto" ref="ruleFormRef" class="api_case_form">
         <el-form-item label="测试用例名称" prop="name" :rules="[
             { required: true, message: '测试用例名称不能为空' },
             { min: 3, max: 30, message: '长度需要为3-30个字符' },
@@ -84,9 +84,9 @@
             </template>
         </el-dialog>
         <!-- 测试步骤 -->
-        <draggable v-model="editform.steps">
+        <draggable v-model="editform.steps" @end="onDragEnd">
             <transition-group>
-                <div v-for="(step, index) in editform.steps" :key="index" style="margin:10px">
+                <div v-for="(step, index) in editform.steps" :key="`step_${index}`" style="margin:10px">
                     <el-collapse>
                         <el-collapse-item :name="index">
                             <template #title>
@@ -116,189 +116,65 @@
                                     @click.stop>删除步骤</el-button>
                             </template>
 
-                            <el-form-item label="请求方式" :prop="'steps.' + index + '.method'" :rules="[
-                                { required: true, message: '请选择请求方式' },
-                            ]">
-                                <el-radio-group v-model="step.method">
-                                    <el-radio label="GET" />
-                                    <el-radio label="POST" />
-                                </el-radio-group>
-                            </el-form-item>
                             <el-form-item label="路径" :prop="'steps.' + index + '.uri'" :rules="[
                                 { required: true, message: '路径不能为空' },
                             ]">
-                                <el-input v-model="step.uri" />
+                                <el-input v-model="step.uri" class="input-with-select">
+                                    <template #prepend>
+                                        <el-select v-model="step.method" style="width: 100px">
+                                            <el-option label="GET" value="GET" />
+                                            <el-option label="POST" value="POST" />
+                                        </el-select>
+                                    </template>
+                                </el-input>
                             </el-form-item>
-                            <!-- 请求头 -->
-                            <el-form-item label="Headers">
-                                <el-table :data="headersData[index]" border style="width: 100%">
-                                    <el-table-column prop="headerskey" label="Keys">
-                                        <template #default="scope">
-                                            <el-input v-model="headersData[index][scope.$index].headerskey" />
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column prop="headersvalue" label="Values">
-                                        <template #default="scope">
-                                            <el-input v-model="headersData[index][scope.$index].headersvalue" />
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column prop="headersdecription" label="描述">
-                                        <template #default="scope">
-                                            <el-input v-model="headersData[index][scope.$index].headersdecription" />
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column width='100'>
-                                        <template #default="scope">
-                                            <el-button type="danger" @click="delHeader(index, scope.$index)">删除</el-button>
-                                        </template>
-                                    </el-table-column>
-                                </el-table>
-                            </el-form-item>
-                            <el-button type="primary" @click="addHeader(index)"
-                                style="margin-left: 50px;margin-bottom: 10px;">新增请求头参数</el-button>
-                            <!-- 请求参数 -->
-                            <el-form-item label="Params">
-                                <el-table :data="paramsData[index]" border style="width: 100%">
-                                    <el-table-column prop="paramskey" label="Keys">
-                                        <template #default="scope">
-                                            <el-input v-model="paramsData[index][scope.$index].paramskey" />
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column prop="paramsvalue" label="Values">
-                                        <template #default="scope">
-                                            <el-input v-model="paramsData[index][scope.$index].paramsvalue"
-                                                class="input-with-select">
-                                                <template #prepend>
-                                                    <el-select v-model="paramsData[index][scope.$index].paramDataType">
-                                                        <el-option label="string" value="string" />
-                                                        <el-option label="int" value="int" />
-                                                        <el-option label="bool" value="bool" />
-                                                    </el-select>
-                                                </template>
-                                            </el-input>
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column prop="paramsdecription" label="描述">
-                                        <template #default="scope">
-                                            <el-input v-model="paramsData[index][scope.$index].paramsdecription" />
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column width='100'>
-                                        <template #default="scope">
-                                            <el-button type="danger" @click="delParam(index, scope.$index)">删除</el-button>
-                                        </template>
-                                    </el-table-column>
-                                </el-table>
-                            </el-form-item>
-                            <el-button type="primary" @click="addParams(index)"
-                                style="margin-left: 50px;margin-bottom: 10px;">新增params参数</el-button>
-                            <!-- 请求体 -->
-                            <el-form-item label="Body">
-                                <el-table :data="bodyData[index]" border style="width: 100%">
-                                    <el-table-column prop="bodykey" label="Keys">
-                                        <template #default="scope">
-                                            <el-input v-model="bodyData[index][scope.$index].bodykey" />
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column prop="bodyvalue" label="Values">
-                                        <template #default="scope">
-                                            <el-input v-model="bodyData[index][scope.$index].bodyvalue"
-                                                class="input-with-select">
-                                                <template #prepend>
-                                                    <el-select v-model="bodyData[index][scope.$index].bodyDataType">
-                                                        <el-option label="string" value="string" />
-                                                        <el-option label="int" value="int" />
-                                                        <el-option label="bool" value="bool" />
-                                                    </el-select>
-                                                </template>
-                                            </el-input>
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column prop="bodydecription" label="描述">
-                                        <template #default="scope">
-                                            <el-input v-model="bodyData[index][scope.$index].bodydecription" />
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column width='100'>
-                                        <template #default="scope">
-                                            <el-button type="danger" @click="delBody(index, scope.$index)">删除</el-button>
-                                        </template>
-                                    </el-table-column>
-                                </el-table>
-                            </el-form-item>
-                            <el-button type="primary" @click="addBody(index)"
-                                style="margin-left: 50px;margin-bottom: 10px;">新增body参数</el-button>
-                            <el-form-item label="响应" :prop="'steps.' + index + '.response'">
+                            <!-- TAB -->
+                            <el-tabs type="border-card" style="min-width: 800px">
+                                <!-- 调试params封装子组件 -->
+                                <el-tab-pane label="Params">
+                                    <request-params :ref=paramsRef(index) v-model:params="step.params" />
+
+                                </el-tab-pane>
+
+                                <el-tab-pane label="Body">
+                                    <request-body :ref=bodyRef(index) v-model:body="step.body" />
+
+                                </el-tab-pane>
+
+                                <el-tab-pane label="Headers">
+                                    <request-header :ref=headersRef(index) v-model:headers="step.headers" />
+
+                                </el-tab-pane>
+
+                                <el-tab-pane label="断言">
+                                    <request-assert :ref=assertRef(index) v-model:assert="step.assert_result" />
+
+                                </el-tab-pane>
+
+                                <el-tab-pane label="提取参数">
+                                    <request-extract :ref=extractRef(index) v-model:extract="step.extract" />
+
+                                </el-tab-pane>
+
+                                <el-tab-pane label="前置处理">
+                                    <el-form-item>
+
+                                        <monaco-edit :ref=beforecodeRef(index) v-model:code="step.beforecode" />
+
+                                    </el-form-item>
+                                </el-tab-pane>
+                                <el-tab-pane label="后置处理">
+                                    <el-form-item>
+
+                                        <monaco-edit :ref=aftercodeRef(index) v-model:code="step.aftercode" />
+
+                                    </el-form-item>
+                                </el-tab-pane>
+                            </el-tabs>
+                            <!-- 返回响应 -->
+                            <el-form-item label="返回响应" :prop="'steps.' + index + '.response'">
                                 <el-input v-model="step.response" type="textarea" autosize disabled />
                             </el-form-item>
-                            <!-- 断言 -->
-                            <el-form-item label="断言">
-                                <el-table :data="assertData[index]" border style="width: 100%">
-                                    <el-table-column prop="assertkey" label="响应值">
-                                        <template #default="scope">
-                                            <el-input v-model="assertData[index][scope.$index].assertkey" />
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column prop="assertvalue" label="期望值">
-                                        <template #default="scope">
-                                            <el-input v-model="assertData[index][scope.$index].assertvalue"
-                                                class="input-with-select">
-                                                <template #prepend>
-                                                    <el-select v-model="assertData[index][scope.$index].assertDataType">
-                                                        <el-option label="string" value="string" />
-                                                        <el-option label="int" value="int" />
-                                                        <el-option label="bool" value="bool" />
-                                                    </el-select>
-                                                </template>
-                                            </el-input>
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column prop="assertdecription" label="描述">
-                                        <template #default="scope">
-                                            <el-input v-model="assertData[index][scope.$index].assertdecription" />
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column prop="assertresult" label="结果"  width="100">
-                                        <template #default="scope">
-                                            <el-input v-model="assertData[index][scope.$index].assertresult" disabled />
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column width='100'>
-                                        <template #default="scope">
-                                            <el-button type="danger" @click="delAssert(index, scope.$index)">删除</el-button>
-                                        </template>
-                                    </el-table-column>
-                                </el-table>
-                            </el-form-item>
-                            <el-button type="primary" @click="addAssert(index)"
-                                style="margin-left: 50px;margin-bottom: 10px;">新增断言</el-button>
-                                <!-- 提取参数 -->
-                            <el-form-item label="提取参数">
-                                <el-table :data="extractData[index]" border style="width: 100%">
-                                    <el-table-column prop="extractkey" label="Keys">
-                                        <template #default="scope">
-                                            <el-input v-model="extractData[index][scope.$index].extractkey" />
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column prop="extractvalue" label="Values">
-                                        <template #default="scope">
-                                            <el-input v-model="extractData[index][scope.$index].extractvalue" />
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column prop="extractdecription" label="描述">
-                                        <template #default="scope">
-                                            <el-input v-model="extractData[index][scope.$index].extractdecription" />
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column width='100'>
-                                        <template #default="scope">
-                                            <el-button type="danger" @click="delExtract(index, scope.$index)">删除</el-button>
-                                        </template>
-                                    </el-table-column>
-                                </el-table>
-                            </el-form-item>
-                            <el-button type="primary" @click="addExtract(index)"
-                                style="margin-left: 50px;margin-bottom: 10px;">新增提取参数</el-button>
                         </el-collapse-item>
                     </el-collapse>
                 </div>
@@ -384,22 +260,21 @@
 .debugBtn {
     justify-content: flex-end;
 }
-
-.input-with-select .el-input-group__prepend {
-    background-color: var(--el-fill-color-blank);
-}
-.input-with-select .el-select{
-    width: 80px;
-}
 </style>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, nextTick } from 'vue';
 import router from "../router/index";
 import { useRoute } from 'vue-router'
 import { getAPIList, getAPIInfo, getAPICaseInfo, editAPICase, getEnvironmentList, debugAPICase } from '../http/api';
 import { ElMessage } from 'element-plus';
 import { VueDraggableNext as Draggable } from 'vue-draggable-next';
+import MonacoEdit from './MonacoEdit.vue';
+import RequestParams from './RequestParams.vue';
+import RequestBody from './RequestBody.vue';
+import RequestHeader from './RequestHeader.vue';
+import RequestExtract from './RequestExtract.vue';
+import RequestAssert from './RequestAssert.vue';
 
 const Dialog = ref(false);
 const envDialog = ref(false);
@@ -410,14 +285,6 @@ const envdata = reactive({
 })
 
 const env = reactive({})
-
-// 创建一个数据类型作映射
-let data_type = new Map();
-
-// 添加键值对，让获取的数据类型匹配列表选项
-data_type.set('number', 'int');
-data_type.set('string', 'string');
-data_type.set('boolean', 'bool');
 
 const goToSelectEnv = () => {
     envDialog.value = true;
@@ -542,97 +409,69 @@ const AddStep = () => {
         response: '',
         assert_result: {},
         extract: {},
+        beforecode: ref(''),
+        aftercode: ref(''),
     });
-    headersData.push([]);
-    paramsData.push([]);
-    bodyData.push([]);
-    assertData.push([]);
-    extractData.push([]);
 }
 
 const removeDomain = (step) => {
     const index = editform.steps.indexOf(step)
     if (index !== -1) {
         editform.steps.splice(index, 1);
-        headersData.splice(index, 1);
-        paramsData.splice(index, 1);
-        bodyData.splice(index, 1);
-        assertData.splice(index, 1);
-        extractData.splice(index, 1);
     }
-}
-
-const headersData = reactive(
-    []
-);
-
-const paramsData = reactive(
-    []
-);
-
-const bodyData = reactive(
-    // 默认为空，需要再点击添加，否则为空时保存的是空对象，有些接口需要空对象时添加一个空行即可
-    []
-);
-
-const assertData = reactive(
-    []
-);
-
-const extractData = reactive(
-    []
-);
-
-const addHeader = (index) => {
-    headersData[index].push({
-    })
-}
-
-const delHeader = (index, delindex) => {
-    headersData[index].splice(delindex, 1);
-}
-
-const addParams = (index) => {
-    paramsData[index].push({
-        paramDataType: 'string'
-    })
-}
-
-const delParam = (index, delindex) => {
-    paramsData[index].splice(delindex, 1);
-}
-
-const addBody = (index) => {
-    bodyData[index].push({
-        bodyDataType: 'string'
-    })
-}
-
-const delBody = (index, delindex) => {
-    bodyData[index].splice(delindex, 1);
-}
-
-const addAssert = (index) => {
-    assertData[index].push({
-        assertDataType: 'string'
-    })
-}
-
-const delAssert = (index, delindex) => {
-    assertData[index].splice(delindex, 1);
-}
-
-const addExtract = (index) => {
-    extractData[index].push({
-    })
-}
-
-const delExtract = (index, delindex) => {
-    extractData[index].splice(delindex, 1);
 }
 
 const cancelBtn = () => {
     router.push('/apicase/list');
+}
+
+const paramschildRefs = ref({});
+const paramsRef = (index) => {
+    return (el) => {
+        paramschildRefs.value[index] = el;
+    }
+}
+
+const bodychildRefs = ref({});
+const bodyRef = (index) => {
+    return (el) => {
+        bodychildRefs.value[index] = el;
+    }
+}
+
+const headerschildRefs = ref({});
+const headersRef = (index) => {
+    return (el) => {
+        headerschildRefs.value[index] = el;
+    }
+}
+
+const extractchildRefs = ref({});
+const extractRef = (index) => {
+    return (el) => {
+        extractchildRefs.value[index] = el;
+    }
+}
+
+const assertchildRefs = ref({});
+const assertRef = (index) => {
+    return (el) => {
+        assertchildRefs.value[index] = el;
+    }
+}
+
+const beforecodechildRefs = ref({});
+const beforecodeRef = (index) => {
+    return (el) => {
+        beforecodechildRefs.value[index] = el;
+    }
+}
+
+const aftercodechildRefs = ref({});
+const aftercodeRef = (index) => {
+    return (el) => {
+        aftercodechildRefs.value[index] = el;
+    }
 }
 
 const SelectApi = async (id) => {
@@ -643,41 +482,31 @@ const SelectApi = async (id) => {
         editform.steps[APIDialog_id.value].name = res.data.name;
         editform.steps[APIDialog_id.value].method = res.data.method;
         editform.steps[APIDialog_id.value].uri = res.data.uri;
-        const headers = [];
-        const params = [];
-        const bodys = [];
+        const headers = {};
+        const params = {};
+        const body = {};
         // 请求头
         for (let key in res.data.headers) {
             let value = res.data.headers[key];
-            headers.push({
-                headerskey: key,
-                headersvalue: value.value,
-                headersdecription: value.decription
-            });
+            headers[key] = { 'value': value.value, 'decription': value.decription }
         }
-        headersData[APIDialog_id.value] = headers;
+        editform.steps[APIDialog_id.value].headers = headers;
         // 请求参数
         for (let key in res.data.params) {
             let value = res.data.params[key];
-            params.push({
-                paramskey: key,
-                paramDataType: data_type.get(typeof(value.value)),
-                paramsvalue: value.value,
-                paramsdecription: value.decription
-            })
+            params[key] = { 'value': value.value, 'decription': value.decription }
         }
-        paramsData[APIDialog_id.value] = params;
+        editform.steps[APIDialog_id.value].params = params;
         // 请求体
         for (let key in res.data.body) {
             let value = res.data.body[key];
-            bodys.push({
-                bodykey: key,
-                bodyDataType: data_type.get(typeof(value.value)),
-                bodyvalue: value.value,
-                bodydecription: value.decription
-            })
+            body[key] = { 'value': value.value, 'decription': value.decription }
         }
-        bodyData[APIDialog_id.value] = bodys;
+        editform.steps[APIDialog_id.value].body = body;
+        await nextTick();
+        headerschildRefs.value[APIDialog_id.value].getHeaders();
+        paramschildRefs.value[APIDialog_id.value].getParams();
+        bodychildRefs.value[APIDialog_id.value].getBody();
         // 重置耗时，结果，响应
         editform.steps[APIDialog_id.value].time = '';
         editform.steps[APIDialog_id.value].result = '';
@@ -702,12 +531,6 @@ const getCaseInfo = async () => {
         editform.status = status.get(res.data.case.status);
         editform.level = res.data.case.level;
 
-        // editform.steps.pop();
-        // headersData.pop();
-        // paramsData.pop();
-        // bodyData.pop();
-        // assertData.pop();
-        // extractData.pop();
         // 测试步骤赋值
         for (let i = 0; i < res.data.steps.length; i++) {
             AddStep();
@@ -715,52 +538,23 @@ const getCaseInfo = async () => {
             editform.steps[i].name = steps[i].name;
             editform.steps[i].method = steps[i].method;
             editform.steps[i].uri = steps[i].uri;
+            editform.steps[i].headers = steps[i].headers;
+            editform.steps[i].params = steps[i].params;
+            editform.steps[i].body = steps[i].body;
+            editform.steps[i].assert_result = steps[i].assert_result;
+            editform.steps[i].extract = steps[i].extract;
+            editform.steps[i].beforecode = steps[i].beforecode;
+            editform.steps[i].aftercode = steps[i].aftercode;
 
-            for (let key in steps[i].headers) {
-                let value = steps[i].headers[key];
-                headersData[i].push({
-                    headerskey: key,
-                    headersvalue: value.value,
-                    headersdecription: value.decription
-                });
-            }
-
-            for (let key in steps[i].params) {
-                let value = steps[i].params[key];
-                paramsData[i].push({
-                    paramskey: key,
-                    paramDataType: data_type.get(typeof(value.value)),
-                    paramsvalue: value.value,
-                    paramsdecription: value.decription
-                });
-            }
-            for (let key in steps[i].body) {
-                let value = steps[i].body[key];
-                bodyData[i].push({
-                    bodykey: key,
-                    bodyDataType: data_type.get(typeof(value.value)),
-                    bodyvalue: value.value,
-                    bodydecription: value.decription
-                });
-            }
-            for (let key in steps[i].assert_result) {
-                let value = steps[i].assert_result[key];
-                assertData[i].push({
-                    assertkey: key,
-                    assertDataType: data_type.get(typeof(value.value)),
-                    assertvalue: value.value,
-                    assertdecription: value.decription
-                });
-            }
-
-            for (let key in steps[i].extract) {
-                let value = steps[i].extract[key];
-                extractData[i].push({
-                    extractkey: key,
-                    extractvalue: value.value,
-                    extractdecription: value.decription
-                });
-            }
+            await nextTick();
+            // 改变prop值时，需要nextTick才能立即同步到子组件
+            paramschildRefs.value[i].getParams();
+            headerschildRefs.value[i].getHeaders();
+            bodychildRefs.value[i].getBody();
+            assertchildRefs.value[i].getAssert();
+            extractchildRefs.value[i].getExtract();
+            beforecodechildRefs.value[i].getCode();
+            aftercodechildRefs.value[i].getCode();
         }
     }
     else {
@@ -790,89 +584,11 @@ const onSubmit = async () => {
     const result = await assertForm();
     if (!result) return
     else {
-        for (let j = 0; j < headersData.length; j++) {
-            for (let i = 0; i < headersData[j].length; i++) {
-                editform.steps[j].headers[headersData[j][i].headerskey] = { "value": headersData[j][i].headersvalue, "decription": headersData[j][i].headersdecription };
-            }
-        }
-        for (let j = 0; j < paramsData.length; j++) {
-            for (let i = 0; i < paramsData[j].length; i++) {
-                if (paramsData[j][i].paramDataType === 'int') {
-                    paramsData[j][i].paramsvalue = Number(paramsData[j][i].paramsvalue);
-                }
-                else if (paramsData[j][i].paramDataType === 'bool') {
-                    if (paramsData[j][i].paramsvalue === 'false') {
-                        paramsData[j][i].paramsvalue = false;
-                    }
-                    else {
-                        paramsData[j][i].paramsvalue = true;
-                    }
-                }
-                editform.steps[j].params[paramsData[j][i].paramskey] = { "value": paramsData[j][i].paramsvalue, "decription": paramsData[j][i].paramsdecription };
-            }
-        }
-        for (let j = 0; j < bodyData.length; j++) {
-            for (let i = 0; i < bodyData[j].length; i++) {
-                if (bodyData[j][i].bodyDataType === 'int') {
-                    bodyData[j][i].bodyvalue = Number(bodyData[j][i].bodyvalue);
-                }
-                else if (bodyData[j][i].bodyDataType === 'bool') {
-                    if (bodyData[j][i].bodyvalue === 'false') {
-                        bodyData[j][i].bodyvalue = false;
-                    }
-                    else {
-                        bodyData[j][i].bodyvalue = true;
-                    }
-                }
-                editform.steps[j].body[bodyData[j][i].bodykey] = { "value": bodyData[j][i].bodyvalue, "decription": bodyData[j][i].bodydecription };
-            }
-        }
-        for (let j = 0; j < assertData.length; j++) {
-            for (let i = 0; i < assertData[j].length; i++) {
-                if (assertData[j][i].assertDataType === 'int') {
-                    assertData[j][i].assertvalue = Number(assertData[j][i].assertvalue);
-                }
-                else if (assertData[j][i].assertDataType === 'bool') {
-                    if (assertData[j][i].assertvalue === 'false') {
-                        assertData[j][i].assertvalue = false;
-                    }
-                    else {
-                        assertData[j][i].assertvalue = true;
-                    }
-                }
-                editform.steps[j].assert_result[assertData[j][i].assertkey] = { "value": assertData[j][i].assertvalue, "decription": assertData[j][i].assertdecription };
-            }
-        }
-        for (let j = 0; j < extractData.length; j++) {
-            for (let i = 0; i < extractData[j].length; i++) {
-                editform.steps[j].extract[extractData[j][i].extractkey] = { "value": extractData[j][i].extractvalue, "decription": extractData[j][i].extractdecription };
-            }
-        }
-
-        for (let i = 0; i < headersData.length; i++) {
-            if (headersData[i].length === 0) {
-                editform.steps[i].headers = null;
-            }
-        }
-        for (let i = 0; i < paramsData.length; i++) {
-            if (paramsData[i].length === 0) {
-                editform.steps[i].params = null;
-            }
-        }
-        for (let i = 0; i < bodyData.length; i++) {
-            if (bodyData[i].length === 0) {
-                editform.steps[i].body = null;
-            }
-        }
-        for (let i = 0; i < assertData.length; i++) {
-            if (assertData[i].length === 0) {
-                editform.steps[i].assert_result = null;
-            }
-        }
-        for (let i = 0; i < extractData.length; i++) {
-            if (extractData[i].length === 0) {
-                editform.steps[i].extract = null;
-            }
+        for (let i = 0; i < editform.steps.length; i++) {
+            editform.steps[i].params = paramschildRefs.value[i].formatParams();
+            editform.steps[i].body = bodychildRefs.value[i].formatBody();
+            editform.steps[i].headers = headerschildRefs.value[i].formatHeaders();
+            editform.steps[i].assert_result = assertchildRefs.value[i].formatAssert();
         }
 
         for (let i = 0; i < editform.steps.length; i++) {
@@ -908,6 +624,13 @@ const onSubmit = async () => {
 }
 
 const debug = async () => {
+    delete editform.result;
+    delete editform.time;
+    for (let i = 0; i < editform.steps.length; i++) {
+        delete editform.steps[i].response;
+        delete editform.steps[i].result;
+        delete editform.steps[i].time;
+    }
     editform.env = env.host;
     if (editform.env === undefined) {
         ElMessage({
@@ -921,88 +644,11 @@ const debug = async () => {
     const result = await assertForm()
     if (!result) return
     else {
-        for (let j = 0; j < headersData.length; j++) {
-            for (let i = 0; i < headersData[j].length; i++) {
-                editform.steps[j].headers[headersData[j][i].headerskey] = { "value": headersData[j][i].headersvalue, "decription": headersData[j][i].headersdecription };
-            }
-        }
-        for (let j = 0; j < paramsData.length; j++) {
-            for (let i = 0; i < paramsData[j].length; i++) {
-                if (paramsData[j][i].paramDataType === 'int') {
-                    paramsData[j][i].paramsvalue = Number(paramsData[j][i].paramsvalue);
-                }
-                else if (paramsData[j][i].paramDataType === 'bool') {
-                    if (paramsData[j][i].paramsvalue === 'false') {
-                        paramsData[j][i].paramsvalue = false;
-                    }
-                    else {
-                        paramsData[j][i].paramsvalue = true;
-                    }
-                }
-                editform.steps[j].params[paramsData[j][i].paramskey] = { "value": paramsData[j][i].paramsvalue, "decription": paramsData[j][i].paramsdecription };
-            }
-        }
-        for (let j = 0; j < bodyData.length; j++) {
-            for (let i = 0; i < bodyData[j].length; i++) {
-                if (bodyData[j][i].bodyDataType === 'int') {
-                    bodyData[j][i].bodyvalue = Number(bodyData[j][i].bodyvalue);
-                }
-                else if (bodyData[j][i].bodyDataType === 'bool') {
-                    if (bodyData[j][i].bodyvalue === 'false') {
-                        bodyData[j][i].bodyvalue = false;
-                    }
-                    else {
-                        bodyData[j][i].bodyvalue = true;
-                    }
-                }
-                editform.steps[j].body[bodyData[j][i].bodykey] = { "value": bodyData[j][i].bodyvalue, "decription": bodyData[j][i].bodydecription };
-            }
-        }
-        for (let j = 0; j < assertData.length; j++) {
-            for (let i = 0; i < assertData[j].length; i++) {
-                if (assertData[j][i].assertDataType === 'int') {
-                    assertData[j][i].assertvalue = Number(assertData[j][i].assertvalue);
-                }
-                else if (assertData[j][i].assertDataType === 'bool') {
-                    if (assertData[j][i].assertvalue === 'false') {
-                        assertData[j][i].assertvalue = false;
-                    }
-                    else {
-                        assertData[j][i].assertvalue = true;
-                    }
-                }
-                editform.steps[j].assert_result[assertData[j][i].assertkey] = { "value": assertData[j][i].assertvalue, "decription": assertData[j][i].assertdecription };
-            }
-        }
-        for (let j = 0; j < extractData.length; j++) {
-            for (let i = 0; i < extractData[j].length; i++) {
-                editform.steps[j].extract[extractData[j][i].extractkey] = { "value": extractData[j][i].extractvalue, "decription": extractData[j][i].extractdecription };
-            }
-        }
-        for (let i = 0; i < headersData.length; i++) {
-            if (headersData[i].length === 0) {
-                editform.steps[i].headers = null;
-            }
-        }
-        for (let i = 0; i < paramsData.length; i++) {
-            if (paramsData[i].length === 0) {
-                editform.steps[i].params = null;
-            }
-        }
-        for (let i = 0; i < bodyData.length; i++) {
-            if (bodyData[i].length === 0) {
-                editform.steps[i].body = null;
-            }
-        }
-        for (let i = 0; i < assertData.length; i++) {
-            if (assertData[i].length === 0) {
-                editform.steps[i].assertData = null;
-            }
-        }
-        for (let i = 0; i < extractData.length; i++) {
-            if (extractData[i].length === 0) {
-                editform.steps[i].extractData = null;
-            }
+        for (let i = 0; i < editform.steps.length; i++) {
+            editform.steps[i].params = paramschildRefs.value[i].formatParams();
+            editform.steps[i].body = bodychildRefs.value[i].formatBody();
+            editform.steps[i].headers = headerschildRefs.value[i].formatHeaders();
+            editform.steps[i].assert_result = assertchildRefs.value[i].formatAssert();
         }
 
         for (let i = 0; i < editform.steps.length; i++) {
@@ -1014,23 +660,25 @@ const debug = async () => {
         editform.result = '';
         if (res.status) {
             for (let i = 0; i < editform.steps.length; i++) {
-                if (assertData[i].length === 0) {
+                if (editform.steps[i] && editform.steps[i].assert_result && typeof editform.steps[i].assert_result === 'object'
+                    && Object.keys(editform.steps[i].assert_result).length === 0) {
                     editform.steps[i].result = 'success';
                 }
                 else {
-                    for (let j = 0; j < res.data.asserts_info[i].length; j++) {
-                        assertData[i][j].assertresult = res.data.asserts_info[i][j].assert_result;
-                    // 步骤断言结果是否包含error，包含将步骤结果设置为error，并用例变成error
-                    if (assertData[i][j].assertresult === 'error'){
-                        editform.steps[i].result = 'error';
-                        editform.result = 'error';
+                    for (let key in editform.steps[i].assert_result) {
+                        editform.steps[i].assert_result[key].result = res.data.res[i].assert_info[key].result;
+                        // 步骤断言结果是否包含error，包含将步骤结果设置为error，并用例变成error
+                        if (editform.steps[i].assert_result[key].result === 'error') {
+                            editform.steps[i].result = 'error';
+                            editform.result = 'error';
                         }
                     }
-                    if (editform.steps[i].result !== 'error'){
+                    if (editform.steps[i].result !== 'error') {
                         editform.steps[i].result = 'success';
                     }
+                    assertchildRefs.value[i].assertResult()
                 }
-                
+
                 editform.steps[i].time = res.data.time[i];
 
                 const response = JSON.stringify(res.data.res[i].response, null, 2);
@@ -1061,13 +709,17 @@ const debug = async () => {
                 type: 'error',
             })
         }
-        for (let i = 0; i < editform.steps.length; i++) {
-            editform.steps[i].headers = {}; // 调试后需要重置，不然修改参数会新增多一条数据
-            editform.steps[i].params = {}; // 调试后需要重置，不然修改参数会新增多一条数据
-            editform.steps[i].body = {}; // 调试后需要重置，不然修改参数会新增多一条数据
-            editform.steps[i].assert_result = {}; // 调试后需要重置，不然修改参数会新增多一条数据
-            editform.steps[i].extract = {}; // 调试后需要重置，不然修改参数会新增多一条数据
-        }
+    }
+}
+
+const onDragEnd = () => {
+    // 拖动结束重新对子组件赋值回显
+    for (let i = 0; i < editform.steps.length; i++) {
+        paramschildRefs.value[i].getParams();
+        bodychildRefs.value[i].getBody();
+        headerschildRefs.value[i].getHeaders();
+        extractchildRefs.value[i].getExtract();
+        assertchildRefs.value[i].getAssert();
     }
 }
 
