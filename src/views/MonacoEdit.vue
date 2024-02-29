@@ -3,7 +3,7 @@
 </template>
   
 <script setup>
-import { onMounted, ref, defineProps, watch,defineEmits } from 'vue';
+import { onMounted, ref, defineProps,defineExpose, watch, defineEmits } from 'vue';
 import * as monaco from 'monaco-editor';
 
 const editorContainer = ref(null);
@@ -19,10 +19,10 @@ const emits = defineEmits([
 ])
 
 
-// defineExpose({
-//   getData: () => editorInstance.getValue(),
-//   setData: (newValue) => editorInstance.setValue(newValue)
-// })
+defineExpose({
+  getCode: () => editorInstance.getValue(),
+  // setData: (newValue) => editorInstance.setValue(newValue)
+})
 
 
 onMounted(() => {
