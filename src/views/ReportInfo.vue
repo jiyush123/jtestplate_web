@@ -45,9 +45,14 @@
                             </el-descriptions-item>
                             <el-descriptions-item label="响应内容" span="3">{{ step_data.step_response }}</el-descriptions-item>
                             <div v-for="(info, index) in step_data.assert_info" :key="index">
-                                <el-descriptions-item label="预期结果">{{ info.assert_expect }}</el-descriptions-item>
-                                <el-descriptions-item label="实际结果">{{ info.assert_value }}</el-descriptions-item>
-                                <el-descriptions-item label="断言结果">{{ info.assert_result }}</el-descriptions-item>
+                                <el-descriptions-item label="预期结果">{{ info.expect }}</el-descriptions-item>
+                                <el-descriptions-item label="实际结果">{{ info.value }}</el-descriptions-item>
+                                <el-descriptions-item v-if="info.expect === ''" label="断言结果"></el-descriptions-item>
+                                <el-descriptions-item v-else label="断言结果">
+                                    <el-tag v-if="info.result === 'success'" type="success">成功</el-tag>
+                                    <el-tag v-else type="danger">失败</el-tag>
+                                </el-descriptions-item>
+
                             </div>
                         </el-descriptions>
                         </div>
@@ -192,7 +197,7 @@ const getInfo = async () => {
 }
 let cases_id_click = [];
 const getReportCaseInfoFun = async (index) => {
-    // 如何case_id点击过，则不请求
+    // 如果case_id点击过，则不请求
     let case_id = cases_data[index].case_id;
     if (cases_id_click.includes(case_id)) {
         return
@@ -214,7 +219,6 @@ const getReportCaseInfoFun = async (index) => {
                 assert_info: res.data[i].assert_info,
                 step_result: res.data[i].step_result
             })
-            console.log(cases_data[index].steps_data);
         }
 
         }
