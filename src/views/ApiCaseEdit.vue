@@ -159,14 +159,14 @@
                                 <el-tab-pane label="前置处理">
                                     <el-form-item>
 
-                                        <monaco-edit :ref=beforecodeRef(index) v-model:code="step.beforecode" />
+                                        <monaco-edit :ref=beforecodeRef(index) v-model:code="step.before_code" />
 
                                     </el-form-item>
                                 </el-tab-pane>
                                 <el-tab-pane label="后置处理">
                                     <el-form-item>
 
-                                        <monaco-edit :ref=aftercodeRef(index) v-model:code="step.aftercode" />
+                                        <monaco-edit :ref=aftercodeRef(index) v-model:code="step.after_code" />
 
                                     </el-form-item>
                                 </el-tab-pane>
@@ -409,8 +409,8 @@ const AddStep = () => {
         response: '',
         assert_result: {},
         extract: {},
-        beforecode: ref(''),
-        aftercode: ref(''),
+        before_code: ref(''),
+        after_code: ref(''),
     });
 }
 
@@ -543,8 +543,8 @@ const getCaseInfo = async () => {
             editform.steps[i].body = steps[i].body;
             editform.steps[i].assert_result = steps[i].assert_result;
             editform.steps[i].extract = steps[i].extract;
-            editform.steps[i].beforecode = steps[i].beforecode;
-            editform.steps[i].aftercode = steps[i].aftercode;
+            editform.steps[i].before_code = steps[i].before_code;
+            editform.steps[i].after_code = steps[i].after_code;
 
             await nextTick();
             // 改变prop值时，需要nextTick才能立即同步到子组件
@@ -580,10 +580,12 @@ const assertForm = async () => {
     }
 }
 
+const is_loading = ref(false);
 const onSubmit = async () => {
     const result = await assertForm();
     if (!result) return
     else {
+        is_loading.value = true
         for (let i = 0; i < editform.steps.length; i++) {
             editform.steps[i].params = paramschildRefs.value[i].formatParams();
             editform.steps[i].body = bodychildRefs.value[i].formatBody();

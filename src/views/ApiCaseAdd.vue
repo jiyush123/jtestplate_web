@@ -156,14 +156,14 @@
                                 <el-tab-pane label="前置处理">
                                     <el-form-item>
 
-                                        <monaco-edit v-model:code="step.beforecode" />
+                                        <monaco-edit :ref=beforecodeRef(index) v-model:code="step.before_code" />
 
                                     </el-form-item>
                                 </el-tab-pane>
                                 <el-tab-pane label="后置处理">
                                     <el-form-item>
 
-                                        <monaco-edit v-model:code="step.aftercode" />
+                                        <monaco-edit :ref=aftercodeRef(index) v-model:code="step.after_code" />
 
                                     </el-form-item>
                                 </el-tab-pane>
@@ -182,7 +182,7 @@
         </draggable>
     </el-form>
 
-    <el-button type="primary" class="api_case_save_btn" @click="onSubmit(ruleFormRef)">保存</el-button>
+    <el-button type="primary" class="api_case_save_btn" @click="onSubmit(ruleFormRef)" :loading="is_loading">保存</el-button>
     <el-button class="api_case_cancel_btn" @click="cancelBtn">取消</el-button>
 
     <!-- 弹窗 -->
@@ -391,8 +391,8 @@ const addForm = reactive({
         response: '',
         assert_result: {},
         extract: {},
-        beforecode: ref(''),
-        aftercode: ref(''),
+        before_code: ref(''),
+        after_code: ref(''),
     }],
     created_user: localStorage.getItem('name'),
     updated_user: localStorage.getItem('name'),
@@ -416,8 +416,8 @@ const AddStep = () => {
         response: '',
         assert_result: {},
         extract: {},
-        beforecode: ref(''),
-        aftercode: ref(''),
+        before_code: ref(''),
+        after_code: ref(''),
     });
 }
 
@@ -467,6 +467,19 @@ const assertRef = (index) => {
     }
 }
 
+const beforecodechildRefs = ref({});
+const beforecodeRef = (index) => {
+    return (el) => {
+        beforecodechildRefs.value[index] = el;
+    }
+}
+
+const aftercodechildRefs = ref({});
+const aftercodeRef = (index) => {
+    return (el) => {
+        aftercodechildRefs.value[index] = el;
+    }
+}
 
 const SelectApi = async (id) => {
     const APIid = { 'id': id };
@@ -528,10 +541,12 @@ const assertForm = async () => {
     }
 }
 
+const is_loading = ref(false);
 const onSubmit = async () => {
     const result = await assertForm()
     if (!result) return
     else {
+        is_loading.value = true
         for (let i = 0; i < addForm.steps.length; i++) {
             addForm.steps[i].params = paramschildRefs.value[i].formatParams();
             addForm.steps[i].body = bodychildRefs.value[i].formatBody();
