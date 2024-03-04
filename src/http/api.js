@@ -328,6 +328,68 @@ export const runAPICase = (data) => {
         }
     });
 }
+
+// 任务接口
+export const getCronJobList = (params) => {
+    return $http({
+        method: "get",
+        url: "http://127.0.0.1:8000/cronjob/list/",
+        params: params,
+        data: {},
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
+
+export const getCronJobInfo = (params) => {
+    return $http({
+        method: "get",
+        url: "http://127.0.0.1:8000/cronjob/detail/",
+        params: params,
+        data: {},
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
+
+export const addCronJob = (data) => {
+    return $http({
+        method: "post",
+        url: "http://127.0.0.1:8000/cronjob/add/",
+        params: {},
+        data: data,
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
+
+export const delCronJob = (data) => {
+    return $http({
+        method: "post",
+        url: "http://127.0.0.1:8000/cronjob/del/",
+        params: {},
+        data: data,
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
+
+export const editCronJob = (data) => {
+    return $http({
+        method: "post",
+        url: "http://127.0.0.1:8000/cronjob/update/",
+        params: {},
+        data: data,
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
+
 // 报告接口
 export const getReportList = (params) => {
     return $http({
