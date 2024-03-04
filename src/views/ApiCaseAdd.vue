@@ -76,7 +76,7 @@
         </el-dialog>
 
         <!-- 测试步骤 -->
-        <draggable v-model="addForm.steps" @end="onDragEnd" filter=".el-button">
+        <draggable v-model="addForm.steps" @end="onDragEnd" handle=".el-collapse-item__header">
             <transition-group>
                 <div v-for="(step, index) in addForm.steps" :key="`step_${index}`" style="margin:10px">
                     <el-collapse>
@@ -172,8 +172,6 @@
                             <el-form-item label="返回响应" :prop="'steps.' + index + '.response'">
                                 <el-input v-model="step.response" type="textarea" autosize disabled />
                             </el-form-item>
-
-
 
                         </el-collapse-item>
                     </el-collapse>

@@ -84,7 +84,7 @@
             </template>
         </el-dialog>
         <!-- 测试步骤 -->
-        <draggable v-model="editform.steps" @end="onDragEnd">
+        <draggable v-model="editform.steps" @end="onDragEnd" handle=".el-collapse-item__header">
             <transition-group>
                 <div v-for="(step, index) in editform.steps" :key="`step_${index}`" style="margin:10px">
                     <el-collapse>
