@@ -87,6 +87,34 @@ const routes = [
         }
       },
       {
+        path: '/task/list',
+        name: 'tasklist',
+        component: () => import(/* webpackChunkName: "tasklist" */ '../views/TaskList.vue'),
+        meta: {
+          isShow: true,
+          title: "任务管理",
+        }
+      },
+      {
+        path: '/task/add',
+        name: 'taskadd',
+        component: () => import(/* webpackChunkName: "taskadd" */ '../views/TaskAdd.vue'),
+        meta: {
+          isShow: false,
+          title: "新增任务",
+        }
+      },
+      {
+        path: '/task/edit/:id',
+        name: 'taskedit',
+        component: () => import(/* webpackChunkName: "tasklist" */ '../views/TaskEdit.vue'),
+        props: true,
+        meta: {
+          isShow: false,
+          title: "修改任务",
+        }
+      },
+      {
         path: '/report/list',
         name: 'reportlist',
         component: () => import(/* webpackChunkName: "reportlist" */ '../views/ReportList.vue'),
