@@ -199,7 +199,6 @@ const goToSelectEnv = (id) => {
             case_ids.value.push(case_info.value[i].id);
         }
     }
-    console.log(case_ids)
 }
 
 const cancelDialog = (formEl) => {
