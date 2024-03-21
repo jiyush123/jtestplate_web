@@ -194,10 +194,12 @@ const goToSelectEnv = (id) => {
     }
     else {
         batch_run.value = true;
+        case_ids.value.length = 0;
         for(let i=0;i<case_info.value.length;i++){
             case_ids.value.push(case_info.value[i].id);
         }
     }
+    console.log(case_ids)
 }
 
 const cancelDialog = (formEl) => {
