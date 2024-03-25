@@ -23,7 +23,11 @@
         <el-table-column prop="name" label="任务名称" width="150px" fixed/>
         <el-table-column prop="env" label="执行环境"/>
         <el-table-column prop="type" label="任务类型"/>
-        <el-table-column prop="is_active" label="启用"/>
+        <el-table-column prop="is_active" label="启用">
+            <template #default="scope">
+                <el-switch v-model="scope.row.is_active" @change=changeIsactive(scope.row.id,scope.row.is_active) />
+            </template>
+        </el-table-column>
         <el-table-column prop="last_run_time" label="上次执行时间" width="180px"/>
         <el-table-column prop="next_run_time" label="下次执行时间" width="180px"/>
 
@@ -51,7 +55,7 @@
 
 <script setup>
 import { reactive, ref,onMounted } from 'vue'
-import { getCronJobList,delCronJob } from '../http/api'
+import { getCronJobList,delCronJob,editCronJobIsActive } from '../http/api'
 import { ElMessage } from 'element-plus'
 import router from "../router/index"
 import PaginationModule from './PaginationModule.vue'
@@ -62,6 +66,30 @@ let data = reactive({
     total: 0,
 })
 
+const changeIsactive = async (id,is_active)=>{
+    const res = await editCronJobIsActive({id:id,is_active:is_active});
+    if (res.status) {
+        let msg = '禁用成功';
+        if(is_active === true){
+            msg = '启用成功'
+        }
+        ElMessage({
+            showClose: true,
+            center: true,
+            message: msg,
+            type: 'success',
+        })
+        getCronJobListFun(params);
+    }
+    else {
+        ElMessage({
+            showClose: true,
+            center: true,
+            message: res.msg,
+            type: 'error',
+        })
+    }
+}
 let params = {
     "page": 1,
     "size": 10,
