@@ -21,8 +21,8 @@
         </el-button>
     </div>
     <!-- 列表 -->
-    <el-table :data="data.table" stripe @select="handleSelect" style="width: 100%" show-overflow-tooltip>
-        <el-table-column type="selection" width="50" fixed />
+    <el-table :data="data.table" :row-key="getRowKey" stripe @select="handleSelect" style="width: 100%" show-overflow-tooltip>
+        <el-table-column type="selection" :reserve-selection="true" width="50" fixed />
         <el-table-column prop="id" label="id" width="50" fixed />
         <el-table-column prop="name" label="用例名称" width="200" fixed />
         <el-table-column prop="level" label="优先级">
@@ -124,6 +124,10 @@ let data = reactive({
     table: [],
     total: 0,
 })
+
+const getRowKey = (row) => {
+    return row.id;
+}
 
 let params = {
     "page": 1,
