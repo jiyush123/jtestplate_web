@@ -28,22 +28,80 @@
                 <el-option label="只执行一次" value="2" />
             </el-select>
         </el-form-item>
-
+        <el-button @click="goToSelectCase">选择关联用例</el-button>
+        <el-text>已选：{{ case_nums }} 条用例</el-text>
         <el-form-item label="启用" prop="is_active">
             <el-switch v-model="addForm.is_active" />
         </el-form-item>
 
-        <el-form-item label="执行时间Cron" prop="schedule" :rules="[
-            { required: true, message: '请输入定时执行时间' }
-        ]">
-            <el-input v-model="addForm.schedule" />
-        </el-form-item>
+        <cron-module ref="cron" v-model:schedule="addForm.schedule"></cron-module>
 
         <el-form-item>
             <el-button type="primary" @click="onSubmit(ruleFormRef)">保存</el-button>
             <el-button @click="cancelBtn">取消</el-button>
         </el-form-item>
     </el-form>
+    <!-- 选择用例弹窗 -->
+    <el-dialog v-model="Dialog" title="选择用例" width="60%" align-center @close="cancelDialog(formRef)">
+        <!-- 搜索栏 -->
+        <el-form ref="formRef" :inline="true" :model="queryForm" label-width="80px" class="queryForm listquery">
+            <el-form-item label="用例名称" prop="name">
+                <el-input v-model="queryForm.name" clearable />
+            </el-form-item>
+            <el-form-item label="状态" prop="status">
+                <el-select v-model="queryForm.status" clearable placeholder="请选择">
+                    <el-option v-for="item in status_options" :key="item.value" :label="item.label"
+                        :value="item.value" />
+                </el-select>
+            </el-form-item>
+            <el-button type="primary" @click="queryList">查询</el-button>
+        </el-form>
+        <!-- 列表 -->
+        <el-table ref="caseTable" :data="case_data.table" stripe style="width: 100%" show-overflow-tooltip
+            :row-key="getRowKey" @selection-change="handleSelectionChange">
+            <el-table-column type="selection" :reserve-selection="true" width="50" fixed />
+            <el-table-column prop="id" label="id" width="50" fixed />
+            <el-table-column prop="name" label="用例名称" width="200" fixed />
+            <el-table-column prop="level" label="优先级">
+                <template #default="scope">
+                    <el-tag v-if="scope.row.level === '1'" class="ml-2" type="danger">
+                        {{ scope.row.level }}
+                    </el-tag>
+                    <el-tag v-else-if="scope.row.level === '2'" class="ml-2" type="warning">
+                        {{ scope.row.level }}
+                    </el-tag>
+                    <el-tag v-else-if="scope.row.level === '3'" class="ml-2" type="">
+                        {{ scope.row.level }}
+                    </el-tag>
+                </template>
+            </el-table-column>
+            <el-table-column prop="status" label="状态" />
+            <el-table-column prop="result" label="结果">
+                <template #default="scope">
+                    <el-tag v-if="scope.row.result === '成功'" class="ml-2" type="success">
+                        {{ scope.row.result }}
+                    </el-tag>
+                    <el-tag v-else-if="scope.row.result === '失败'" class="ml-2" type="danger">
+                        {{ scope.row.result }}
+                    </el-tag>
+                    <el-tag v-else-if="scope.row.result === '无'" class="ml-2" type="info">
+                        {{ scope.row.result }}
+                    </el-tag>
+                </template>
+            </el-table-column>
+            <el-table-column prop="last_time" label="最后一次执行时间" width="200" />
+            <el-table-column prop="updated_time" label="修改时间" width="200" />
+        </el-table>
+        <!-- 分页模板 -->
+        <el-row>
+            <el-col :span="8">
+                <el-button type="primary" @click="sureCases">确定</el-button>
+            </el-col>
+            <el-col :span="16">
+                <PaginationModule :total="case_data.total" :getListFun="getAPICaseListFun" />
+            </el-col>
+        </el-row>
+    </el-dialog>
 </template>
 
 <style>
@@ -54,10 +112,13 @@
 </style>
 
 <script setup>
-import { reactive, ref, onMounted } from 'vue';
+import { reactive, ref, onMounted, computed } from 'vue';
 import router from "../router/index";
 import { ElMessage } from 'element-plus';
-import { addCronJob, getEnvironmentList } from '../http/api';
+import { addCronJob, getEnvironmentList, getAPICaseList } from '../http/api';
+
+import CronModule from './CronModule.vue';
+import PaginationModule from './PaginationModule.vue'
 
 const envOptions = ref(null);
 
@@ -82,9 +143,111 @@ const addForm = reactive({
     env: '',
     type: '1',
     is_active: true,
-    schedule:'',
+    case_ids: [],
+    schedule: '* * * * * ? *',
     created_user: '',
 });
+// 选择用例弹窗参数
+const caseTable = ref('')
+const Dialog = ref(false);
+const formRef = ref('');
+const case_info = ref([]);
+let case_data = reactive({
+    table: [],
+    total: 0,
+})
+let params = {
+    "page": 1,
+    "size": 10,
+}
+// 枚举映射
+const status_options = [{
+    value: '1',
+    label: '未开始',
+},
+{
+    value: '2',
+    label: '进行中',
+},
+{
+    value: '3',
+    label: '已完成',
+},]
+
+let queryForm = reactive({
+    name: '',
+    status: '',
+})
+const queryList = () => {
+    if (queryForm.name == '') {
+        delete params.name;
+    } else {
+        params.name = queryForm.name;
+    }
+    if (queryForm.status == '') {
+        delete params.status;
+    } else {
+        params.status = queryForm.status;
+    }
+    getAPICaseListFun(params)
+}
+
+const getAPICaseListFun = async (paramdata) => {
+    params.page = paramdata.page;
+    params.size = paramdata.size;
+    // 发送到后端获取列表数据
+    const res = await getAPICaseList(params);
+    case_data.table = res.data;
+    case_data.total = res.total;
+}
+
+const goToSelectCase = async () => {
+    Dialog.value = true;
+    await getAPICaseListFun(params);
+    echoSelect()
+}
+
+// 回显
+const echoSelect = () =>{
+    case_data.table.forEach(row => {
+        if(addForm.case_ids.includes(row.id)){
+            caseTable.value.toggleRowSelection(row, true)
+        }
+        else{
+            caseTable.value.toggleRowSelection(row, false)
+        }
+    })
+}
+
+const getRowKey = (row) => {
+    return row.id;
+}
+
+const handleSelectionChange = (selection) => {
+    case_info.value = selection
+}
+
+const cancelDialog = (formEl) => {
+    // 取消弹窗，重置搜索条件，重置未确定选项在echoSelect方法处理
+    Dialog.value = false;
+    if (!formEl) return
+    formEl.resetFields();
+}
+
+const sureCases = () => {
+    addForm.case_ids.length = 0;
+    for (let i = 0; i < case_info.value.length; i++) {
+        addForm.case_ids.push(case_info.value[i].id)
+    }
+    cancelDialog();
+}
+
+const case_nums = computed(() => {
+  return addForm.case_ids.length
+})
+
+// cron组件
+const cron = ref(null);
 
 const ruleFormRef = ref(null);
 // 这个方法是等待表单验证结果，因为返回的是promise.reject,所以要用try去捕捉异常再返回布尔值
@@ -135,4 +298,5 @@ onMounted(() => {
     setTimeout(() => {
     }, 1000)
 })
+
 </script>
