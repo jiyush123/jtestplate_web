@@ -390,6 +390,18 @@ export const editCronJob = (data) => {
     });
 }
 
+export const editCronJobIsActive = (data) => {
+    return $http({
+        method: "post",
+        url: "http://127.0.0.1:8000/cronjob/is_active/",
+        params: {},
+        data: data,
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
+
 // 报告接口
 export const getReportList = (params) => {
     return $http({
