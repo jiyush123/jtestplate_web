@@ -220,12 +220,7 @@
                 </template>
             </el-table-column>
         </el-table>
-        <div class="demo-pagination-block">
-            <div class="demonstration"></div>
-            <el-pagination v-model:current-page="currentPage1" v-model:page-size="pageSize1" :page-sizes="[10, 20, 50, 100]"
-                :background="true" layout="total, prev, pager, next, sizes, jumper" :total="data.total"
-                @size-change="handleSizeChange" @current-change="handleCurrentChange" />
-        </div>
+        <PaginationModule ref="pagemodule" :total="data.total" :getListFun="getApiListFun" />
     </el-dialog>
 </template>
 
@@ -269,6 +264,7 @@ import { useRoute } from 'vue-router'
 import { getAPIList, getAPIInfo, getAPICaseInfo, editAPICase, getEnvironmentList, debugAPICase } from '../http/api';
 import { ElMessage } from 'element-plus';
 import { VueDraggableNext as Draggable } from 'vue-draggable-next';
+import PaginationModule from './PaginationModule.vue';
 import MonacoEdit from './MonacoEdit.vue';
 import RequestParams from './RequestParams.vue';
 import RequestBody from './RequestBody.vue';
@@ -317,8 +313,9 @@ let params = {
     "page": 1,
     "size": 10,
 };
-const currentPage1 = ref(1);
-const pageSize1 = ref(10);
+// 分页组件实例，用来调用里面重置页码的方法
+const pagemodule = ref('')
+
 let data = reactive({
     table: [],
     total: 0,
@@ -331,26 +328,24 @@ const queryForm = reactive({
 const APIDialog_id = ref(null);
 const APIDialog = async (index) => {
     // 打开弹窗，请求接口
+    queryForm.name = '';
+    queryForm.module = '';
     Dialog.value = true;
     APIDialog_id.value = index;
-    getApiListFun()
+    getApiListFun(params)
 }
 
 const cancelDialog = (formEl) => {
     // 取消弹窗，重置
+    params = {
+        "page": 1,
+        "size": 10,
+    }
+    pagemodule.value.resetParams();
     Dialog.value = false;
     envDialog.value = false;
     if (!formEl) return
     formEl.resetFields();
-}
-
-const handleSizeChange = (val) => {
-    params.size = val;
-    getApiListFun()
-}
-const handleCurrentChange = (val) => {
-    params.page = val;
-    getApiListFun()
 }
 
 const queryList = () => {
@@ -364,10 +359,10 @@ const queryList = () => {
     } else {
         params.module = queryForm.module;
     }
-    getApiListFun()
+    getApiListFun(params)
 }
 
-const getApiListFun = async () => {
+const getApiListFun = async (params) => {
     // 发送到后端获取列表数据
     const res = await getAPIList(params);
     data.table = res.data;

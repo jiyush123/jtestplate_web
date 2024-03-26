@@ -29,7 +29,7 @@
             </el-select>
         </el-form-item>
         <el-button @click="goToSelectCase">选择关联用例</el-button>
-        <el-text>已选：{{ case_nums }} 条用例</el-text>
+        <el-text style="margin-left: 10px;">已选：{{ case_nums }} 条用例</el-text>
         <el-form-item label="启用" prop="is_active">
             <el-switch v-model="editForm.is_active" />
         </el-form-item>
@@ -98,7 +98,7 @@
                 <el-button type="primary" @click="sureCases">确定</el-button>
             </el-col>
             <el-col :span="16">
-                <PaginationModule :total="case_data.total" :getListFun="getAPICaseListFun" />
+                <PaginationModule ref="pagemodule" :total="case_data.total" :getListFun="getAPICaseListFun" />
             </el-col>
         </el-row>
     </el-dialog>
@@ -164,6 +164,8 @@ let params = {
     "page": 1,
     "size": 10,
 }
+// 分页组件实例，用来调用里面重置页码的方法
+const pagemodule = ref('')
 // 枚举映射
 const status_options = [{
     value: '1',
@@ -261,7 +263,12 @@ const handleSelectionChange = (selection) => {
 }
 
 const cancelDialog = (formEl) => {
-    // 取消弹窗，重置搜索条件，重置未确定选项在echoSelect方法处理
+    params = {
+        "page": 1,
+        "size": 10,
+    }
+    // 取消弹窗，重置搜索条件，重置未确定选项在echoSelect方法处理，重置分页组件
+    pagemodule.value.resetParams();
     Dialog.value = false;
     if (!formEl) return
     formEl.resetFields();
