@@ -15,7 +15,7 @@
 }
 </style>
 <script setup>
-import { ref,defineProps } from 'vue'
+import { ref,defineProps,defineExpose } from 'vue'
 
 const currentPage1 = ref(1);
 const pageSize1 = ref(10);
@@ -42,4 +42,14 @@ const props = defineProps({
         // required: true // 如果这个 prop 是必需的
     }
 })
+const resetParams = () =>{
+    // params.size = 10;
+    // params.page = 1;
+    // console.log('重置分页页码')
+    currentPage1.value = 1;
+    pageSize1.value = 10;
+
+}
+defineExpose({ resetParams })
+
 </script>
