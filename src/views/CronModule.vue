@@ -64,8 +64,8 @@
                 <el-radio-group v-model="formdata.hours" class="cronradio">
                   <el-radio label="0">每一小时</el-radio>
                   <el-radio label='1'>每隔<el-input-number class="radio-input" v-model="interval_hours" :min="1"
-                      :max="60"></el-input-number>小时执行，从<el-input-number class="radio-input"
-                      v-model="interval_start_hours" :min="0" :max="59"></el-input-number>小时开始</el-radio>
+                      :max="24"></el-input-number>小时执行，从<el-input-number class="radio-input"
+                      v-model="interval_start_hours" :min="0" :max="23"></el-input-number>小时开始</el-radio>
                   <div class="radio-select"><el-radio label='2'>具体小时数（可多选）
 
                     </el-radio>
@@ -74,10 +74,10 @@
                       <el-option v-for="item in hours_list" :key="item.value" :label="item.label" :value="item.value" />
                     </el-select>
                   </div>
-                  <el-radio label='3'>周期从<el-input-number class="radio-input" v-model="hours_start" :min="1"
-                      :max="60"></el-input-number>
+                  <el-radio label='3'>周期从<el-input-number class="radio-input" v-model="hours_start" :min="0"
+                      :max="23"></el-input-number>
                     到<el-input-number class="radio-input" v-model="hours_end" :min="0"
-                      :max="59"></el-input-number>小时</el-radio>
+                      :max="23"></el-input-number>小时</el-radio>
                 </el-radio-group>
               </div>
             </el-tab-pane>
