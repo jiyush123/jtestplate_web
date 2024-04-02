@@ -128,39 +128,39 @@
                             <!-- TAB -->
                             <el-tabs type="border-card" style="min-width: 800px">
                                 <!-- 调试params封装子组件 -->
-                                <el-tab-pane label="Params">
+                                <el-tab-pane label="Params" lazy>
                                     <request-params :ref=paramsRef(index) v-model:params="step.params" />
 
                                 </el-tab-pane>
 
-                                <el-tab-pane label="Body">
+                                <el-tab-pane label="Body" lazy>
                                     <request-body :ref=bodyRef(index) v-model:body="step.body" />
 
                                 </el-tab-pane>
 
-                                <el-tab-pane label="Headers">
+                                <el-tab-pane label="Headers" lazy>
                                     <request-header :ref=headersRef(index) v-model:headers="step.headers" />
 
                                 </el-tab-pane>
 
-                                <el-tab-pane label="断言">
+                                <el-tab-pane label="断言" lazy>
                                     <request-assert :ref=assertRef(index) v-model:assert="step.assert_result" />
 
                                 </el-tab-pane>
 
-                                <el-tab-pane label="提取参数">
+                                <el-tab-pane label="提取参数" lazy>
                                     <request-extract :ref=extractRef(index) v-model:extract="step.extract" />
 
                                 </el-tab-pane>
 
-                                <el-tab-pane label="前置处理">
+                                <el-tab-pane label="前置处理" lazy>
                                     <el-form-item>
 
                                         <monaco-edit :ref=beforecodeRef(index) v-model:code="step.before_code" />
 
                                     </el-form-item>
                                 </el-tab-pane>
-                                <el-tab-pane label="后置处理">
+                                <el-tab-pane label="后置处理" lazy>
                                     <el-form-item>
 
                                         <monaco-edit :ref=aftercodeRef(index) v-model:code="step.after_code" />
