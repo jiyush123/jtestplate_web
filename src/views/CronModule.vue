@@ -297,8 +297,14 @@ const formdata = reactive({
 // 间隔多少秒，从几秒开始
 const interval_second = ref(1);
 const interval_start_second = ref(0);
+
 const str_interval_second = computed(() => {
-  return interval_start_second.value.toString() + '/' + interval_second.value.toString();
+  if (interval_second.value !== null && interval_start_second.value !== null) {
+    return interval_start_second.value.toString() + '/' + interval_second.value.toString();
+  }
+  else {
+    return '*'
+  }
 })
 
 // 具体那一秒开始
@@ -557,7 +563,12 @@ const changeSecondRadio = () => {
 const sencond_start = ref(1);
 const sencond_end = ref(0);
 const str_sencond_start_end = computed(() => {
-  return sencond_start.value.toString() + '-' + sencond_end.value.toString();
+  if (sencond_start.value !== null && sencond_end.value !== null) {
+    return sencond_start.value.toString() + '-' + sencond_end.value.toString();
+  }
+  else {
+    return '*'
+  }
 })
 
 //分钟
@@ -565,7 +576,12 @@ const str_sencond_start_end = computed(() => {
 const interval_minute = ref(1);
 const interval_start_minute = ref(0);
 const str_interval_minute = computed(() => {
-  return interval_start_minute.value.toString() + '/' + interval_minute.value.toString();
+  if (interval_minute.value !== null && interval_start_minute.value !== null) {
+    return interval_start_minute.value.toString() + '/' + interval_minute.value.toString();
+  }
+  else {
+    return '*'
+  }
 })
 
 // 具体那一分钟开始
@@ -824,7 +840,11 @@ const changeMinuteRadio = () => {
 const minute_start = ref(1);
 const minute_end = ref(0);
 const str_minute_start_end = computed(() => {
-  return minute_start.value.toString() + '-' + minute_end.value.toString();
+  if (minute_start.value !== null && minute_end.value !== null) {
+  return minute_start.value.toString() + '-' + minute_end.value.toString();}
+  else{
+    return '*'
+  }
 })
 
 //小时
@@ -832,7 +852,11 @@ const str_minute_start_end = computed(() => {
 const interval_hours = ref(1);
 const interval_start_hours = ref(0);
 const str_interval_hours = computed(() => {
-  return interval_start_hours.value.toString() + '/' + interval_hours.value.toString();
+  if (interval_hours.value !== null && interval_start_hours.value !== null) {
+  return interval_start_hours.value.toString() + '/' + interval_hours.value.toString();}
+  else{
+    return '*'
+  }
 })
 
 // 具体那一小时开始
@@ -947,7 +971,11 @@ const changeHoursRadio = () => {
 const hours_start = ref(1);
 const hours_end = ref(0);
 const str_hours_start_end = computed(() => {
-  return hours_start.value.toString() + '-' + hours_end.value.toString();
+  if (hours_start.value !== null && hours_end.value !== null) {
+  return hours_start.value.toString() + '-' + hours_end.value.toString();}
+  else{
+    return '*'
+  }
 })
 
 // 天
@@ -955,10 +983,14 @@ const str_hours_start_end = computed(() => {
 const interval_day = ref(1);
 const interval_start_day = ref(1);
 const str_interval_day = computed(() => {
-  return interval_start_day.value.toString() + '/' + interval_day.value.toString();
+  if (interval_day.value !== null && interval_start_day.value !== null) {
+  return interval_start_day.value.toString() + '/' + interval_day.value.toString();}
+  else{
+    return '*'
+  }
 })
 
-// 具体那一小时开始
+// 具体那一天开始
 const day = ref([]);
 const day_list = [
   {
@@ -1102,7 +1134,11 @@ const changeDayRadio = () => {
 const day_start = ref(1);
 const day_end = ref(0);
 const str_day_start_end = computed(() => {
-  return day_start.value.toString() + '-' + day_end.value.toString();
+  if (day_start.value !== null && day_end.value !== null) {
+  return day_start.value.toString() + '-' + day_end.value.toString();}
+  else{
+    return '*'
+  }
 })
 
 //月
@@ -1110,7 +1146,11 @@ const str_day_start_end = computed(() => {
 const interval_month = ref(1);
 const interval_start_month = ref(0);
 const str_interval_month = computed(() => {
-  return interval_start_month.value.toString() + '/' + interval_month.value.toString();
+  if (interval_month.value !== null && interval_start_month.value !== null) {
+  return interval_start_month.value.toString() + '/' + interval_month.value.toString();}
+  else{
+    return '*'
+  }
 })
 
 // 具体那一月开始
@@ -1177,7 +1217,11 @@ const changeMonthRadio = () => {
 const month_start = ref(1);
 const month_end = ref(0);
 const str_month_start_end = computed(() => {
-  return month_start.value.toString() + '-' + month_end.value.toString();
+  if (month_start.value !== null && month_end.value !== null) {
+  return month_start.value.toString() + '-' + month_end.value.toString();}
+  else{
+    return '*'
+  }
 })
 
 //年
@@ -1185,7 +1229,11 @@ const str_month_start_end = computed(() => {
 const interval_year = ref(1);
 const interval_start_year = ref(2024);
 const str_interval_year = computed(() => {
-  return interval_start_year.value.toString() + '/' + interval_year.value.toString();
+  if (interval_year.value !== null && interval_start_year.value !== null) {
+  return interval_start_year.value.toString() + '/' + interval_year.value.toString();}
+  else{
+    return '*'
+  }
 })
 
 // 具体那一年开始
@@ -1252,7 +1300,11 @@ const changeYearRadio = () => {
 const year_start = ref(1);
 const year_end = ref(0);
 const str_year_start_end = computed(() => {
-  return year_start.value.toString() + '-' + year_end.value.toString();
+  if (year_start.value !== null && year_end.value !== null) {
+  return year_start.value.toString() + '-' + year_end.value.toString();}
+  else{
+    return '*'
+  }
 })
 
 // 最后拼接的字符串
@@ -1393,25 +1445,25 @@ defineExpose({ getStrCron })
 watch(str_cron, () => {
   emit('update:schedule', str_cron);
 })
-// // 以下是防抖动导致ResizeObserver出现BUG的代码，如果写在全局main.js里，可能会导致部分页面功能不正常，先写在出现BUG的模块
-// const debounce = (fn, delay) => {
-//   let timer
-//   return (...args) => {
-//     if (timer) {
-//       clearTimeout(timer)
-//     }
-//     timer = setTimeout(() => {
-//       fn(...args)
-//     }, delay)
-//   }
-// }
-// // 在这里设置延迟操作代码，这样就不会弹出报错
-// const _ResizeObserver = window.ResizeObserver;
-// window.ResizeObserver = class ResizeObserver extends _ResizeObserver {
-//   constructor(callback) {
-//     callback = debounce(callback, 200);
-//     super(callback);
-//   }
-// }
+// 以下是防抖动导致ResizeObserver出现BUG的代码，如果写在全局main.js里，可能会导致部分页面功能不正常，先写在出现BUG的模块
+const debounce = (fn, delay) => {
+  let timer
+  return (...args) => {
+    if (timer) {
+      clearTimeout(timer)
+    }
+    timer = setTimeout(() => {
+      fn(...args)
+    }, delay)
+  }
+}
+// 在这里设置延迟操作代码，这样就不会弹出报错
+const _ResizeObserver = window.ResizeObserver;
+window.ResizeObserver = class ResizeObserver extends _ResizeObserver {
+  constructor(callback) {
+    callback = debounce(callback, 300);
+    super(callback);
+  }
+}
 
 </script>
