@@ -147,7 +147,7 @@ const editForm = reactive({
     type: '',
     is_active: null,
     case_ids: [],
-    schedule:'',
+    schedule: '',
     created_user: '',
 });
 
@@ -205,6 +205,8 @@ const getAPICaseListFun = async (paramdata) => {
     const res = await getAPICaseList(params);
     case_data.table = res.data;
     case_data.total = res.total;
+    // 切换页码后回显选项
+    echoSelect()
 }
 
 const goToSelectCase = async () => {
@@ -214,12 +216,12 @@ const goToSelectCase = async () => {
 }
 
 // 回显
-const echoSelect = () =>{
+const echoSelect = () => {
     case_data.table.forEach(row => {
-        if(editForm.case_ids.includes(row.id)){
+        if (editForm.case_ids.includes(row.id)) {
             caseTable.value.toggleRowSelection(row, true)
         }
-        else{
+        else {
             caseTable.value.toggleRowSelection(row, false)
         }
     })
@@ -283,7 +285,7 @@ const sureCases = () => {
 }
 
 const case_nums = computed(() => {
-  return editForm.case_ids.length
+    return editForm.case_ids.length
 })
 
 // cron组件
@@ -331,11 +333,15 @@ const cancelBtn = () => {
     router.push('/task/list');
 }
 
-onMounted(async () => {
-    getEnvironmentFun();
+const getInfoFun = async () => {
     await getInfo();
     // 等待详情返回后再进行cron转换回显
     cron.value.getStrCron()
+}
+
+onMounted(() => {
+    getEnvironmentFun();
+    getInfoFun();
     setTimeout(() => {
     }, 1000)
 })
