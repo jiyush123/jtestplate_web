@@ -341,7 +341,9 @@ const cancelDialog = (formEl) => {
         "page": 1,
         "size": 10,
     }
-    pagemodule.value.resetParams();
+    if (pagemodule.value !== ''){
+        pagemodule.value.resetParams();
+    }
     Dialog.value = false;
     envDialog.value = false;
     if (!formEl) return
