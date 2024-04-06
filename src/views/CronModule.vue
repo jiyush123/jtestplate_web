@@ -1445,25 +1445,25 @@ defineExpose({ getStrCron })
 watch(str_cron, () => {
   emit('update:schedule', str_cron);
 })
-// 以下是防抖动导致ResizeObserver出现BUG的代码，如果写在全局main.js里，可能会导致部分页面功能不正常，先写在出现BUG的模块
-const debounce = (fn, delay) => {
-  let timer
-  return (...args) => {
-    if (timer) {
-      clearTimeout(timer)
-    }
-    timer = setTimeout(() => {
-      fn(...args)
-    }, delay)
-  }
-}
-// 在这里设置延迟操作代码，这样就不会弹出报错
-const _ResizeObserver = window.ResizeObserver;
-window.ResizeObserver = class ResizeObserver extends _ResizeObserver {
-  constructor(callback) {
-    callback = debounce(callback, 300);
-    super(callback);
-  }
-}
+// // 以下是防抖动导致ResizeObserver出现BUG的代码，如果写在全局main.js里，可能会导致部分页面功能不正常，先写在出现BUG的模块，在禁用内置错误覆盖层后，不需要了
+// const debounce = (fn, delay) => {
+//   let timer
+//   return (...args) => {
+//     if (timer) {
+//       clearTimeout(timer)
+//     }
+//     timer = setTimeout(() => {
+//       fn(...args)
+//     }, delay)
+//   }
+// }
+// // 在这里设置延迟操作代码，这样就不会弹出报错
+// const _ResizeObserver = window.ResizeObserver;
+// window.ResizeObserver = class ResizeObserver extends _ResizeObserver {
+//   constructor(callback) {
+//     callback = debounce(callback, 300);
+//     super(callback);
+//   }
+// }
 
 </script>
