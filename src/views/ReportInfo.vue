@@ -34,8 +34,8 @@
                 <!-- 步骤详情 -->
                 <template #default>
                     <div v-for="(step_data, index) in cases_data[index].steps_data" :key="index">
-                    <el-descriptions :title="'步骤'+(index+1)" border :column="3">
-                        <!-- 获取步骤信息 -->
+                        <el-descriptions :title="'步骤' + (index + 1)" border :column="3">
+                            <!-- 获取步骤信息 -->
                             <el-descriptions-item label="步骤名称">{{ step_data.step_name }}</el-descriptions-item>
                             <el-descriptions-item label="执行时长">{{ step_data.run_time }} ms</el-descriptions-item>
                             <el-descriptions-item label="结果">
@@ -43,19 +43,20 @@
                                 <el-tag v-else-if="step_data.step_result === 2" type="danger">失败</el-tag>
                                 <el-tag v-else type="info">无</el-tag>
                             </el-descriptions-item>
-                            <el-descriptions-item label="响应内容" span="3">{{ step_data.step_response }}</el-descriptions-item>
-                            <div v-for="(info, index) in step_data.assert_info" :key="index">
-                                <el-descriptions-item label="预期结果">{{ info.expect }}</el-descriptions-item>
-                                <el-descriptions-item label="实际结果">{{ info.value }}</el-descriptions-item>
-                                <el-descriptions-item v-if="info.expect === ''" label="断言结果"></el-descriptions-item>
+                            <el-descriptions-item label="响应内容" span="3">{{ step_data.step_response
+                                }}</el-descriptions-item>
+                            <div v-for="(value, key, index) in step_data.assert_info" :key="index">
+                                <el-descriptions-item label="预期结果">{{ key }}:{{ value.expect }}</el-descriptions-item>
+                                <el-descriptions-item label="实际结果">{{ value.value }}</el-descriptions-item>
+                                <el-descriptions-item v-if="value.expect === ''" label="断言结果"></el-descriptions-item>
                                 <el-descriptions-item v-else label="断言结果">
-                                    <el-tag v-if="info.result === 'success'" type="success">成功</el-tag>
+                                    <el-tag v-if="value.result === 'success'" type="success">成功</el-tag>
                                     <el-tag v-else type="danger">失败</el-tag>
                                 </el-descriptions-item>
 
                             </div>
                         </el-descriptions>
-                        </div>
+                    </div>
                 </template>
             </el-collapse-item>
         </el-collapse>
@@ -206,20 +207,22 @@ const getReportCaseInfoFun = async (index) => {
         cases_id_click.push(case_id);
         // 记录点击了哪个面板后再请求
         const report_id = id_params.id;
-        const params = {'case_id': case_id,
-                        'report_id':report_id}
+        const params = {
+            'case_id': case_id,
+            'report_id': report_id
+        }
         const res = await getReportCaseInfo(params);
         if (res.status) {
             // 回显用例详情
             for (let i = 0; i < res.data.length; i++) {
                 cases_data[index].steps_data.push({
-                step_name:res.data[i].step_name,
-                run_time: res.data[i].run_time,
-                step_response: res.data[i].step_response,
-                assert_info: res.data[i].assert_info,
-                step_result: res.data[i].step_result
-            })
-        }
+                    step_name: res.data[i].step_name,
+                    run_time: res.data[i].run_time,
+                    step_response: res.data[i].step_response,
+                    assert_info: res.data[i].assert_info,
+                    step_result: res.data[i].step_result
+                })
+            }
 
         }
         else {
