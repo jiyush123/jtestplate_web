@@ -231,10 +231,6 @@ const onSubmit = async () => {
     const result = await assertForm()
     if (!result) return
     else {
-        // editform.params = reqparams.value.formatParams();
-        // editform.body = reqbody.value.formatBody();
-        // editform.headers = reqheader.value.formatHeaders();
-        
         // 发送到后端新增用户数据
         editform.updated_user = localStorage.getItem('name');
         console.log(editform)
@@ -306,9 +302,6 @@ const debug = async () => {
     const result = await assertForm();
     if (!result) return
     else {
-        // editform.params = reqparams.value.formatParams();
-        // editform.body = reqbody.value.formatBody();
-        // editform.headers = reqheader.value.formatHeaders();
         // 发送调试
         const res = await debugAPI(editform);
         try {

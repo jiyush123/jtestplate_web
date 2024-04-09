@@ -95,33 +95,6 @@ const changeParams = () => {
     return params
 }
 
-// const formatParams = () => {// params = {key1:{datatype:xxx,value:xxx,decription:xxx},key2:{datatype:xxx,value:xxx,decription:xxx}}
-//     let params = {};
-//     if (paramsData.length === 0) {
-//         params = null
-//     }
-//     else {
-//         params = props.params;
-//         if (Object.keys(params).length > 0) {
-//             for (let key in params) {
-//                 if (params[key].datatype === 'int') {
-//                     params[key].value = Number(params[key].value);
-//                 }
-//                 else if (params[key].datatype === 'bool') {
-//                     if (params[key].value === 'false') {
-//                         params[key].value = false;
-//                     }
-//                     else {
-//                         params[key].value = true;
-//                     }
-//                 }
-//                 params[key] = { "value": params[key].value, "decription": params[key].decription };
-//             }
-//         }
-//     }
-//     return params
-// }
-
 defineExpose({ getParams })
 
 onMounted(() => {
