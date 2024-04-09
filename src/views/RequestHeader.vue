@@ -11,9 +11,9 @@
                     @input="emit('update:headers', changeHeaders())">
                     <template #prepend>
                         <el-select v-model="headersData[scope.$index].headersDataType">
-                            <el-option label="string" value="string" @input="emit('update:headers', changeHeaders())" />
-                            <el-option label="int" value="int" @input="emit('update:headers', changeHeaders())" />
-                            <el-option label="bool" value="bool" @input="emit('update:headers', changeHeaders())" />
+                            <el-option label="string" value="string" @click="emit('update:headers', changeHeaders())" />
+                            <el-option label="int" value="int" @click="emit('update:headers', changeHeaders())" />
+                            <el-option label="bool" value="bool" @click="emit('update:headers', changeHeaders())" />
                         </el-select>
                     </template>
                 </el-input>
@@ -55,15 +55,6 @@ const headersData = reactive(
     []
 );
 
-// 创建一个数据类型作映射
-let data_type = new Map();
-
-// 添加键值对，让获取的数据类型匹配列表选项
-data_type.set('number', 'int');
-data_type.set('string', 'string');
-data_type.set('boolean', 'bool');
-
-
 const addheaders = () => {
     headersData.push({
         headersDataType: 'string'
@@ -82,11 +73,12 @@ const getHeaders = () => {
         let value = props.headers[key];
         headersData.push({
             headerskey: key,
-            headersDataType: data_type.get(typeof (value.value)),
+            headersDataType: value.datatype,
             headersvalue: value.value,
             headersdecription: value.decription
         });
     }
+    return headersData
 }
 
 const changeHeaders = () => {
@@ -101,37 +93,11 @@ const changeHeaders = () => {
             headers[headersData[i].headerskey] = { "datatype": headersData[i].headersDataType, "value": headersData[i].headersvalue, "decription": headersData[i].headersdecription };
         }
     }
+    console.log(headers)
     return headers
 }
 
-const formatHeaders = () => {
-    let headers = {};
-    if (headersData.length === 0) {
-        headers = null
-    }
-    else {
-        headers = props.headers;
-        if (Object.keys(headers).length > 0) {
-            for (let key in headers) {
-                if (headers[key].datatype === 'int') {
-                    headers[key].value = Number(headers[key].value);
-                }
-                else if (headers[key].datatype === 'bool') {
-                    if (headers[key].value === 'false') {
-                        headers[key].value = false;
-                    }
-                    else {
-                        headers[key].value = true;
-                    }
-                }
-                headers[key] = { "value": headers[key].value, "decription": headers[key].decription };
-            }
-        }
-    }
-    return headers
-}
-
-defineExpose({ getHeaders, formatHeaders })
+defineExpose({ getHeaders })
 
 onMounted(() => {
     setTimeout(() => {

@@ -55,15 +55,6 @@ let paramsData = reactive(
     []
 );
 
-// 创建一个数据类型作映射
-let data_type = new Map();
-
-// 添加键值对，让获取的数据类型匹配列表选项
-data_type.set('number', 'int');
-data_type.set('string', 'string');
-data_type.set('boolean', 'bool');
-
-
 const addParams = () => {
     paramsData.push({
         paramDataType: 'string'
@@ -82,19 +73,16 @@ const getParams = () => {
         let value = props.params[key];
         paramsData.push({
             paramskey: key,
-            paramDataType: data_type.get(typeof (value.value)),
+            paramDataType: value.datatype,
             paramsvalue: value.value,
             paramsdecription: value.decription
         });
     }
+    return paramsData
 }
 
 const changeParams = () => {
     let params = {};
-    // 首先使用 Object.keys(addform.params).length === 0 检查addform.params是否没有任何属性，
-    // 接着通过addform.params.constructor === Object确认它确实是一个对象（而不是其他类型）。
-    // 如果满足这两个条件，则将addform.params设置为null，数据库存null，否则存null
-
     // 如果需要一个{}，则添加一个不输入key的参数
     if (paramsData.length === 1 && paramsData[0].paramskey === undefined) {
         params = {}
@@ -107,34 +95,34 @@ const changeParams = () => {
     return params
 }
 
-const formatParams = () => {// params = {key1:{datatype:xxx,value:xxx,decription:xxx},key2:{datatype:xxx,value:xxx,decription:xxx}}
-    let params = {};
-    if (paramsData.length === 0) {
-        params = null
-    }
-    else {
-        params = props.params;
-        if (Object.keys(params).length > 0) {
-            for (let key in params) {
-                if (params[key].datatype === 'int') {
-                    params[key].value = Number(params[key].value);
-                }
-                else if (params[key].datatype === 'bool') {
-                    if (params[key].value === 'false') {
-                        params[key].value = false;
-                    }
-                    else {
-                        params[key].value = true;
-                    }
-                }
-                params[key] = { "value": params[key].value, "decription": params[key].decription };
-            }
-        }
-    }
-    return params
-}
+// const formatParams = () => {// params = {key1:{datatype:xxx,value:xxx,decription:xxx},key2:{datatype:xxx,value:xxx,decription:xxx}}
+//     let params = {};
+//     if (paramsData.length === 0) {
+//         params = null
+//     }
+//     else {
+//         params = props.params;
+//         if (Object.keys(params).length > 0) {
+//             for (let key in params) {
+//                 if (params[key].datatype === 'int') {
+//                     params[key].value = Number(params[key].value);
+//                 }
+//                 else if (params[key].datatype === 'bool') {
+//                     if (params[key].value === 'false') {
+//                         params[key].value = false;
+//                     }
+//                     else {
+//                         params[key].value = true;
+//                     }
+//                 }
+//                 params[key] = { "value": params[key].value, "decription": params[key].decription };
+//             }
+//         }
+//     }
+//     return params
+// }
 
-defineExpose({ getParams, formatParams })
+defineExpose({ getParams })
 
 onMounted(() => {
     setTimeout(() => {

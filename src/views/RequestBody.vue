@@ -11,9 +11,9 @@
                     @input="emit('update:body', changeBody())">
                     <template #prepend>
                         <el-select v-model="bodyData[scope.$index].bodyDataType">
-                            <el-option label="string" value="string" @input="emit('update:body', changeBody())" />
-                            <el-option label="int" value="int" @input="emit('update:body', changeBody())" />
-                            <el-option label="bool" value="bool" @input="emit('update:body', changeBody())" />
+                            <el-option label="string" value="string" @click="emit('update:body', changeBody())" />
+                            <el-option label="int" value="int" @click="emit('update:body', changeBody())" />
+                            <el-option label="bool" value="bool" @click="emit('update:body', changeBody())" />
                         </el-select>
                     </template>
                 </el-input>
@@ -30,7 +30,7 @@
             </template>
         </el-table-column>
     </el-table>
-    <el-button type="primary" @click="addbody" style="margin-top: 10px;">新增body参数</el-button>
+    <el-button type="primary" @click="addbody()" style="margin-top: 10px;">新增body参数</el-button>
 </template>
 <style>
 .input-with-select .el-input-group__prepend {
@@ -50,18 +50,9 @@ const props = defineProps({
 })
 const emit = defineEmits(['update:body'])
 
-const bodyData = reactive(
+let bodyData = reactive(
     []
 );
-
-// 创建一个数据类型作映射
-let data_type = new Map();
-
-// 添加键值对，让获取的数据类型匹配列表选项
-data_type.set('number', 'int');
-data_type.set('string', 'string');
-data_type.set('boolean', 'bool');
-
 
 const addbody = () => {
     bodyData.push({
@@ -81,11 +72,12 @@ const getBody = () => {
         let value = props.body[key];
         bodyData.push({
             bodykey: key,
-            bodyDataType: data_type.get(typeof (value.value)),
+            bodyDataType: value.datatype,
             bodyvalue: value.value,
             bodydecription: value.decription
         });
     }
+    return bodyData
 }
 
 const changeBody = () => {
@@ -103,34 +95,7 @@ const changeBody = () => {
     return body
 }
 
-const formatBody = () => {
-    let body = {};
-    if (bodyData.length === 0) {
-        body = null
-    }
-    else {
-        body = props.body;
-        if (Object.keys(body).length > 0) {
-            for (let key in body) {
-                if (body[key].datatype === 'int') {
-                    body[key].value = Number(body[key].value);
-                }
-                else if (body[key].datatype === 'bool') {
-                    if (body[key].value === 'false') {
-                        body[key].value = false;
-                    }
-                    else {
-                        body[key].value = true;
-                    }
-                }
-                body[key] = { "value": body[key].value, "decription": body[key].decription };
-            }
-        }
-    }
-    return body
-}
-
-defineExpose({ getBody, formatBody })
+defineExpose({ getBody })
 
 onMounted(() => {
     setTimeout(() => {

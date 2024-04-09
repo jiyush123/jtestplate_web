@@ -176,9 +176,9 @@ const onSubmit = async () => {
     const result = await assertForm()
     if (!result) return
     else {
-        addform.params = reqparams.value.formatParams();
-        addform.body = reqbody.value.formatBody();
-        addform.headers = reqheader.value.formatHeaders();
+        // addform.params = reqparams.value.formatParams();
+        // addform.body = reqbody.value.formatBody();
+        // addform.headers = reqheader.value.formatHeaders();
         // 发送到后端新增接口数据
         addform.created_user = localStorage.getItem('name');
         addform.updated_user = localStorage.getItem('name');
@@ -270,9 +270,9 @@ const debug = async () => {
     const result = await assertForm();
     if (!result) return
     else {
-        addform.params = reqparams.value.formatParams();
-        addform.body = reqbody.value.formatBody();
-        addform.headers = reqheader.value.formatHeaders();
+        // addform.params = reqparams.value.formatParams();
+        // addform.body = reqbody.value.formatBody();
+        // addform.headers = reqheader.value.formatHeaders();
         // 发送调试
         const res = await debugAPI(addform);
         try {

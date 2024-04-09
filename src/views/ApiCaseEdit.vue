@@ -485,19 +485,19 @@ const SelectApi = async (id) => {
         // 请求头
         for (let key in res.data.headers) {
             let value = res.data.headers[key];
-            headers[key] = { 'value': value.value, 'decription': value.decription }
+            headers[key] = { 'value': value.value, 'datatype':value.datatype, 'decription': value.decription }
         }
         editform.steps[APIDialog_id.value].headers = headers;
         // 请求参数
         for (let key in res.data.params) {
             let value = res.data.params[key];
-            params[key] = { 'value': value.value, 'decription': value.decription }
+            params[key] = { 'value': value.value, 'datatype':value.datatype, 'decription': value.decription }
         }
         editform.steps[APIDialog_id.value].params = params;
         // 请求体
         for (let key in res.data.body) {
             let value = res.data.body[key];
-            body[key] = { 'value': value.value, 'decription': value.decription }
+            body[key] = { 'value': value.value, 'datatype':value.datatype, 'decription': value.decription }
         }
         editform.steps[APIDialog_id.value].body = body;
         await nextTick();
@@ -583,12 +583,6 @@ const onSubmit = async () => {
     if (!result) return
     else {
         is_loading.value = true
-        for (let i = 0; i < editform.steps.length; i++) {
-            editform.steps[i].params = paramschildRefs.value[i].formatParams();
-            editform.steps[i].body = bodychildRefs.value[i].formatBody();
-            editform.steps[i].headers = headerschildRefs.value[i].formatHeaders();
-            editform.steps[i].assert_result = assertchildRefs.value[i].formatAssert();
-        }
 
         for (let i = 0; i < editform.steps.length; i++) {
             editform.steps[i].sort = i;
@@ -643,12 +637,6 @@ const debug = async () => {
     const result = await assertForm()
     if (!result) return
     else {
-        for (let i = 0; i < editform.steps.length; i++) {
-            editform.steps[i].params = paramschildRefs.value[i].formatParams();
-            editform.steps[i].body = bodychildRefs.value[i].formatBody();
-            editform.steps[i].headers = headerschildRefs.value[i].formatHeaders();
-            editform.steps[i].assert_result = assertchildRefs.value[i].formatAssert();
-        }
 
         for (let i = 0; i < editform.steps.length; i++) {
             editform.steps[i].sort = i;

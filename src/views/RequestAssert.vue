@@ -11,9 +11,9 @@
                     @input="emit('update:assert', changeAssert())">
                     <template #prepend>
                         <el-select v-model="assertData[scope.$index].assertDataType">
-                            <el-option label="string" value="string" @input="emit('update:assert', changeAssert())" />
-                            <el-option label="int" value="int" @input="emit('update:assert', changeAssert())" />
-                            <el-option label="bool" value="bool" @input="emit('update:assert', changeAssert())" />
+                            <el-option label="string" value="string" @click="emit('update:assert', changeAssert())" />
+                            <el-option label="int" value="int" @click="emit('update:assert', changeAssert())" />
+                            <el-option label="bool" value="bool" @click="emit('update:assert', changeAssert())" />
                         </el-select>
                     </template>
                 </el-input>
@@ -87,7 +87,7 @@ const getAssert = () => {
         let value = props.assert[key];
         assertData.push({
             assertkey: key,
-            assertDataType: data_type.get(typeof (value.value)),
+            assertDataType: value.datatype,
             assertvalue: value.value,
             assertdecription: value.decription,
         });
@@ -106,7 +106,6 @@ const assertResult = () => {
 }
 
 const changeAssert = () => {
-    console.log('变更')
     let assert = {};
 
     // 如果需要一个{}，则添加一个不输入key的参数
@@ -121,34 +120,7 @@ const changeAssert = () => {
     return assert
 }
 
-const formatAssert = () => {
-    let assert = {};
-    if (assertData.length === 0) {
-        assert = null
-    }
-    else {
-        assert = props.assert;
-        if (Object.keys(assert).length > 0) {
-            for (let key in assert) {
-                if (assert[key].datatype === 'int') {
-                    assert[key].value = Number(assert[key].value);
-                }
-                else if (assert[key].datatype === 'bool') {
-                    if (assert[key].value === 'false') {
-                        assert[key].value = false;
-                    }
-                    else {
-                        assert[key].value = true;
-                    }
-                }
-                assert[key] = { "value": assert[key].value, "decription": assert[key].decription };
-            }
-        }
-    }
-    return assert
-}
-
-defineExpose({ getAssert, formatAssert, assertResult })
+defineExpose({ getAssert, assertResult })
 
 onMounted(() => {
     setTimeout(() => {
