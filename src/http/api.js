@@ -244,6 +244,18 @@ export const debugAPI = (data) => {
         }
     });
 }
+
+export const importAPI = (data) => {
+    return $http({
+        method: "post",
+        url: "http://127.0.0.1:8000/api/import/",
+        params: {},
+        data: data,
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
 // 测试用例接口
 export const addAPICase = (data) => {
     return $http({
