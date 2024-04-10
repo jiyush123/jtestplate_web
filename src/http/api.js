@@ -245,6 +245,18 @@ export const debugAPI = (data) => {
     });
 }
 
+export const getImportAPI = (data) => {
+    return $http({
+        method: "post",
+        url: "http://127.0.0.1:8000/api/get_import_list/",
+        params: {},
+        data: data,
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
+
 export const importAPI = (data) => {
     return $http({
         method: "post",
