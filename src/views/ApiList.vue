@@ -16,35 +16,51 @@
         <el-button type="primary" @click="goToAdd">
             新增接口
         </el-button>
-        <el-button type="success" style="justify-content: flex-end;" @click="goToImport">导入接口</el-button>
+        <el-button type="success" @click="goToImport">导入接口</el-button>
     </div>
     <!-- 导入弹窗 -->
     <el-dialog v-model="importDialog" title="导入接口" width="40%" align-center @close="cancelDialog(formRef)">
         <el-form label-width="100px" ref="formRef" label-position="top">
-        <el-form-item label="文件方式导入" prop="url">
-        <el-upload class="upload-demo" drag action="http://127.0.0.1:8000/api/import/" :headers="headers_token">
-            <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-            <div class="el-upload__text">
-                拖拽文件到此或 <em>点击导入</em>
-            </div>
-            <template #tip>
-                <div class="el-upload__tip">
-                    只支持json文件
-                </div>
-            </template>
-        </el-upload>
-    </el-form-item>
-</el-form>
+            <el-form-item label="文件方式导入" prop="url">
+                <el-upload ref="upload_file" class="upload-demo" drag :action="uploadUrl" :headers="headers_token"
+                    :on-success="ImportFile" :accept="'.json'">
+                    <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+                    <div class="el-upload__text">
+                        <em>拖拽文件到此或点击导入</em>
+                    </div>
+                    <template #tip>
+                        <div class="el-upload__tip">
+                            <div>
+                                <el-text type="info" size="small">只支持json文件</el-text>
+                            </div>
+                            <div>
+                                <el-text type="info" size="small">注意：chrome不支持拖拽</el-text>
+                            </div>
+                        </div>
+                    </template>
+                </el-upload>
+            </el-form-item>
+        </el-form>
         <el-form :model="formdata" label-width="100px" ref="formRef" label-position="top">
             <el-form-item label="URL 方式导入" prop="url">
                 <div class="import_url">
-                <el-input v-model="formdata.url" placeholder="请输入Swagger数据 URL"></el-input>
-                <el-button style="justify-content: flex-end;" type="primary" @click="() => { ImportApiFun(); importDialog = false; }">
-                    确定
-                </el-button>
-            </div>
+                    <el-input v-model="formdata.url" placeholder="请输入Swagger数据 URL"></el-input>
+                    <el-button style="justify-content: flex-end;" type="primary"
+                        @click="() => { ImportApiFun(); importDialog = false; }">
+                        继续
+                    </el-button>
+                </div>
             </el-form-item>
         </el-form>
+    </el-dialog>
+    <!-- 导入预览弹窗 -->
+    <el-dialog v-model="importPreviewDialog" title="导入预览" width="50%" align-center @close="cancelDialog(formRef)">
+        <el-tree style="max-width: 600px" show-checkbox :data="apiinfo_tree" node-key="id" :default-expanded-keys="[1]"
+            :default-checked-keys="[1]" @check-change="handleCheckChange" />
+        <template #footer>
+            <el-button @click="() => { importPreviewDialog = flase }">取消</el-button>
+            <el-button type="primary" @click="sureImport">确定</el-button>
+        </template>
     </el-dialog>
     <!-- 列表 -->
     <el-table :data="data.table" stripe style="width: 100%" show-overflow-tooltip>
@@ -85,29 +101,51 @@
 <style>
 .addBtn {
     display: flex;
-    justify-content: space-between;
 }
-.upload-demo{
+
+.upload-demo {
     width: 100%;
 }
-.import_url{
+
+.el-dialog__body {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.import_url {
     display: flex;
     width: 100%
 }
 </style>
 
 <script setup>
-import { reactive, ref, onMounted } from 'vue'
-import { getAPIList, delAPI, importAPI } from '../http/api'
+import { reactive, ref, onMounted, watch } from 'vue'
+import { getAPIList, delAPI, getImportAPI, importAPI } from '../http/api'
 import { ElMessage } from 'element-plus'
 import router from "../router/index"
 import PaginationModule from './PaginationModule.vue'
 
+// 导入弹窗
 const importDialog = ref(false);
-const headers_token = ref({Authorization:localStorage.getItem('token')});
+// 导入预览弹窗
+const importPreviewDialog = ref(false);
+// 导入文件接口需要的请求头
+const headers_token = ref({ Authorization: localStorage.getItem('token') });
+// 导入文件接口
+const uploadUrl = ref("http://127.0.0.1:8000/api/get_import_list/");
+// 导入文件组件
+const upload_file = ref('');
+const clearFiles = () => {
+    upload_file.value.clearFiles()
+}
 const formdata = reactive({
     url: ''
 })
+const apiinfo_list = ref([]);
+
+// 通过监听apiinfo_list变化，重新对apiingfo_tree赋值
+const apiinfo_tree = ref([{ id: 1, label: '全选', children: [] }])
+
 const goToImport = () => {
     importDialog.value = true
 }
@@ -115,12 +153,78 @@ const formRef = ref(null);
 const cancelDialog = (formEl) => {
     // 取消弹窗，重置
     importDialog.value = false;
+    clearFiles();
     if (!formEl) return
     formEl.resetFields();
 }
+const ImportFile = (response) => {
+    // 回调函数自动接收请求体数据，从文件导入列表
+    if (response.status) {
+        apiinfo_list.value = response.data;
+        openImportPreviewDialog();
+    }
+    else {
+        ElMessage({
+            showClose: true,
+            center: true,
+            message: response.msg,
+            type: 'error',
+        })
+        clearFiles();
+    }
+}
 
 const ImportApiFun = async () => {
-    const res = await importAPI(formdata);
+    // 从URL导入列表
+    const res = await getImportAPI(formdata);
+    if (res.status) {
+        apiinfo_list.value = res.data;
+        openImportPreviewDialog();
+    }
+    else {
+        ElMessage({
+            showClose: true,
+            center: true,
+            message: res.msg,
+            type: 'error',
+        })
+    }
+}
+
+const openImportPreviewDialog = () => {
+    importPreviewDialog.value = true;
+}
+
+const handleCheckChange = (selection, is_select) => {
+    if (selection.id === 1) {
+        return
+    }
+    else if (is_select === true) {
+        selection.is_select = true
+    }
+    else {
+        selection.is_select = false
+    }
+}
+// 确认导入的列表
+const import_apis = ref([])
+const import_data = reactive({
+    apis_list:[],
+    created_user: '',
+    updated_user: '',
+})
+const sureImport = async() => {
+    import_apis.value.length = 0;
+    apiinfo_tree.value[0].children.forEach((item) => {
+        if (item.is_select === true) {
+            import_apis.value.push(item.value);
+        }
+    });
+    import_data.apis_list = import_apis.value
+    import_data.created_user = localStorage.getItem('name');
+    import_data.updated_user = localStorage.getItem('name');
+    const res = await importAPI(import_data);
+    importPreviewDialog.value = false;
     if (res.status) {
         ElMessage({
             showClose: true,
@@ -128,7 +232,7 @@ const ImportApiFun = async () => {
             message: res.msg,
             type: 'success',
         })
-        getApiListFun(params);
+        getApiListFun({page:1,size:10})
     }
     else {
         ElMessage({
@@ -230,4 +334,18 @@ onMounted(() => {
     setTimeout(() => {
     }, 1000)
 })
+
+// 监听apiinfo_list的变化
+watch(apiinfo_list, () => {
+    // 清空原有的children数组
+    apiinfo_tree.value[0].children.length = 0;
+
+    // 将处理后的apiinfo_list添加到children数组中
+    apiinfo_list.value.forEach((item, index) => {
+        let api_method = item.method;
+        let name = item.name;
+        let uri = item.uri;
+        apiinfo_tree.value[0].children.push({ id: index + 2, label: api_method + ' ' + name + ' ' + uri, value: item, is_select: true });
+    });
+});
 </script>
