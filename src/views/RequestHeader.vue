@@ -19,9 +19,9 @@
                 </el-input>
             </template>
         </el-table-column>
-        <el-table-column prop="headersdecription" label="描述">
+        <el-table-column prop="headersdescription" label="描述">
             <template #default="scope">
-                <el-input v-model="headersData[scope.$index].headersdecription"
+                <el-input v-model="headersData[scope.$index].headersdescription"
                     @input="emit('update:headers', changeHeaders())" />
             </template>
         </el-table-column>
@@ -75,7 +75,7 @@ const getHeaders = () => {
             headerskey: key,
             headersDataType: value.datatype,
             headersvalue: value.value,
-            headersdecription: value.decription
+            headersdescription: value.description
         });
     }
     return headersData
@@ -90,7 +90,7 @@ const changeHeaders = () => {
     }
     else {
         for (let i = 0; i < headersData.length; i++) {
-            headers[headersData[i].headerskey] = { "datatype": headersData[i].headersDataType, "value": headersData[i].headersvalue, "decription": headersData[i].headersdecription };
+            headers[headersData[i].headerskey] = { "datatype": headersData[i].headersDataType, "value": headersData[i].headersvalue, "description": headersData[i].headersdescription };
         }
     }
     console.log(headers)

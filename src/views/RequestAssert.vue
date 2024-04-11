@@ -19,9 +19,9 @@
                 </el-input>
             </template>
         </el-table-column>
-        <el-table-column prop="assertdecription" label="描述">
+        <el-table-column prop="assertdescription" label="描述">
             <template #default="scope">
-                <el-input v-model="assertData[scope.$index].assertdecription"
+                <el-input v-model="assertData[scope.$index].assertdescription"
                     @input="emit('update:assert', changeAssert())" />
             </template>
         </el-table-column>
@@ -89,7 +89,7 @@ const getAssert = () => {
             assertkey: key,
             assertDataType: value.datatype,
             assertvalue: value.value,
-            assertdecription: value.decription,
+            assertdescription: value.description,
         });
     }
 }
@@ -114,7 +114,7 @@ const changeAssert = () => {
     }
     else {
         for (let i = 0; i < assertData.length; i++) {
-            assert[assertData[i].assertkey] = { "datatype": assertData[i].assertDataType, "value": assertData[i].assertvalue, "decription": assertData[i].assertdecription };
+            assert[assertData[i].assertkey] = { "datatype": assertData[i].assertDataType, "value": assertData[i].assertvalue, "description": assertData[i].assertdescription };
         }
     }
     return assert

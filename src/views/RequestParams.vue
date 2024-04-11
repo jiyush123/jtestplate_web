@@ -19,9 +19,9 @@
                 </el-input>
             </template>
         </el-table-column>
-        <el-table-column prop="paramsdecription" label="描述">
+        <el-table-column prop="paramsdescription" label="描述">
             <template #default="scope">
-                <el-input v-model="paramsData[scope.$index].paramsdecription"
+                <el-input v-model="paramsData[scope.$index].paramsdescription"
                     @input="emit('update:params', changeParams())" />
             </template>
         </el-table-column>
@@ -75,7 +75,7 @@ const getParams = () => {
             paramskey: key,
             paramDataType: value.datatype,
             paramsvalue: value.value,
-            paramsdecription: value.decription
+            paramsdescription: value.description
         });
     }
     return paramsData
@@ -89,7 +89,7 @@ const changeParams = () => {
     }
     else {
         for (let i = 0; i < paramsData.length; i++) {
-            params[paramsData[i].paramskey] = { "datatype": paramsData[i].paramDataType, "value": paramsData[i].paramsvalue, "decription": paramsData[i].paramsdecription };
+            params[paramsData[i].paramskey] = { "datatype": paramsData[i].paramDataType, "value": paramsData[i].paramsvalue, "description": paramsData[i].paramsdescription };
         }
     }
     return params

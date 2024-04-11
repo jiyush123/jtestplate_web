@@ -11,9 +11,9 @@
                 </el-input>
             </template>
         </el-table-column>
-        <el-table-column prop="extractdecription" label="描述">
+        <el-table-column prop="extractdescription" label="描述">
             <template #default="scope">
-                <el-input v-model="extractData[scope.$index].extractdecription"
+                <el-input v-model="extractData[scope.$index].extractdescription"
                     @input="emit('update:extract', changeExtract())" />
             </template>
         </el-table-column>
@@ -57,7 +57,7 @@ const getExtract = () => {
         extractData.push({
             extractkey: key,
             extractvalue: value.value,
-            extractdecription: value.decription
+            extractdescription: value.description
         });
     }
 }
@@ -71,7 +71,7 @@ const changeExtract = () => {
     }
     else {
         for (let i = 0; i < extractData.length; i++) {
-            extract[extractData[i].extractkey] = { "datatype": extractData[i].extractDataType, "value": extractData[i].extractvalue, "decription": extractData[i].extractdecription };
+            extract[extractData[i].extractkey] = { "datatype": extractData[i].extractDataType, "value": extractData[i].extractvalue, "description": extractData[i].extractdescription };
         }
     }
     return extract

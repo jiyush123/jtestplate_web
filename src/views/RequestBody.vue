@@ -19,9 +19,9 @@
                 </el-input>
             </template>
         </el-table-column>
-        <el-table-column prop="bodydecription" label="描述">
+        <el-table-column prop="bodydescription" label="描述">
             <template #default="scope">
-                <el-input v-model="bodyData[scope.$index].bodydecription" @input="emit('update:body', changeBody())" />
+                <el-input v-model="bodyData[scope.$index].bodydescription" @input="emit('update:body', changeBody())" />
             </template>
         </el-table-column>
         <el-table-column width='100'>
@@ -74,7 +74,7 @@ const getBody = () => {
             bodykey: key,
             bodyDataType: value.datatype,
             bodyvalue: value.value,
-            bodydecription: value.decription
+            bodydescription: value.description
         });
     }
     return bodyData
@@ -89,7 +89,7 @@ const changeBody = () => {
     }
     else {
         for (let i = 0; i < bodyData.length; i++) {
-            body[bodyData[i].bodykey] = { "datatype": bodyData[i].bodyDataType, "value": bodyData[i].bodyvalue, "decription": bodyData[i].bodydecription };
+            body[bodyData[i].bodykey] = { "datatype": bodyData[i].bodyDataType, "value": bodyData[i].bodyvalue, "description": bodyData[i].bodydescription };
         }
     }
     return body
