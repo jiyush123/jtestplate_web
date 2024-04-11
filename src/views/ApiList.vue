@@ -55,8 +55,17 @@
     </el-dialog>
     <!-- 导入预览弹窗 -->
     <el-dialog v-model="importPreviewDialog" title="导入预览" width="50%" align-center @close="cancelDialog(formRef)">
-        <el-tree style="max-width: 600px" show-checkbox :data="apiinfo_tree" node-key="id" :default-expanded-keys="[1]"
-            :default-checked-keys="[1]" @check-change="handleCheckChange" />
+        <el-tree ref="api_tree" style="max-width: 800px" show-checkbox :data="apiinfo_tree" node-key="id"
+            @check-change="handleCheckChange" :default-expanded-keys="default_expanded"
+            :default-checked-keys="default_key">
+            <!-- 使用插槽让多出的部分显示省略号，并鼠标悬浮显示全部数据 -->
+            <template v-slot:default="{ data }">
+                <span :title="data.label"
+                    :style="{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }">
+                    {{ data.label }}
+                </span>
+            </template>
+        </el-tree>
         <template #footer>
             <el-button @click="() => { importPreviewDialog = flase }">取消</el-button>
             <el-button type="primary" @click="sureImport">确定</el-button>
@@ -65,7 +74,7 @@
     <!-- 列表 -->
     <el-table :data="data.table" stripe style="width: 100%" show-overflow-tooltip>
         <el-table-column prop="id" label="id" width="50px" fixed />
-        <el-table-column prop="name" label="接口名称" width="200px" fixed />
+        <el-table-column prop="name" label="接口名称" fixed />
         <el-table-column prop="description" label="描述" />
         <el-table-column prop="module" label="所属模块" width="100px" />
         <el-table-column prop="method" label="请求方式" width="100px">
@@ -78,7 +87,7 @@
                 </el-tag>
             </template>
         </el-table-column>
-        <el-table-column prop="uri" label="路径" width="250px" />
+        <el-table-column prop="uri" label="路径" width="300px" />
         <el-table-column prop="status" label="状态" width="100px" />
         <el-table-column prop="created_user" label="创建人" width="100px" />
         <el-table-column prop="updated_time" label="修改时间" width="180px" />
@@ -149,6 +158,11 @@ const apiinfo_tree = ref([{ id: 1, label: '全选', children: [] }])
 const goToImport = () => {
     importDialog.value = true
 }
+// api_tree组件的实例对象
+const api_tree = ref('');
+const default_expanded = ref([1]);
+const default_key = ref([1]);
+
 const formRef = ref(null);
 const cancelDialog = (formEl) => {
     // 取消弹窗，重置
@@ -193,6 +207,8 @@ const ImportApiFun = async () => {
 
 const openImportPreviewDialog = () => {
     importPreviewDialog.value = true;
+    default_expanded.value = [1];
+    default_key.value = [1]
 }
 
 const handleCheckChange = (selection, is_select) => {
@@ -209,11 +225,11 @@ const handleCheckChange = (selection, is_select) => {
 // 确认导入的列表
 const import_apis = ref([])
 const import_data = reactive({
-    apis_list:[],
+    apis_list: [],
     created_user: '',
     updated_user: '',
 })
-const sureImport = async() => {
+const sureImport = async () => {
     import_apis.value.length = 0;
     apiinfo_tree.value[0].children.forEach((item) => {
         if (item.is_select === true) {
@@ -232,7 +248,7 @@ const sureImport = async() => {
             message: res.msg,
             type: 'success',
         })
-        getApiListFun({page:1,size:10})
+        getApiListFun({ page: 1, size: 10 })
     }
     else {
         ElMessage({
