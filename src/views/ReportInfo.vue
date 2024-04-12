@@ -37,7 +37,7 @@
                         <el-descriptions :title="'步骤' + (index + 1)" border :column="3">
                             <!-- 获取步骤信息 -->
                             <el-descriptions-item label="步骤名称">{{ step_data.step_name }}</el-descriptions-item>
-                            <el-descriptions-item label="执行时长">{{ step_data.run_time }} ms</el-descriptions-item>
+                            <el-descriptions-item label="响应时间">{{ step_data.run_time }} ms</el-descriptions-item>
                             <el-descriptions-item label="结果">
                                 <el-tag v-if="step_data.step_result === 1" type="success">成功</el-tag>
                                 <el-tag v-else-if="step_data.step_result === 2" type="danger">失败</el-tag>
