@@ -646,6 +646,7 @@ const debug = async () => {
         // 重置调试结果
         editform.result = '';
         if (res.status) {
+            editform.time = 0
             for (let i = 0; i < editform.steps.length; i++) {
                 if (editform.steps[i] && editform.steps[i].assert_result && typeof editform.steps[i].assert_result === 'object'
                     && Object.keys(editform.steps[i].assert_result).length === 0) {
@@ -666,18 +667,14 @@ const debug = async () => {
                     assertchildRefs.value[i].assertResult()
                 }
 
-                editform.steps[i].time = res.data.time[i];
+                editform.steps[i].time = res.data.res[i].run_time;
 
                 const response = JSON.stringify(res.data.res[i].response, null, 2);
                 editform.steps[i].response = 'status:' + res.data.res[i].status + '\n'
                     + 'status_code:' + res.data.res[i].status_code + '\n'
                     + 'response:' + response;
+                editform.time = editform.steps[i].time + editform.time;
             }
-            editform.time = parseFloat(
-                res.data.time.reduce(function (accumulator, currentValue) {
-                    return accumulator + currentValue;
-                }, 0).toFixed(2)
-            );
             if (editform.result !== 'error') {
                 editform.result = 'success';
             }

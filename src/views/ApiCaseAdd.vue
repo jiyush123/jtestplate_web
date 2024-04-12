@@ -606,6 +606,7 @@ const debug = async () => {
         // 重置调试结果
         addForm.result = '';
         if (res.status) {
+            addForm.time = 0
             for (let i = 0; i < addForm.steps.length; i++) {
                 // 断言结果赋值
                 // 先检查 addForm.steps[i] 是否存在，接着确认 .assert_result 是否存在且是一个对象，最后才检查其键的数量。
@@ -630,17 +631,15 @@ const debug = async () => {
                     assertchildRefs.value[i].assertResult()
                 }
 
-                addForm.steps[i].time = res.data.time[i];
+                addForm.steps[i].time = res.data.res[i].run_time;
                 const response = JSON.stringify(res.data.res[i].response, null, 2);
                 addForm.steps[i].response = 'status:' + res.data.res[i].status + '\n'
                     + 'status_code:' + res.data.res[i].status_code + '\n'
                     + 'response:' + response;
+                //将步骤时间合计到总时间
+                addForm.time = addForm.steps[i].time + addForm.time;
             }
-            addForm.time = parseFloat(
-                res.data.time.reduce(function (accumulator, currentValue) {
-                    return accumulator + currentValue;
-                }, 0).toFixed(2)
-            );
+            
             // 如果用例没有设置成error，则将结果设置为success
             if (addForm.result !== 'error') {
                 addForm.result = 'success';
