@@ -52,6 +52,11 @@
     background: #E5EAF3;
 }
 
+.el-menu-item .is-active{
+    background: #E5EAF3;
+    color: none;
+}
+
 .el-aside .el-menu-item {
     font-size: 18px !important;
 }
