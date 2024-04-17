@@ -147,8 +147,7 @@ const editForm = reactive({
     type: '',
     is_active: null,
     case_ids: [],
-    schedule: '',
-    created_user: '',
+    schedule: ''
 });
 
 // 选择用例弹窗参数

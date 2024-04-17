@@ -177,15 +177,13 @@ const editform = reactive({
     headers: {},
     params: {},
     body: {},
-    response: '',
-    updated_user: ""
+    response: ''
 });
 
 // 获取接口信息
 const getInfo = async () => {
     const res = await getAPIInfo(id_params);
     if (res.status) {
-        console.log(res.data)
         editform.id = id_params.id;
         editform.name = res.data.name;
         editform.status = status.get(res.data.status);
@@ -232,8 +230,6 @@ const onSubmit = async () => {
     if (!result) return
     else {
         // 发送到后端新增用户数据
-        editform.updated_user = localStorage.getItem('name');
-        console.log(editform)
         const res = await editAPI(editform);
         if (res.status) {
             ElMessage({

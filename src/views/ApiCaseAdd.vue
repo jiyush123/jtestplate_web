@@ -389,8 +389,6 @@ const addForm = reactive({
         before_code: ref(''),
         after_code: ref(''),
     }],
-    created_user: localStorage.getItem('name'),
-    updated_user: localStorage.getItem('name'),
     time: '',
     result: '',
 })
@@ -550,8 +548,6 @@ const onSubmit = async () => {
             delete addForm.steps[i].result;
         }
         // 发送到后端新增数据
-        addForm.created_user = localStorage.getItem('name');
-        addForm.updated_user = localStorage.getItem('name');
         delete addForm.result;
         delete addForm.time;
         delete addForm.env;

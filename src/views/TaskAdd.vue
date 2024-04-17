@@ -144,8 +144,7 @@ const addForm = reactive({
     type: '1',
     is_active: true,
     case_ids: [],
-    schedule: '* * * * * ? *',
-    created_user: '',
+    schedule: '* * * * * ? *'
 });
 // 选择用例弹窗参数
 const caseTable = ref('')
@@ -273,8 +272,6 @@ const onSubmit = async () => {
     if (!result) return
     else {
         // 发送到后端新增接口数据
-        addForm.created_user = localStorage.getItem('name');
-        console.log(addForm)
         const res = await addCronJob(addForm);
         if (res.status) {
             ElMessage({

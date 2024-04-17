@@ -156,8 +156,6 @@ const addform = reactive({
     params: {},
     body: {},
     response: {},
-    created_user: '',
-    updated_user: '',
 });
 
 const ruleFormRef = ref(null);
@@ -177,8 +175,6 @@ const onSubmit = async () => {
     if (!result) return
     else {
         // 发送到后端新增接口数据
-        addform.created_user = localStorage.getItem('name');
-        addform.updated_user = localStorage.getItem('name');
         const res = await addAPI(addform);
         if (res.status) {
             ElMessage({

@@ -385,7 +385,6 @@ const editform = reactive({
     level: '',
     status: 1,
     steps: [],
-    updated_user: localStorage.getItem('name'),
     time: '',
     result: '',
 })
@@ -591,7 +590,6 @@ const onSubmit = async () => {
             delete editform.steps[i].result;
         }
         // 发送到后端新增数据
-        editform.updated_user = localStorage.getItem('name');
         delete editform.result;
         delete editform.time;
         delete editform.env;
