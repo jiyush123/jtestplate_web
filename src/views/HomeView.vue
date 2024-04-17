@@ -3,7 +3,9 @@
         <el-container>
             <el-header class="top-menu" style="padding: 0;">
                 <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" :ellipsis="false">
-                    <el-menu-item index="0">LOGO</el-menu-item>
+                    <el-menu-item index="0" @click="goToHome">
+                        <img src="../assets/Jlogo.png" alt="Logo" class="logo">
+                    </el-menu-item>
                     <div class="flex-grow"></div>
                     <el-sub-menu index="1">
                         <template #title>{{ name }}</template>
@@ -31,12 +33,23 @@
     </div>
 </template>
 <style>
+.logo{
+    height: 50px;
+}
+
+.el-menu--horizontal>.el-menu-item.is-active{
+    border:none !important
+}
+.el-menu--horizontal>.el-sub-menu.is-active .el-sub-menu__title{
+    border:none !important
+}
+
 .flex-grow {
     flex-grow: 1;
 }
 
 .top-menu .el-menu {
-    background: #f2f1f1;
+    background: #E5EAF3;
 }
 
 .el-aside .el-menu-item {
@@ -118,5 +131,9 @@ const out=async() =>{
             type: 'error',
         })
         }
+}
+
+const goToHome=()=>{
+    router.push('/home');
 }
 </script>
