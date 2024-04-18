@@ -266,7 +266,6 @@ const runTest = async (case_ids) => {
     else {
         let data = {
             'ids': case_ids,
-            'created_user': localStorage.getItem('name'),
             'host': formdata.host
         };
         cancelDialog();
