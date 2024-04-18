@@ -17,7 +17,7 @@
             <el-container>
                 <el-aside width="200px">
                     <el-col>
-                        <el-menu :router="true" default-active="1" class="el-menu-vertical-demo">
+                        <el-menu :router="true" :default-active="activeIndex" class="el-menu-vertical-demo">
 
                             <el-menu-item :route="i.path" v-for="i in tablist" :key="i.name" :index="i.name" :visible="i.meta.isShow">
                                 <template #title>{{ i.meta.title }}</template>
@@ -52,9 +52,8 @@
     background: #E5EAF3;
 }
 
-.el-menu-item .is-active{
+.el-menu-item.is-active{
     background: #E5EAF3;
-    color: none;
 }
 
 .el-aside .el-menu-item {
@@ -95,6 +94,7 @@
 .listquery .el-input {
     width: 200px;
 }
+
 </style>
 <script setup>
 import { ref } from "vue";
