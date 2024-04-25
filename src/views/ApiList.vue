@@ -225,9 +225,7 @@ const handleCheckChange = (selection, is_select) => {
 // 确认导入的列表
 const import_apis = ref([])
 const import_data = reactive({
-    apis_list: [],
-    created_user: '',
-    updated_user: '',
+    apis_list: []
 })
 const sureImport = async () => {
     import_apis.value.length = 0;
@@ -237,8 +235,6 @@ const sureImport = async () => {
         }
     });
     import_data.apis_list = import_apis.value
-    import_data.created_user = localStorage.getItem('name');
-    import_data.updated_user = localStorage.getItem('name');
     const res = await importAPI(import_data);
     importPreviewDialog.value = false;
     if (res.status) {
