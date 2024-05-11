@@ -28,9 +28,8 @@
                 <el-form-item label="所属模块" prop="module" :rules="[
                     { required: true, message: '请选择所属模块' },
                 ]">
-                    <el-select v-model="editform.module" filterable placeholder="请选择">
-                        <el-option v-for="item in moduleOptions" :key="item.id" :label="item.name" :value="item.id" />
-                    </el-select>
+                    <el-tree-select v-model="editform.module" :data="moduleOptions" check-strictly :render-after-expand="false"
+                style="width: 240px" />
                 </el-form-item>
 
                 <el-form-item label="路径" :prop="uri" :rules="[
@@ -177,7 +176,6 @@ const editform = reactive({
     headers: {},
     params: {},
     body: {},
-    response: ''
 });
 
 // 获取接口信息
@@ -191,7 +189,7 @@ const getInfo = async () => {
         editform.module = res.data.mod_id;
         editform.method = res.data.method;
         editform.uri = res.data.uri;
-        editform.response = res.data.response;
+        // editform.response = res.data.response;
         editform.headers = res.data.headers;
         editform.params = res.data.params;
         editform.body = res.data.body;
@@ -340,7 +338,7 @@ const getModuleFun = async () => {
     // 发送到后端获取模块列表数据
     const res = await getModuleList();
     if (res.status == true) {
-        moduleOptions.value = res.data;
+        moduleOptions.value = renameKeyInTree(res.data, 'id', 'value');
     }
     else {
         ElMessage({
@@ -350,6 +348,22 @@ const getModuleFun = async () => {
             type: 'error',
         })
     }
+}
+
+const renameKeyInTree = (data, oldKey, newKey) => {
+    const hasOwn = Object.prototype.hasOwnProperty;
+    return data.map(item => {
+        const newItem = {};
+        for (const key in item) {
+            if (hasOwn.call(item, key)) { // 使用hasOwnProperty的call方法并传递目标对象为第一个参数
+                const newKeyToUse = key === oldKey ? newKey : key;
+                newItem[newKeyToUse] = Array.isArray(item[key]) && item[key].some(child => child.children)
+                    ? renameKeyInTree(item[key], oldKey, newKey)
+                    : item[key];
+            }
+        }
+        return newItem;
+    });
 }
 
 onMounted(() => {

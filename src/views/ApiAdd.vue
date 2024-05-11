@@ -20,9 +20,8 @@
         <el-form-item label="所属模块" prop="module" :rules="[
             { required: true, message: '请选择所属模块' },
         ]">
-            <el-select v-model="addform.module" filterable placeholder="请选择">
-                <el-option v-for="item in moduleOptions" :key="item.id" :label="item.name" :value="item.id" />
-            </el-select>
+            <el-tree-select v-model="addform.module" :data="moduleOptions" check-strictly :render-after-expand="false"
+                style="width: 240px" />
         </el-form-item>
 
         <el-form-item label="路径" :prop="uri" :rules="[
@@ -70,8 +69,8 @@
     <el-dialog v-model="Dialog" title="选择运行环境" width="40%" align-center @close="cancelDialog(formRef)">
         <el-form :model="formdata" label-width="80px" ref="formRef">
             <el-form-item label="运行环境" prop="host" :rules="[
-                { required: true, message: '请选择运行环境' },
-            ]">
+            { required: true, message: '请选择运行环境' },
+        ]">
                 <el-select v-model="formdata.host" filterable placeholder="请选择" style="width: 400px;">
                     <el-option v-for="item in envOptions" :key="item.id"
                         :label="item.name + '    ' + item.protocol + '://' + item.host + ':' + item.port"
@@ -128,7 +127,7 @@ import router from "../router/index"
 import RequestParams from './RequestParams.vue';
 import RequestBody from './RequestBody.vue';
 import RequestHeader from './RequestHeader.vue';
-
+import { now_module_id } from '@/store';
 
 const moduleOptions = ref(null);
 // 这里是弹窗选择环境的参数
@@ -149,7 +148,7 @@ const debug_res = reactive({
 const addform = reactive({
     name: '',
     description: '',
-    module: '',
+    module: now_module_id.module_id,
     method: 'GET',
     uri: '',
     headers: {},
@@ -197,7 +196,8 @@ const onSubmit = async () => {
 }
 
 const cancelBtn = () => {
-    router.push('/api/list');
+    router.push('/api/list')
+    // router.push({ name: 'apilist', params: { module_id: now_module_id.module_id }});
 }
 
 const reqparams = ref(null);
@@ -208,7 +208,9 @@ const getModuleFun = async () => {
     // 发送到后端获取列表数据
     const res = await getModuleList();
     if (res.status == true) {
-        moduleOptions.value = res.data;
+        // moduleOptions.value = res.data;
+        // 调用函数转换数据结构
+        moduleOptions.value = renameKeyInTree(res.data, 'id', 'value');
     }
     else {
         ElMessage({
@@ -218,6 +220,22 @@ const getModuleFun = async () => {
             type: 'error',
         })
     }
+}
+
+const renameKeyInTree = (data, oldKey, newKey) => {
+    const hasOwn = Object.prototype.hasOwnProperty;
+    return data.map(item => {
+        const newItem = {};
+        for (const key in item) {
+            if (hasOwn.call(item, key)) { // 使用hasOwnProperty的call方法并传递目标对象为第一个参数
+                const newKeyToUse = key === oldKey ? newKey : key;
+                newItem[newKeyToUse] = Array.isArray(item[key]) && item[key].some(child => child.children)
+                    ? renameKeyInTree(item[key], oldKey, newKey)
+                    : item[key];
+            }
+        }
+        return newItem;
+    });
 }
 
 const goToSelectEnv = () => {
