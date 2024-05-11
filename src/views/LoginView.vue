@@ -1,6 +1,6 @@
 <template>
     <div class="Login">
-        <h1>登录</h1>
+        <h1 class="login_title">测试平台</h1>
         <el-form :model="logindata">
             <el-form-item label="账号">
                 <el-input v-model="logindata.username" placeholder="请输入账号"/>
@@ -21,6 +21,11 @@
     border: 1px solid #efefef;
     border-radius: 10px;
     padding: 20px;
+}
+.login_title{
+    margin-top: 0px;
+    margin-bottom: 10px;
+    text-align: center;
 }
 .sub-btn{
     width: 100%;
