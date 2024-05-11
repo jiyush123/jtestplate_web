@@ -59,9 +59,12 @@
     </el-dialog>
 </template>
 <style scoped>
+.tree-title{
+    font-size: 18px;
+}
 .add-tree-project {
-    margin-top: 10px;
-    margin-left: 5px;
+    margin-top: 16px;
+    margin-left: 20px;
 }
 
 .custom-tree-node {
@@ -69,12 +72,12 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-size: 14px;
-    padding-right: 8px;
+    font-size: 18px;
+    padding-right: 10px;
 }
 
 .action-buttons .el-icon {
-    margin-left: 5px;
+    margin-left: 8px;
 }
 </style>
 <script setup>

@@ -1,7 +1,7 @@
 <template>
     <!-- 项目模块菜单 -->
     <el-container>
-        <el-aside width="200px">
+        <el-aside width="230px">
             <project-module :getListFun="getApiListFun"/>
         </el-aside>
         <el-main>
