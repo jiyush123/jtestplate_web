@@ -1,110 +1,122 @@
 <template>
-    <!-- 搜索栏 -->
-    <el-form :inline="true" :model="queryForm" label-width="80px" class="queryForm listquery">
-        <el-form-item label="接口名称" prop="name">
-            <el-input v-model="queryForm.name" clearable />
-        </el-form-item>
-        <el-form-item label="状态" prop="status">
-            <el-select v-model="queryForm.status" clearable placeholder="请选择">
-                <el-option v-for="item in status_options" :key="item.value" :label="item.label" :value="item.value" />
-            </el-select>
-        </el-form-item>
-        <el-button type="primary" @click="queryList">查询</el-button>
-    </el-form>
-    <!-- 新增按钮 -->
-    <div class="addBtn">
-        <el-button type="primary" @click="goToAdd">
-            新增接口
-        </el-button>
-        <el-button type="success" @click="goToImport">导入接口</el-button>
-    </div>
-    <!-- 导入弹窗 -->
-    <el-dialog v-model="importDialog" title="导入接口" width="40%" align-center @close="cancelDialog(formRef)">
-        <el-form label-width="100px" ref="formRef" label-position="top">
-            <el-form-item label="文件方式导入" prop="url">
-                <el-upload ref="upload_file" class="upload-demo" drag :action="uploadUrl" :headers="headers_token"
-                    :on-success="ImportFile" :accept="'.json'">
-                    <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-                    <div class="el-upload__text">
-                        <em>拖拽文件到此或点击导入</em>
-                    </div>
-                    <template #tip>
-                        <div class="el-upload__tip">
-                            <div>
-                                <el-text type="info" size="small">只支持json文件</el-text>
+    <!-- 项目模块菜单 -->
+    <el-container>
+        <el-aside width="200px">
+            <project-module :getListFun="getApiListFun"/>
+        </el-aside>
+        <el-main>
+
+            <!-- 搜索栏 -->
+            <el-form :inline="true" :model="queryForm" label-width="80px" class="queryForm listquery">
+                <el-form-item label="接口名称" prop="name">
+                    <el-input v-model="queryForm.name" clearable />
+                </el-form-item>
+                <el-form-item label="状态" prop="status">
+                    <el-select v-model="queryForm.status" clearable placeholder="请选择">
+                        <el-option v-for="item in status_options" :key="item.value" :label="item.label"
+                            :value="item.value" />
+                    </el-select>
+                </el-form-item>
+                <el-button type="primary" @click="queryList">查询</el-button>
+            </el-form>
+            <!-- 新增按钮 -->
+            <div class="addBtn">
+                <el-button type="primary" @click="goToAdd(params.module_id)">
+                    新增接口
+                </el-button>
+                <el-button type="success" @click="goToImport">导入接口</el-button>
+            </div>
+            <!-- 导入弹窗 -->
+            <el-dialog v-model="importDialog" title="导入接口" width="40%" align-center @close="cancelDialog(formRef)">
+                <el-form label-width="100px" ref="formRef" label-position="top">
+                    <el-form-item label="文件方式导入" prop="url">
+                        <el-upload ref="upload_file" class="upload-demo" drag :action="uploadUrl"
+                            :headers="headers_token" :on-success="ImportFile" :accept="'.json'">
+                            <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+                            <div class="el-upload__text">
+                                <em>拖拽文件到此或点击导入</em>
                             </div>
-                            <div>
-                                <el-text type="info" size="small">注意：chrome不支持拖拽</el-text>
-                            </div>
+                            <template #tip>
+                                <div class="el-upload__tip">
+                                    <div>
+                                        <el-text type="info" size="small">只支持json文件</el-text>
+                                    </div>
+                                    <div>
+                                        <el-text type="info" size="small">注意：chrome不支持拖拽</el-text>
+                                    </div>
+                                </div>
+                            </template>
+                        </el-upload>
+                    </el-form-item>
+                </el-form>
+                <el-form :model="formdata" label-width="100px" ref="formRef" label-position="top">
+                    <el-form-item label="URL 方式导入" prop="url">
+                        <div class="import_url">
+                            <el-input v-model="formdata.url" placeholder="请输入Swagger数据 URL"></el-input>
+                            <el-button style="justify-content: flex-end;" type="primary"
+                                @click="() => { ImportApiFun(); importDialog = false; }">
+                                继续
+                            </el-button>
                         </div>
+                    </el-form-item>
+                </el-form>
+            </el-dialog>
+            <!-- 导入预览弹窗 -->
+            <el-dialog v-model="importPreviewDialog" title="导入预览" width="50%" align-center
+                @close="cancelDialog(formRef)">
+                <el-tree ref="api_tree" style="max-width: 800px" show-checkbox :data="apiinfo_tree" node-key="id"
+                    @check-change="handleCheckChange" :default-expanded-keys="default_expanded"
+                    :default-checked-keys="default_key">
+                    <!-- 使用插槽让多出的部分显示省略号，并鼠标悬浮显示全部数据 -->
+                    <template v-slot:default="{ data }">
+                        <span :title="data.label"
+                            :style="{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }">
+                            {{ data.label }}
+                        </span>
                     </template>
-                </el-upload>
-            </el-form-item>
-        </el-form>
-        <el-form :model="formdata" label-width="100px" ref="formRef" label-position="top">
-            <el-form-item label="URL 方式导入" prop="url">
-                <div class="import_url">
-                    <el-input v-model="formdata.url" placeholder="请输入Swagger数据 URL"></el-input>
-                    <el-button style="justify-content: flex-end;" type="primary"
-                        @click="() => { ImportApiFun(); importDialog = false; }">
-                        继续
-                    </el-button>
-                </div>
-            </el-form-item>
-        </el-form>
-    </el-dialog>
-    <!-- 导入预览弹窗 -->
-    <el-dialog v-model="importPreviewDialog" title="导入预览" width="50%" align-center @close="cancelDialog(formRef)">
-        <el-tree ref="api_tree" style="max-width: 800px" show-checkbox :data="apiinfo_tree" node-key="id"
-            @check-change="handleCheckChange" :default-expanded-keys="default_expanded"
-            :default-checked-keys="default_key">
-            <!-- 使用插槽让多出的部分显示省略号，并鼠标悬浮显示全部数据 -->
-            <template v-slot:default="{ data }">
-                <span :title="data.label"
-                    :style="{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }">
-                    {{ data.label }}
-                </span>
-            </template>
-        </el-tree>
-        <template #footer>
-            <el-button @click="() => { importPreviewDialog = flase }">取消</el-button>
-            <el-button type="primary" @click="sureImport">确定</el-button>
-        </template>
-    </el-dialog>
-    <!-- 列表 -->
-    <el-table :data="data.table" stripe style="width: 100%" show-overflow-tooltip>
-        <el-table-column prop="id" label="id" width="50px" fixed />
-        <el-table-column prop="name" label="接口名称" fixed />
-        <el-table-column prop="description" label="描述" />
-        <el-table-column prop="module" label="所属模块" width="100px" />
-        <el-table-column prop="method" label="请求方式" width="100px">
-            <template #default="scope">
-                <el-tag v-if="scope.row.method === 'GET'" class="ml-2" type="success">
-                    {{ scope.row.method }}
-                </el-tag>
-                <el-tag v-else-if="scope.row.method === 'POST'" class="ml-2" type="">
-                    {{ scope.row.method }}
-                </el-tag>
-            </template>
-        </el-table-column>
-        <el-table-column prop="uri" label="路径" width="300px" />
-        <el-table-column prop="status" label="状态" width="100px" />
-        <el-table-column prop="created_user" label="创建人" width="100px" />
-        <el-table-column prop="updated_time" label="修改时间" width="180px" />
-        <el-table-column fixed="right" label="操作" width="200">
-            <template #default="scope">
-                <el-button type="primary" size="small" @click="goToEdit(scope.row.id)">编辑</el-button>
-                <el-popconfirm width="220" :hide-after="hideAfter" confirm-button-text="确定" cancel-button-text="取消"
-                    title="是否确定删除?" @confirm="delFun(scope.row.id)">
-                    <template #reference>
-                        <el-button ref="delBtn" type="danger" size="small">删除</el-button>
+                </el-tree>
+                <template #footer>
+                    <el-button @click="() => { importPreviewDialog = flase }">取消</el-button>
+                    <el-button type="primary" @click="sureImport">确定</el-button>
+                </template>
+            </el-dialog>
+            <!-- 列表 -->
+            <el-table :data="data.table" stripe style="width: 100%" show-overflow-tooltip>
+                <el-table-column prop="id" label="id" width="50px" fixed />
+                <el-table-column prop="name" label="接口名称" fixed />
+                <el-table-column prop="description" label="描述" />
+                <el-table-column prop="module" label="所属模块" width="100px" />
+                <el-table-column prop="method" label="请求方式" width="100px">
+                    <template #default="scope">
+                        <el-tag v-if="scope.row.method === 'GET'" class="ml-2" type="success">
+                            {{ scope.row.method }}
+                        </el-tag>
+                        <el-tag v-else-if="scope.row.method === 'POST'" class="ml-2" type="">
+                            {{ scope.row.method }}
+                        </el-tag>
                     </template>
-                </el-popconfirm>
-            </template>
-        </el-table-column>
-    </el-table>
-    <!-- 分页模板 -->
-    <PaginationModule :total="data.total" :getListFun="getApiListFun" />
+                </el-table-column>
+                <el-table-column prop="uri" label="路径" width="300px" />
+                <el-table-column prop="status" label="状态" width="100px" />
+                <el-table-column prop="created_user" label="创建人" width="100px" />
+                <el-table-column prop="updated_time" label="修改时间" width="180px" />
+                <el-table-column fixed="right" label="操作" width="200">
+                    <template #default="scope">
+                        <el-button type="primary" size="small" @click="goToEdit(scope.row.id)">编辑</el-button>
+                        <el-popconfirm width="220" :hide-after="hideAfter" confirm-button-text="确定"
+                            cancel-button-text="取消" title="是否确定删除?" @confirm="delFun(scope.row.id)">
+                            <template #reference>
+                                <el-button ref="delBtn" type="danger" size="small">删除</el-button>
+                            </template>
+                        </el-popconfirm>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <!-- 分页模板 -->
+            <PaginationModule :total="data.total" :getListFun="getApiListFun" />
+
+        </el-main>
+    </el-container>
 </template>
 
 <style>
@@ -133,6 +145,8 @@ import { getAPIList, delAPI, getImportAPI, importAPI } from '../http/api'
 import { ElMessage } from 'element-plus'
 import router from "../router/index"
 import PaginationModule from './PaginationModule.vue'
+import ProjectModule from './ProjectModule.vue'
+import { now_module_id } from '@/store'
 
 // 导入弹窗
 const importDialog = ref(false);
@@ -235,6 +249,7 @@ const sureImport = async () => {
         }
     });
     import_data.apis_list = import_apis.value
+    import_data.module_id = now_module_id.module_id;
     const res = await importAPI(import_data);
     importPreviewDialog.value = false;
     if (res.status) {
@@ -265,6 +280,7 @@ let data = reactive({
 let params = {
     "page": 1,
     "size": 10,
+    "module_id": null,
 }
 // 枚举映射
 const status_options = [{
@@ -303,6 +319,7 @@ const queryList = () => {
 const getApiListFun = async (paramdata) => {
     params.page = paramdata.page;
     params.size = paramdata.size;
+    params.module_id = now_module_id.module_id;
     // 发送到后端获取列表数据
     const res = await getAPIList(params);
     data.table = res.data;
@@ -310,7 +327,8 @@ const getApiListFun = async (paramdata) => {
 
 }
 
-const goToAdd = () => {
+const goToAdd = (module_id) => {
+    params.module_id = module_id;
     router.push('/api/add');
 }
 
