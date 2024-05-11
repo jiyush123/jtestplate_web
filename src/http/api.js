@@ -109,6 +109,42 @@ export const getModuleList = (params) => {
     });
 }
 
+export const addModule = (data) => {
+    return $http({
+        method: "post",
+        url: "http://127.0.0.1:8000/module/add/",
+        params: {},
+        data: data,
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
+
+export const updateModule = (data) => {
+    return $http({
+        method: "post",
+        url: "http://127.0.0.1:8000/module/update/",
+        params: {},
+        data: data,
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
+
+export const delModule = (data) => {
+    return $http({
+        method: "post",
+        url: "http://127.0.0.1:8000/module/del/",
+        params: {},
+        data: data,
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
+
 // 环境接口
 export const getEnvironmentList = (params) => {
     return $http({
