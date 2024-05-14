@@ -9,7 +9,7 @@
             </el-col>
         </el-row>
     </div>
-    <el-tree style="width: 100%" :data="module_data" node-key="id" :current-node-key="currentNodeKey" :props="defaultProps" @node-click="nodeClick" highlight-current="true">
+    <el-tree style="width: 100%" :data="module_data" node-key="id" :current-node-key="currentNodeKey" :props="defaultProps" @node-click="nodeClick" :highlight-current="true">
         <template #default="{ node, data }">
             <span class="custom-tree-node">
                 <span>{{ node.label }}</span>
