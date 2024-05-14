@@ -2,7 +2,7 @@
     <div class="Home">
         <el-container>
             <el-header class="top-menu" style="padding: 0;">
-                <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" :ellipsis="false">
+                <el-menu class="el-menu-demo" mode="horizontal" :ellipsis="false">
                     <el-menu-item index="0" @click="goToHome">
                         <img src="../assets/Jlogo.png" alt="Logo" class="logo">
                     </el-menu-item>
@@ -17,9 +17,9 @@
             <el-container>
                 <el-aside width="200px">
                     <el-col>
-                        <el-menu :router="true" :default-active="activeIndex" class="el-menu-vertical-demo">
+                        <el-menu :router="true" :default-active="route.currentRoute.value.path" class="el-menu-vertical-demo">
 
-                            <el-menu-item :route="i.path" v-for="i in tablist" :key="i.name" :index="i.name" :visible="i.meta.isShow">
+                            <el-menu-item :route="i.path" v-for="i in tablist" :key="i.name" :index="i.path" :visible="i.meta.isShow">
                                 <template #title>{{ i.meta.title }}</template>
                             </el-menu-item>
                         </el-menu>
@@ -101,8 +101,9 @@ import { ref } from "vue";
 import router from "../router/index";
 import { logout } from '../http/api';
 import { ElMessage } from 'element-plus';
+import { useRouter } from "vue-router";
 
-const activeIndex = ref('1');
+const route = useRouter();
 
 let tablist = router.options.routes[0].children;
 let showmenus=() =>{
@@ -141,4 +142,5 @@ const out=async() =>{
 const goToHome=()=>{
     router.push('/home');
 }
+
 </script>
