@@ -32,7 +32,7 @@
                 style="width: 240px" />
                 </el-form-item>
 
-                <el-form-item label="路径" :prop="uri" :rules="[
+                <el-form-item label="路径" prop="uri" :rules="[
             { required: true, message: '路径不能为空' },
         ]">
             <el-input v-model="editform.uri" class="input-with-select">
