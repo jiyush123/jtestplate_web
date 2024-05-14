@@ -17,31 +17,34 @@
             <el-container>
                 <el-aside width="200px">
                     <el-col>
-                        <el-menu :router="true" :default-active="route.currentRoute.value.path" class="el-menu-vertical-demo">
+                        <el-menu :router="true" :default-active="route.currentRoute.value.path"
+                            class="el-menu-vertical-demo">
 
-                            <el-menu-item :route="i.path" v-for="i in tablist" :key="i.name" :index="i.path" :visible="i.meta.isShow">
+                            <el-menu-item :route="i.path" v-for="i in tablist" :key="i.name" :index="i.path"
+                                :visible="i.meta.isShow">
                                 <template #title>{{ i.meta.title }}</template>
                             </el-menu-item>
                         </el-menu>
                     </el-col>
                 </el-aside>
                 <el-main>
-                    <router-view/>
+                    <router-view />
                 </el-main>
             </el-container>
         </el-container>
     </div>
 </template>
 <style>
-.logo{
+.logo {
     height: 50px;
 }
 
-.el-menu--horizontal>.el-menu-item.is-active{
-    border:none !important
+.el-menu--horizontal>.el-menu-item.is-active {
+    border: none !important
 }
-.el-menu--horizontal>.el-sub-menu.is-active .el-sub-menu__title{
-    border:none !important
+
+.el-menu--horizontal>.el-sub-menu.is-active .el-sub-menu__title {
+    border: none !important
 }
 
 .flex-grow {
@@ -52,7 +55,7 @@
     background: #E5EAF3;
 }
 
-.el-menu-item.is-active{
+.el-menu-item.is-active {
     background: #E5EAF3;
 }
 
@@ -63,6 +66,7 @@
 .el-aside .el-sub-menu__title {
     font-size: 18px !important;
 }
+
 /* 下面是其他页面通用的样式 */
 
 .queryForm {
@@ -94,7 +98,6 @@
 .listquery .el-input {
     width: 200px;
 }
-
 </style>
 <script setup>
 import { ref } from "vue";
@@ -106,17 +109,17 @@ import { useRouter } from "vue-router";
 const route = useRouter();
 
 let tablist = router.options.routes[0].children;
-let showmenus=() =>{
+let showmenus = () => {
     tablist = tablist.filter(tablist => tablist.meta.isShow);
 }
 showmenus();
 const name = ref(localStorage.getItem('name'));
-const user_id = ref(localStorage.getItem('user_id'));
+const user_id = ref(parseInt(localStorage.getItem('user_id'), 10));
 
-const out=async() =>{
+const out = async () => {
     // 获取用户信息
-    const res = await logout({'id':user_id.value});
-        if (res.status) {
+    const res = await logout({ 'id': user_id.value });
+    if (res.status) {
         // 清除登录信息
         localStorage.removeItem('user_id');
         localStorage.removeItem('name');
@@ -128,18 +131,18 @@ const out=async() =>{
             type: 'success',
         })
         router.push('/login');
-        }
-        else {
+    }
+    else {
         ElMessage({
             showClose: true,
             center: true,
             message: res.msg,
             type: 'error',
         })
-        }
+    }
 }
 
-const goToHome=()=>{
+const goToHome = () => {
     router.push('/home');
 }
 
