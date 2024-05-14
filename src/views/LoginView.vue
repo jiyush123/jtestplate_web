@@ -52,7 +52,6 @@ let subFun=()=>{
     }
     // 发送到后端校验账号密码
     login(logindata).then(res=>{
-        console.log(res);
         if(res.status){
             //先把已有的信息删除
             localStorage.removeItem('user_id');
