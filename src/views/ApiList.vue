@@ -21,7 +21,7 @@
             </el-form>
             <!-- 新增按钮 -->
             <div class="addBtn">
-                <el-button type="primary" @click="goToAdd(params.module_id)">
+                <el-button type="primary" @click="goToAdd">
                     新增接口
                 </el-button>
                 <el-button type="success" @click="goToImport">导入接口</el-button>
@@ -146,7 +146,6 @@ import { ElMessage } from 'element-plus'
 import router from "../router/index"
 import PaginationModule from './PaginationModule.vue'
 import ProjectModule from './ProjectModule.vue'
-import { now_module_id } from '@/store'
 
 // 导入弹窗
 const importDialog = ref(false);
@@ -249,7 +248,7 @@ const sureImport = async () => {
         }
     });
     import_data.apis_list = import_apis.value
-    import_data.module_id = now_module_id.module_id;
+    import_data.module_id = parseInt(localStorage.getItem('api_module_id'),10);
     const res = await importAPI(import_data);
     importPreviewDialog.value = false;
     if (res.status) {
@@ -319,7 +318,7 @@ const queryList = () => {
 const getApiListFun = async (paramdata) => {
     params.page = paramdata.page;
     params.size = paramdata.size;
-    params.module_id = now_module_id.module_id;
+    params.module_id = parseInt(localStorage.getItem('api_module_id'),10);
     // 发送到后端获取列表数据
     const res = await getAPIList(params);
     data.table = res.data;
@@ -327,8 +326,8 @@ const getApiListFun = async (paramdata) => {
 
 }
 
-const goToAdd = (module_id) => {
-    params.module_id = module_id;
+const goToAdd = () => {
+    // params.module_id = module_id;
     router.push('/api/add');
 }
 

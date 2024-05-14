@@ -127,7 +127,6 @@ import router from "../router/index"
 import RequestParams from './RequestParams.vue';
 import RequestBody from './RequestBody.vue';
 import RequestHeader from './RequestHeader.vue';
-import { now_module_id } from '@/store';
 
 const moduleOptions = ref(null);
 // 这里是弹窗选择环境的参数
@@ -148,7 +147,7 @@ const debug_res = reactive({
 const addform = reactive({
     name: '',
     description: '',
-    module: now_module_id.module_id,
+    module: parseInt(localStorage.getItem('api_module_id'),10),
     method: 'GET',
     uri: '',
     headers: {},
@@ -197,7 +196,6 @@ const onSubmit = async () => {
 
 const cancelBtn = () => {
     router.push('/api/list')
-    // router.push({ name: 'apilist', params: { module_id: now_module_id.module_id }});
 }
 
 const reqparams = ref(null);
@@ -208,7 +206,6 @@ const getModuleFun = async () => {
     // 发送到后端获取列表数据
     const res = await getModuleList();
     if (res.status == true) {
-        // moduleOptions.value = res.data;
         // 调用函数转换数据结构
         moduleOptions.value = renameKeyInTree(res.data, 'id', 'value');
     }

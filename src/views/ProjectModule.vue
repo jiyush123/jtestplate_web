@@ -84,14 +84,13 @@
 import { ref, reactive, onMounted,defineProps } from 'vue';
 import { getModuleList, addModule, updateModule, delModule } from '../http/api'
 import { ElMessage } from 'element-plus';
-import { now_module_id } from '../store/index.js'
 
 const params = {
     "page": 1,
     "size": 10,
 }
 
-const currentNodeKey = ref(now_module_id.module_id);
+const currentNodeKey = ref(parseInt(localStorage.getItem('api_module_id'),10));
 
 const module_data = ref(null);
 
@@ -258,8 +257,7 @@ const props = defineProps({
 })
 
 const nodeClick = (node) => {
-    // params.module_id = node.id;
-    now_module_id.module_id = node.id;
+    localStorage.setItem('api_module_id', node.id);
     props.getListFun(params);
 }
 
