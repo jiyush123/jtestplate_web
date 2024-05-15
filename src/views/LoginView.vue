@@ -9,7 +9,7 @@
                 <el-input v-model="logindata.password" type="password" placeholder="请输入密码" show-password />
             </el-form-item>
             <el-form-item>
-                <el-button @click="subFun" class="sub-btn" type="primary">登录</el-button>
+                <el-button @click="subFun" class="sub-btn" type="primary" :is-loading="isLoading">登录</el-button>
             </el-form-item>
         </el-form>
     </div>
@@ -34,25 +34,27 @@
 }
 </style>
 <script setup>
-import { reactive } from "vue";
+import { ref,reactive } from "vue";
 import { ElMessage } from 'element-plus';
 import { login } from '../http/api';
 import router from "../router/index.js";
 
 
-let logindata = reactive({
+const logindata = reactive({
     username: '',
     password: '',
 })
 
+const isLoading = ref(false);
 
-let subFun = async () => {
+const subFun = async () => {
     // 判断账号密码是否为空
     if (!logindata.username || !logindata.password) {
         ElMessage.error('账号密码不能为空');
         return
     }
     // 发送到后端校验账号密码
+    isLoading.value = true;
     const res = await login(logindata);
     
     if (res.status) {
@@ -75,6 +77,7 @@ let subFun = async () => {
         })
     } else {
         ElMessage.error(res.msg);
+        isLoading.value = false;
         return
     }
 

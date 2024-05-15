@@ -92,10 +92,10 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="cancelDialog(formRef)">取消</el-button>
-                <el-button v-if="batch_run" type="primary" @click="runTest(case_ids)">
+                <el-button v-if="batch_run" type="primary" @click="runTest(case_ids)" :loading="run_loading">
                     运行
                 </el-button>
-                <el-button v-else type="primary" @click="runTest([case_id])">
+                <el-button v-else type="primary" @click="runTest([case_id])" :loading="run_loading">
                     运行
                 </el-button>
             </span>
@@ -190,7 +190,7 @@ const goToEdit = (id) => {
 }
 
 const goToSelectEnv = (id) => {
-
+    run_loading.value = false;
     Dialog.value = true;
     getEnvironmentFun();
     if (id) {
@@ -260,10 +260,13 @@ const getEnvironmentFun = async () => {
     }
 }
 
+const run_loading = ref(false);
+
 const runTest = async (case_ids) => {
     const result = await assertForm();
     if (!result) return
     else {
+        run_loading.value = true;
         let data = {
             'ids': case_ids,
             'host': formdata.host

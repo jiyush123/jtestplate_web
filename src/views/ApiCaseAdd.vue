@@ -568,6 +568,7 @@ const onSubmit = async () => {
                 message: res.msg,
                 type: 'error',
             })
+            is_loading.value = false;
         }
     }
 }

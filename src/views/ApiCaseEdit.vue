@@ -581,7 +581,7 @@ const onSubmit = async () => {
     const result = await assertForm();
     if (!result) return
     else {
-        is_loading.value = true
+        is_loading.value = true;
 
         for (let i = 0; i < editform.steps.length; i++) {
             editform.steps[i].sort = i;
@@ -609,7 +609,8 @@ const onSubmit = async () => {
                 center: true,
                 message: res.msg,
                 type: 'error',
-            })
+            });
+            is_loading.value = false;
         }
     }
 }

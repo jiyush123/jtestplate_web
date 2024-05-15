@@ -37,7 +37,7 @@
         <cron-module ref="cron" v-model:schedule="addForm.schedule"></cron-module>
 
         <el-form-item>
-            <el-button type="primary" @click="onSubmit(ruleFormRef)">保存</el-button>
+            <el-button type="primary" @click="onSubmit(ruleFormRef)" :loading="is_loading">保存</el-button>
             <el-button @click="cancelBtn">取消</el-button>
         </el-form-item>
     </el-form>
@@ -266,11 +266,14 @@ const assertForm = async () => {
     }
 }
 
+const is_loading=ref(false);
+
 const onSubmit = async () => {
 
     const result = await assertForm()
     if (!result) return
     else {
+        is_loading.value = true;
         // 发送到后端新增接口数据
         const res = await addCronJob(addForm);
         if (res.status) {
@@ -288,7 +291,8 @@ const onSubmit = async () => {
                 center: true,
                 message: res.msg,
                 type: 'error',
-            })
+            });
+            is_loading.value = false;
         }
     }
 }

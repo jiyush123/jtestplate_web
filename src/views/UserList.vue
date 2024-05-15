@@ -67,7 +67,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="cancelDialog(formRef)">取消</el-button>
-                <el-button type="primary" @click="Submit">
+                <el-button type="primary" @click="Submit" :loading="is_loading">
                     保存
                 </el-button>
             </span>
@@ -108,8 +108,10 @@ const Dialog = ref(false);
 const isEdit = ref(null);
 const dialog_title = ref(null);
 
+const is_loading = ref(false);
 const AddDialog = () => {
     // 打开弹窗
+    is_loading.value = false;
     Dialog.value = true;
     dialog_title.value = '新建用户';
     isEdit.value = false
@@ -193,6 +195,7 @@ const onSubmit = async () => {
     if (!result) return
     // 发送到后端新增用户数据
     else {
+        is_loading.value = true;
         delete formdata.check_password;
         const res = await addUser(formdata);
         if (res.status) {
@@ -212,7 +215,8 @@ const onSubmit = async () => {
                 center: true,
                 message: res.msg,
                 type: 'error',
-            })
+            });
+            is_loading.value = false;
         }
     }
 }
@@ -241,6 +245,7 @@ const delFun = async (Did) => {
 
 const updateDialog = async (Did) => {
     // 打开弹窗同时给表单赋值id，更新时根据id修改数据
+    is_loading.value = false;
     Dialog.value = true;
     dialog_title.value = '编辑用户';
     isEdit.value = true;
@@ -253,6 +258,7 @@ const updateDialog = async (Did) => {
 
 const updateSubmit = async () => {
     // 发送到后端新增用户数据
+    is_loading.value = true;
     const res = await updateUser(formdata);
     if (res.status) {
         // 先重置弹窗再给提示;
@@ -271,7 +277,8 @@ const updateSubmit = async () => {
             center: true,
             message: res.msg,
             type: 'error',
-        })
+        });
+        is_loading.value = false;
     }
 }
 
