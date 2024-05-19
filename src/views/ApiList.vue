@@ -318,7 +318,9 @@ const queryList = () => {
 const getApiListFun = async (paramdata) => {
     params.page = paramdata.page;
     params.size = paramdata.size;
-    params.module_id = parseInt(localStorage.getItem('api_module_id'),10);
+    if (localStorage.getItem('api_module_id') !== null){
+        params.module_id = parseInt(localStorage.getItem('api_module_id'),10);
+    }
     // 发送到后端获取列表数据
     const res = await getAPIList(params);
     data.table = res.data;
