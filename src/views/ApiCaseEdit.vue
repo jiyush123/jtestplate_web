@@ -588,6 +588,14 @@ const onSubmit = async () => {
             delete editform.steps[i].response;
             delete editform.steps[i].time;
             delete editform.steps[i].result;
+            // 保存时删除调试的断言结果
+            if (editform.steps[i].assert_result) {
+                for (const key in editform.steps[i].assert_result) {
+                    if (editform.steps[i].assert_result[key] && editform.steps[i].assert_result[key].result !== undefined) {
+                        delete editform.steps[i].assert_result[key].result;
+                    }
+                }
+            }
         }
         // 发送到后端新增数据
         delete editform.result;
