@@ -546,6 +546,14 @@ const onSubmit = async () => {
             delete addForm.steps[i].response;
             delete addForm.steps[i].time;
             delete addForm.steps[i].result;
+            // 保存时删除调试的断言结果
+            if (editform.steps[i].assert_result) {
+                for (const key in editform.steps[i].assert_result) {
+                    if (editform.steps[i].assert_result[key] && editform.steps[i].assert_result[key].result !== undefined) {
+                        delete editform.steps[i].assert_result[key].result;
+                    }
+                }
+            }
         }
         // 发送到后端新增数据
         delete addForm.result;
