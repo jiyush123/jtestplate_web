@@ -93,7 +93,6 @@ const changeHeaders = () => {
             headers[headersData[i].headerskey] = { "datatype": headersData[i].headersDataType, "value": headersData[i].headersvalue, "description": headersData[i].headersdescription };
         }
     }
-    console.log(headers)
     return headers
 }
 
