@@ -34,7 +34,7 @@
                             :headers="headers_token" :on-success="ImportFile" :accept="'.json'">
                             <el-icon class="el-icon--upload"><upload-filled /></el-icon>
                             <div class="el-upload__text">
-                                <em>拖拽文件到此或点击导入</em>
+                                将文件拖到此处，或 <em>点击导入</em>
                             </div>
                             <template #tip>
                                 <div class="el-upload__tip">
