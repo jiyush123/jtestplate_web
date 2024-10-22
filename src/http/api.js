@@ -3,7 +3,7 @@ import $http from './index.js'
 export const login = (data) => {
     return $http({
         method: "post",
-        url: "http://127.0.0.1:8000/login/",
+        url: "/login/",
         params: {},
         data: data,
         headers: {
@@ -27,7 +27,7 @@ export const login = (data) => {
 export const logout = (data) => {
     return $http({
         method: "post",
-        url: "http://127.0.0.1:8000/logout/",
+        url: "/logout/",
         params: {},
         data: data,
         headers: {
@@ -39,7 +39,7 @@ export const logout = (data) => {
 export const getUserList = (params) => {
     return $http({
         method: "get",
-        url: "http://127.0.0.1:8000/user/list/",
+        url: "/user/list/",
         params: params,
         data: {},
         headers: {
@@ -51,7 +51,7 @@ export const getUserList = (params) => {
 export const getUserInfo = (params) => {
     return $http({
         method: "get",
-        url: "http://127.0.0.1:8000/user/detail/",
+        url: "/user/detail/",
         params: params,
         data: {},
         headers: {
@@ -63,7 +63,7 @@ export const getUserInfo = (params) => {
 export const addUser = (data) => {
     return $http({
         method: "post",
-        url: "http://127.0.0.1:8000/user/add/",
+        url: "/user/add/",
         params: {},
         data: data,
         headers: {
@@ -75,7 +75,7 @@ export const addUser = (data) => {
 export const delUser = (data) => {
     return $http({
         method: "post",
-        url: "http://127.0.0.1:8000/user/del/",
+        url: "/user/del/",
         params: {},
         data: data,
         headers: {
@@ -87,7 +87,7 @@ export const delUser = (data) => {
 export const updateUser = (data) => {
     return $http({
         method: "post",
-        url: "http://127.0.0.1:8000/user/update/",
+        url: "/user/update/",
         params: {},
         data: data,
         headers: {
@@ -100,7 +100,7 @@ export const updateUser = (data) => {
 export const getModuleList = (params) => {
     return $http({
         method: "get",
-        url: "http://127.0.0.1:8000/module/list/",
+        url: "/module/list/",
         params: params,
         data: {},
         headers: {
@@ -112,7 +112,7 @@ export const getModuleList = (params) => {
 export const addModule = (data) => {
     return $http({
         method: "post",
-        url: "http://127.0.0.1:8000/module/add/",
+        url: "/module/add/",
         params: {},
         data: data,
         headers: {
@@ -124,7 +124,7 @@ export const addModule = (data) => {
 export const updateModule = (data) => {
     return $http({
         method: "post",
-        url: "http://127.0.0.1:8000/module/update/",
+        url: "/module/update/",
         params: {},
         data: data,
         headers: {
@@ -136,7 +136,7 @@ export const updateModule = (data) => {
 export const delModule = (data) => {
     return $http({
         method: "post",
-        url: "http://127.0.0.1:8000/module/del/",
+        url: "/module/del/",
         params: {},
         data: data,
         headers: {
@@ -149,7 +149,7 @@ export const delModule = (data) => {
 export const getEnvironmentList = (params) => {
     return $http({
         method: "get",
-        url: "http://127.0.0.1:8000/environment/list/",
+        url: "/environment/list/",
         params: params,
         data: {},
         headers: {
@@ -161,7 +161,7 @@ export const getEnvironmentList = (params) => {
 export const getEnvironmentInfo = (params) => {
     return $http({
         method: "get",
-        url: "http://127.0.0.1:8000/environment/detail/",
+        url: "/environment/detail/",
         params: params,
         data: {},
         headers: {
@@ -173,7 +173,7 @@ export const getEnvironmentInfo = (params) => {
 export const addEnvironment = (data) => {
     return $http({
         method: "post",
-        url: "http://127.0.0.1:8000/environment/add/",
+        url: "/environment/add/",
         params: {},
         data: data,
         headers: {
@@ -185,7 +185,7 @@ export const addEnvironment = (data) => {
 export const delEnvironment = (data) => {
     return $http({
         method: "post",
-        url: "http://127.0.0.1:8000/environment/del/",
+        url: "/environment/del/",
         params: {},
         data: data,
         headers: {
@@ -197,7 +197,7 @@ export const delEnvironment = (data) => {
 export const updateEnvironment = (data) => {
     return $http({
         method: "post",
-        url: "http://127.0.0.1:8000/environment/update/",
+        url: "/environment/update/",
         params: {},
         data: data,
         headers: {
@@ -211,7 +211,7 @@ export const updateEnvironment = (data) => {
 export const getAPIList = (params) => {
     return $http({
         method: "get",
-        url: "http://127.0.0.1:8000/api/list/",
+        url: "/api/list/",
         params: params,
         data: {},
         headers: {
@@ -223,7 +223,7 @@ export const getAPIList = (params) => {
 export const getAPIInfo = (params) => {
     return $http({
         method: "get",
-        url: "http://127.0.0.1:8000/api/detail/",
+        url: "/api/detail/",
         params: params,
         data: {},
         headers: {
@@ -235,7 +235,7 @@ export const getAPIInfo = (params) => {
 export const addAPI = (data) => {
     return $http({
         method: "post",
-        url: "http://127.0.0.1:8000/api/add/",
+        url: "/api/add/",
         params: {},
         data: data,
         headers: {
@@ -248,7 +248,7 @@ export const addAPI = (data) => {
 export const editAPI = (data) => {
     return $http({
         method: "post",
-        url: "http://127.0.0.1:8000/api/update/",
+        url: "/api/update/",
         params: {},
         data: data,
         headers: {
@@ -260,7 +260,7 @@ export const editAPI = (data) => {
 export const delAPI = (data) => {
     return $http({
         method: "post",
-        url: "http://127.0.0.1:8000/api/del/",
+        url: "/api/del/",
         params: {},
         data: data,
         headers: {
@@ -272,7 +272,7 @@ export const delAPI = (data) => {
 export const debugAPI = (data) => {
     return $http({
         method: "post",
-        url: "http://127.0.0.1:8000/api/debug/",
+        url: "/api/debug/",
         params: {},
         data: data,
         headers: {
@@ -284,7 +284,7 @@ export const debugAPI = (data) => {
 export const getImportAPI = (data) => {
     return $http({
         method: "post",
-        url: "http://127.0.0.1:8000/api/get_import_list/",
+        url: "/api/get_import_list/",
         params: {},
         data: data,
         headers: {
@@ -296,7 +296,7 @@ export const getImportAPI = (data) => {
 export const importAPI = (data) => {
     return $http({
         method: "post",
-        url: "http://127.0.0.1:8000/api/import/",
+        url: "/api/import/",
         params: {},
         data: data,
         headers: {
@@ -308,7 +308,7 @@ export const importAPI = (data) => {
 export const addAPICase = (data) => {
     return $http({
         method: "post",
-        url: "http://127.0.0.1:8000/apicase/add/",
+        url: "/apicase/add/",
         params: {},
         data: data,
         headers: {
@@ -320,7 +320,7 @@ export const addAPICase = (data) => {
 export const getAPICaseList = (params) => {
     return $http({
         method: "get",
-        url: "http://127.0.0.1:8000/apicase/list/",
+        url: "/apicase/list/",
         params: params,
         data: {},
         headers: {
@@ -332,7 +332,7 @@ export const getAPICaseList = (params) => {
 export const delAPICase = (data) => {
     return $http({
         method: "post",
-        url: "http://127.0.0.1:8000/apicase/del/",
+        url: "/apicase/del/",
         params: {},
         data: data,
         headers: {
@@ -344,7 +344,7 @@ export const delAPICase = (data) => {
 export const getAPICaseInfo = (params) => {
     return $http({
         method: "get",
-        url: "http://127.0.0.1:8000/apicase/detail/",
+        url: "/apicase/detail/",
         params: params,
         data: {},
         headers: {
@@ -356,7 +356,7 @@ export const getAPICaseInfo = (params) => {
 export const editAPICase = (data) => {
     return $http({
         method: "post",
-        url: "http://127.0.0.1:8000/apicase/update/",
+        url: "/apicase/update/",
         params: {},
         data: data,
         headers: {
@@ -368,7 +368,7 @@ export const editAPICase = (data) => {
 export const debugAPICase = (data) => {
     return $http({
         method: "post",
-        url: "http://127.0.0.1:8000/apicase/debug/",
+        url: "/apicase/debug/",
         params: {},
         data: data,
         headers: {
@@ -380,7 +380,7 @@ export const debugAPICase = (data) => {
 export const runAPICase = (data) => {
     return $http({
         method: "post",
-        url: "http://127.0.0.1:8000/apicase/run/",
+        url: "/apicase/run/",
         params: {},
         data: data,
         headers: {
@@ -393,7 +393,7 @@ export const runAPICase = (data) => {
 export const getCronJobList = (params) => {
     return $http({
         method: "get",
-        url: "http://127.0.0.1:8000/cronjob/list/",
+        url: "/cronjob/list/",
         params: params,
         data: {},
         headers: {
@@ -405,7 +405,7 @@ export const getCronJobList = (params) => {
 export const getCronJobInfo = (params) => {
     return $http({
         method: "get",
-        url: "http://127.0.0.1:8000/cronjob/detail/",
+        url: "/cronjob/detail/",
         params: params,
         data: {},
         headers: {
@@ -417,7 +417,7 @@ export const getCronJobInfo = (params) => {
 export const addCronJob = (data) => {
     return $http({
         method: "post",
-        url: "http://127.0.0.1:8000/cronjob/add/",
+        url: "/cronjob/add/",
         params: {},
         data: data,
         headers: {
@@ -429,7 +429,7 @@ export const addCronJob = (data) => {
 export const delCronJob = (data) => {
     return $http({
         method: "post",
-        url: "http://127.0.0.1:8000/cronjob/del/",
+        url: "/cronjob/del/",
         params: {},
         data: data,
         headers: {
@@ -441,7 +441,7 @@ export const delCronJob = (data) => {
 export const editCronJob = (data) => {
     return $http({
         method: "post",
-        url: "http://127.0.0.1:8000/cronjob/update/",
+        url: "/cronjob/update/",
         params: {},
         data: data,
         headers: {
@@ -453,7 +453,7 @@ export const editCronJob = (data) => {
 export const editCronJobIsActive = (data) => {
     return $http({
         method: "post",
-        url: "http://127.0.0.1:8000/cronjob/is_active/",
+        url: "/cronjob/is_active/",
         params: {},
         data: data,
         headers: {
@@ -466,7 +466,7 @@ export const editCronJobIsActive = (data) => {
 export const getReportList = (params) => {
     return $http({
         method: "get",
-        url: "http://127.0.0.1:8000/report/list/",
+        url: "/report/list/",
         params: params,
         data: {},
         headers: {
@@ -478,7 +478,7 @@ export const getReportList = (params) => {
 export const delReport = (data) => {
     return $http({
         method: "post",
-        url: "http://127.0.0.1:8000/report/del/",
+        url: "/report/del/",
         params: {},
         data: data,
         headers: {
@@ -490,7 +490,7 @@ export const delReport = (data) => {
 export const getReportInfo = (params) => {
     return $http({
         method: "get",
-        url: "http://127.0.0.1:8000/report/detail/",
+        url: "/report/detail/",
         params: params,
         data: {},
         headers: {
@@ -502,7 +502,7 @@ export const getReportInfo = (params) => {
 export const getReportCaseInfo = (params) => {
     return $http({
         method: "get",
-        url: "http://127.0.0.1:8000/report/case/detail/",
+        url: "/report/case/detail/",
         params: params,
         data: {},
         headers: {
@@ -514,7 +514,7 @@ export const getReportCaseInfo = (params) => {
 export const getAPIAcount = (params) => {
     return $http({
         method: "get",
-        url: "http://127.0.0.1:8000/api/acount/",
+        url: "/api/acount/",
         params: params,
         data: {},
         headers: {
@@ -526,7 +526,7 @@ export const getAPIAcount = (params) => {
 export const getAPICaseAcount = (params) => {
     return $http({
         method: "get",
-        url: "http://127.0.0.1:8000/apicase/acount/",
+        url: "/apicase/acount/",
         params: params,
         data: {},
         headers: {
