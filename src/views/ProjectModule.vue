@@ -37,7 +37,7 @@
         @close="cancelDialog(moduleformRef)">
         <el-form :model="moduledata" label-width="100px" ref="moduleformRef">
             <el-form-item label="所属父模块" prop="parent_name">
-                <el-input v-model="moduledata.parent_name" disabled='false' />
+                <el-input v-model="moduledata.parent_name" disabled />
             </el-form-item>
             <el-form-item label="模块名称" prop="name" :rules="[
                 { required: true, message: '模块名称不能为空' },
@@ -144,7 +144,7 @@ const updateDialog = (Did, name, parent_id) => {
     dialog_title.value = '编辑模块';
     isEdit.value = true;
     moduledata.id = Did;
-    moduledata.name = name;
+    moduledata.parent_name = name;
     moduledata.parent_id = parent_id
 }
 
