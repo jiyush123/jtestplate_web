@@ -33,7 +33,7 @@
                 <el-tag v-else-if="scope.row.level === '2'" class="ml-2" type="warning">
                     {{ scope.row.level }}
                 </el-tag>
-                <el-tag v-else-if="scope.row.level === '3'" class="ml-2" type="">
+                <el-tag v-else-if="scope.row.level === '3'" class="ml-2" type="primary">
                     {{ scope.row.level }}
                 </el-tag>
             </template>

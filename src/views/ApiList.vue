@@ -91,7 +91,7 @@
                         <el-tag v-if="scope.row.method === 'GET'" class="ml-2" type="success">
                             {{ scope.row.method }}
                         </el-tag>
-                        <el-tag v-else-if="scope.row.method === 'POST'" class="ml-2" type="">
+                        <el-tag v-else-if="scope.row.method === 'POST'" class="ml-2" type="primary">
                             {{ scope.row.method }}
                         </el-tag>
                     </template>
@@ -329,7 +329,6 @@ const getApiListFun = async (paramdata) => {
 }
 
 const goToAdd = () => {
-    // params.module_id = module_id;
     router.push('/api/add');
 }
 
