@@ -98,6 +98,14 @@
 .listquery .el-input {
     width: 200px;
 }
+ /* 这个是2.5.0版本后，内联表单下下拉列表不能自适应宽度，需要手动配置 */
+.el-form--inline {
+  .el-form-item {
+    .el-input, .el-cascader, .el-select, .el-autocomplete {
+      width: 240px;
+    }
+  }
+}
 </style>
 <script setup>
 import { ref } from "vue";
