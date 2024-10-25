@@ -41,9 +41,6 @@
                                     <div>
                                         <el-text type="info" size="small">只支持json文件</el-text>
                                     </div>
-                                    <div>
-                                        <el-text type="info" size="small">注意：chrome不支持拖拽</el-text>
-                                    </div>
                                 </div>
                             </template>
                         </el-upload>
