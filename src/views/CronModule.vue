@@ -10,11 +10,11 @@
             <el-tab-pane label="秒">
               <div class="cron-radio-group">
                 <el-radio-group v-model="formdata.second" class="cronradio">
-                  <el-radio label="0">每一秒</el-radio>
-                  <el-radio label='1'>每隔<el-input-number class="radio-input" v-model="interval_second" :min="1"
+                  <el-radio value="0">每一秒</el-radio>
+                  <el-radio value='1'>每隔<el-input-number class="radio-input" v-model="interval_second" :min="1"
                       :max="60"></el-input-number>秒执行，从<el-input-number class="radio-input"
                       v-model="interval_start_second" :min="0" :max="59"></el-input-number>秒开始</el-radio>
-                  <div class="radio-select"><el-radio label='2'>具体秒数（可多选）
+                  <div class="radio-select"><el-radio value='2'>具体秒数（可多选）
 
                     </el-radio>
                     <el-select v-model="seconds" multiple placeholder="请选择" style="width: 240px;margin-bottom: auto;"
@@ -23,7 +23,7 @@
                         :value="item.value" />
                     </el-select>
                   </div>
-                  <el-radio label='3'>周期从<el-input-number class="radio-input" v-model="sencond_start" :min="0"
+                  <el-radio value='3'>周期从<el-input-number class="radio-input" v-model="sencond_start" :min="0"
                       :max="59"></el-input-number>
                     到<el-input-number class="radio-input" v-model="sencond_end" :min="0"
                       :max="59"></el-input-number>秒</el-radio>
@@ -36,11 +36,11 @@
             <el-tab-pane label="分">
               <div class="cron-radio-group">
                 <el-radio-group v-model="formdata.minute" class="cronradio">
-                  <el-radio label="0">每一分钟</el-radio>
-                  <el-radio label='1'>每隔<el-input-number class="radio-input" v-model="interval_minute" :min="1"
+                  <el-radio value="0">每一分钟</el-radio>
+                  <el-radio value='1'>每隔<el-input-number class="radio-input" v-model="interval_minute" :min="1"
                       :max="60"></el-input-number>分执行，从<el-input-number class="radio-input"
                       v-model="interval_start_minute" :min="0" :max="59"></el-input-number>分开始</el-radio>
-                  <div class="radio-select"><el-radio label='2'>具体分钟数（可多选）
+                  <div class="radio-select"><el-radio value='2'>具体分钟数（可多选）
 
                     </el-radio>
                     <el-select v-model="minute" multiple placeholder="请选择" style="width: 240px;margin-bottom: auto;"
@@ -49,7 +49,7 @@
                         :value="item.value" />
                     </el-select>
                   </div>
-                  <el-radio label='3'>周期从<el-input-number class="radio-input" v-model="minute_start" :min="0"
+                  <el-radio value='3'>周期从<el-input-number class="radio-input" v-model="minute_start" :min="0"
                       :max="59"></el-input-number>
                     到<el-input-number class="radio-input" v-model="minute_end" :min="0"
                       :max="59"></el-input-number>分</el-radio>
@@ -62,11 +62,11 @@
             <el-tab-pane label="时">
               <div class="cron-radio-group">
                 <el-radio-group v-model="formdata.hours" class="cronradio">
-                  <el-radio label="0">每一小时</el-radio>
-                  <el-radio label='1'>每隔<el-input-number class="radio-input" v-model="interval_hours" :min="1"
+                  <el-radio value="0">每一小时</el-radio>
+                  <el-radio value='1'>每隔<el-input-number class="radio-input" v-model="interval_hours" :min="1"
                       :max="24"></el-input-number>小时执行，从<el-input-number class="radio-input"
                       v-model="interval_start_hours" :min="0" :max="23"></el-input-number>小时开始</el-radio>
-                  <div class="radio-select"><el-radio label='2'>具体小时数（可多选）
+                  <div class="radio-select"><el-radio value='2'>具体小时数（可多选）
 
                     </el-radio>
                     <el-select v-model="hours" multiple placeholder="请选择" style="width: 240px;margin-bottom: auto;"
@@ -74,7 +74,7 @@
                       <el-option v-for="item in hours_list" :key="item.value" :label="item.label" :value="item.value" />
                     </el-select>
                   </div>
-                  <el-radio label='3'>周期从<el-input-number class="radio-input" v-model="hours_start" :min="0"
+                  <el-radio value='3'>周期从<el-input-number class="radio-input" v-model="hours_start" :min="0"
                       :max="23"></el-input-number>
                     到<el-input-number class="radio-input" v-model="hours_end" :min="0"
                       :max="23"></el-input-number>小时</el-radio>
@@ -85,18 +85,18 @@
             <el-tab-pane label="天">
               <div class="cron-radio-group">
                 <el-radio-group v-model="formdata.day" class="cronradio">
-                  <el-radio label="0">每一天</el-radio>
-                  <el-radio label='1'>每隔<el-input-number class="radio-input" v-model="interval_day" :min="1"
+                  <el-radio value="0">每一天</el-radio>
+                  <el-radio value='1'>每隔<el-input-number class="radio-input" v-model="interval_day" :min="1"
                       :max="31"></el-input-number>天执行，从<el-input-number class="radio-input" v-model="interval_start_day"
                       :min="1" :max="31"></el-input-number>天开始</el-radio>
-                  <div class="radio-select"><el-radio label='2'>具体天数（可多选）
+                  <div class="radio-select"><el-radio value='2'>具体天数（可多选）
                     </el-radio>
                     <el-select v-model="day" multiple placeholder="请选择" style="width: 240px;margin-bottom: auto;"
                       @click="changeDayRadio">
                       <el-option v-for="item in day_list" :key="item.value" :label="item.label" :value="item.value" />
                     </el-select>
                   </div>
-                  <el-radio label='3'>周期从<el-input-number class="radio-input" v-model="day_start" :min="1"
+                  <el-radio value='3'>周期从<el-input-number class="radio-input" v-model="day_start" :min="1"
                       :max="31"></el-input-number>
                     到<el-input-number class="radio-input" v-model="day_end" :min="1"
                       :max="31"></el-input-number>天</el-radio>
@@ -107,11 +107,11 @@
             <el-tab-pane label="月">
               <div class="cron-radio-group">
                 <el-radio-group v-model="formdata.month" class="cronradio">
-                  <el-radio label="0">每一月</el-radio>
-                  <el-radio label='1'>每隔<el-input-number class="radio-input" v-model="interval_month" :min="1"
+                  <el-radio value="0">每一月</el-radio>
+                  <el-radio value='1'>每隔<el-input-number class="radio-input" v-model="interval_month" :min="1"
                       :max="12"></el-input-number>月执行，从<el-input-number class="radio-input"
                       v-model="interval_start_month" :min="1" :max="12"></el-input-number>月开始</el-radio>
-                  <div class="radio-select"><el-radio label='2'>具体月数（可多选）
+                  <div class="radio-select"><el-radio value='2'>具体月数（可多选）
 
                     </el-radio>
                     <el-select v-model="month" multiple placeholder="请选择" style="width: 240px;margin-bottom: auto;"
@@ -119,7 +119,7 @@
                       <el-option v-for="item in month_list" :key="item.value" :label="item.label" :value="item.value" />
                     </el-select>
                   </div>
-                  <el-radio label='3'>周期从<el-input-number class="radio-input" v-model="month_start" :min="1"
+                  <el-radio value='3'>周期从<el-input-number class="radio-input" v-model="month_start" :min="1"
                       :max="12"></el-input-number>
                     到<el-input-number class="radio-input" v-model="month_end" :min="1"
                       :max="12"></el-input-number>月</el-radio>
@@ -131,11 +131,11 @@
             <el-tab-pane label="年">
               <div class="cron-radio-group">
                 <el-radio-group v-model="formdata.year" class="cronradio">
-                  <el-radio label="0">每一年</el-radio>
-                  <el-radio label='1'>每隔<el-input-number class="radio-input" v-model="interval_year" :min="1"
+                  <el-radio value="0">每一年</el-radio>
+                  <el-radio value='1'>每隔<el-input-number class="radio-input" v-model="interval_year" :min="1"
                       :max="5"></el-input-number>年执行，从<el-input-number class="radio-input" v-model="interval_start_year"
                       :min="2024" :max="2030"></el-input-number>年开始</el-radio>
-                  <div class="radio-select"><el-radio label='2'>具体年份（可多选）
+                  <div class="radio-select"><el-radio value='2'>具体年份（可多选）
 
                     </el-radio>
                     <el-select v-model="year" multiple placeholder="请选择" style="width: 240px;margin-bottom: auto;"
@@ -143,7 +143,7 @@
                       <el-option v-for="item in year_list" :key="item.value" :label="item.label" :value="item.value" />
                     </el-select>
                   </div>
-                  <el-radio label='3'>周期从<el-input-number class="radio-input" v-model="year_start" :min="2024"
+                  <el-radio value='3'>周期从<el-input-number class="radio-input" v-model="year_start" :min="2024"
                       :max="2030"></el-input-number>
                     到<el-input-number class="radio-input" v-model="year_end" :min="2024"
                       :max="2035"></el-input-number>年</el-radio>
