@@ -27,9 +27,9 @@
         <el-form-item label="路径" prop="uri" :rules="[
             { required: true, message: '路径不能为空' },
         ]">
-            <el-input v-model="addform.uri" class="input-with-select">
+            <el-input v-model="addform.uri" class="input-with-select" :validate-event='false'>
                 <template #prepend>
-                    <el-select v-model="addform.method" style="width: 100px">
+                    <el-select v-model="addform.method">
                         <el-option label="GET" value="GET" />
                         <el-option label="POST" value="POST" />
                     </el-select>
@@ -115,7 +115,7 @@
 }
 
 .input-with-select .el-select {
-    width: 90px;
+    width: 100px;
 }
 </style>
 

@@ -115,9 +115,9 @@
                             <el-form-item label="路径" :prop="'steps.' + index + '.uri'" :rules="[
                                 { required: true, message: '路径不能为空' },
                             ]">
-                                <el-input v-model="step.uri" class="input-with-select">
+                                <el-input v-model="step.uri" class="input-with-select" :validate-event='false'>
                                     <template #prepend>
-                                        <el-select v-model="step.method" style="width: 100px">
+                                        <el-select v-model="step.method">
                                             <el-option label="GET" value="GET" />
                                             <el-option label="POST" value="POST" />
                                         </el-select>
@@ -234,6 +234,10 @@
 
 .api_case_cancel_btn {
     margin-left: 40%;
+}
+
+.input-with-select .el-select {
+    width: 100px;
 }
 
 .handle_info {
