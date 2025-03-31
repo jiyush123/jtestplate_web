@@ -134,9 +134,17 @@ const api_acount = reactive({
     total: ''
 })
 
+
 const api_completed_percent = computed(() => {
-    return (api_acount.completed_total / api_acount.total * 100).toFixed(1)
-})
+    const completedTotal = parseFloat(api_acount.completed_total); // 转换为数字
+    const total = parseFloat(api_acount.total);                    // 转换为数字
+
+    if (isNaN(completedTotal) || isNaN(total) || total === 0) {
+        return '0'; // 如果数据无效或总数为 0，返回 0
+    }
+
+    return (completedTotal / total * 100).toFixed(1) + '%';
+});
 
 const goToAPIList = () => {
     router.push({ name: 'apilist' });
@@ -174,7 +182,14 @@ const apicase_acount = reactive({
 })
 
 const apicase_completed_percent = computed(() => {
-    return (apicase_acount.completed_total / apicase_acount.total * 100).toFixed(1)
+    const completedTotal = parseFloat(apicase_acount.completed_total); // 转换为数字
+    const total = parseFloat(apicase_acount.total);                    // 转换为数字
+
+    if (isNaN(completedTotal) || isNaN(total) || total === 0) {
+        return '0'; // 如果数据无效或总数为 0，返回 0
+    }
+
+    return (completedTotal / total * 100).toFixed(1) + '%';
 })
 
 const getAPICaseAcountFun = async () => {
