@@ -54,13 +54,12 @@
 
             <el-form-item label="地址" prop="host" :rules="[
                 { required: true, message: '地址不能为空' },
-                { min: 7, max: 15, message: '地址长度在7-15位' }
+                { min: 1, max: 50, message: '地址长度在1-50位' }
             ]">
                 <el-input v-model="formdata.host" />
             </el-form-item>
 
             <el-form-item label="端口" prop="port" :rules="[
-                { required: true, message: '端口不能为空' },
                 { type: 'number', message: '必须是数字' }
             ]">
                 <el-input v-model.number="formdata.port" />
@@ -105,7 +104,7 @@ const formdata = reactive({
     name: '',
     protocol: '',
     host: '',
-    port: '',
+    port: null,
     id: null
 })
 

@@ -121,9 +121,81 @@
                 </template>
                 <el-row>
                     <el-col :span="6">
-                        <el-button class="quick-jump-button" @click="openLink" text>
+                        <el-button class="quick-jump-button" @click="openLink(1)" text>
                             <img src="../assets/云效icon.svg" alt="Icon" />
                             <span>云效平台</span>
+                        </el-button>
+                    </el-col>
+                    <el-col :span="6">
+                        <el-button class="quick-jump-button" @click="openLink(2)" text>
+                            <img src="../assets/jenkins_icon.svg" alt="Icon" />
+                            <span>Jenkins前端</span>
+                        </el-button>
+                    </el-col>
+                    <el-col :span="6">
+                        <el-button class="quick-jump-button" @click="openLink(3)" text>
+                            <img src="../assets/jenkins_icon.svg" alt="Icon" />
+                            <span>Jenkins后端</span>
+                        </el-button>
+                    </el-col>
+                    <el-col :span="6">
+                        <el-button class="quick-jump-button" @click="openLink(4)" text>
+                            <img src="../assets/kubernetes.png" alt="Icon" />
+                            <span>K8s</span>
+                        </el-button>
+                    </el-col>
+                </el-row>
+                <!-- 第二行 -->
+                <el-row>
+                    <el-col :span="6">
+                        <el-button class="quick-jump-button" @click="openLink(5)" text>
+                            <img src="../assets/gitlab.png" alt="Icon" />
+                            <span>Gitlab</span>
+                        </el-button>
+                    </el-col>
+                    <el-col :span="6">
+                        <el-button class="quick-jump-button" @click="openLink(6)" text>
+                            <img src="../assets/metersphere.png" alt="Icon" />
+                            <span>MeterSphere</span>
+                        </el-button>
+                    </el-col>
+                    <el-col :span="6">
+                        <el-button class="quick-jump-button" @click="openLink(7)" text>
+                            <img src="../assets/RocketMq.png" alt="Icon" />
+                            <span>RocketMq</span>
+                        </el-button>
+                    </el-col>
+                    <el-col :span="6">
+                        <el-button class="quick-jump-button" @click="openLink(8)" text>
+                            <img src="../assets/YApi.png" alt="Icon" />
+                            <span>YApi</span>
+                        </el-button>
+                    </el-col>
+                </el-row>
+                <!-- 第三行 -->
+                <el-row>
+                    <el-col :span="6">
+                        <el-button class="quick-jump-button" @click="openLink(9)">
+                            <!-- <img src="../assets/kubernetes.png" alt="Icon" /> -->
+                            <span>测试工具</span>
+                        </el-button>
+                    </el-col>
+                    <el-col :span="6">
+                        <el-button class="quick-jump-button" @click="openLink(10)" text>
+                            <img src="../assets/Tapd.png" alt="Icon" />
+                            <span>Tapd</span>
+                        </el-button>
+                    </el-col>
+                    <el-col :span="6">
+                        <el-button class="quick-jump-button" @click="openLink(11)" text>
+                            <img src="../assets/xxl.png" alt="Icon" />
+                            <span>XXL</span>
+                        </el-button>
+                    </el-col>
+                    <el-col :span="6">
+                        <el-button class="quick-jump-button" @click="openLink(12)" text>
+                            <img src="../assets/jumpserver.png" alt="Icon" />
+                            <span>JumpServer</span>
                         </el-button>
                     </el-col>
                 </el-row>
@@ -159,22 +231,22 @@
     margin: 10px;
 }
 
-.el-button span {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-}
-
 .quick-jump-button {
     width: 100px;
     height: 100px;
 }
 
+.quick-jump-button span {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
 .quick-jump-button img {
     width: 50px;
     height: 50px;
-    margin-bottom: 4px;
+    margin-bottom: 5px;
 }
 </style>
 <script setup>
@@ -269,8 +341,46 @@ const getAPICaseAcountFun = async () => {
     }
 }
 
-const openLink = () => {
-    window.open('https://devops.aliyun.com/workbench', '_blank');
+const openLink = (x) => {
+    if (x === 1) {
+        window.open('https://devops.aliyun.com/workbench', '_blank');
+    }
+    else if (x === 2){
+        window.open('https://jenkins.local.sinoxk.cn/', '_blank');
+    }
+    else if (x === 3){
+        window.open('http://jenkins.sinoxk.cn/', '_blank');
+    }
+    else if (x === 4){
+        window.open('http://192.168.16.181:3080', '_blank');
+    }
+    else if (x === 5){
+        window.open('http://192.168.16.65/', '_blank');
+    }
+    else if (x === 6){
+        window.open('http://192.168.16.46:8088/#/api/definition', '_blank');
+    }
+    else if (x === 7){
+        window.open('http://192.168.16.46:8080/#/message', '_blank');
+    }
+    else if (x === 8){
+        window.open('http://api.local.sinoxk.cn/project/338/interface/api/57201', '_blank');
+    }
+    else if (x === 9){
+        window.open('http://192.168.16.182:30500/', '_blank');
+    }
+    else if (x === 10){
+        window.open('https://www.tapd.cn/55619881', '_blank');
+    }
+    else if (x === 11){
+        window.open('https://tjob.sinoxk.cn/', '_blank');
+    }
+    else if (x === 12){
+        window.open('http://jump.sinohealth.cn/ui/#/workbench/home', '_blank');
+    }
+    else{
+        return
+    }
 };
 
 onMounted(() => {
