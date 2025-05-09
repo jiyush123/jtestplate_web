@@ -272,7 +272,7 @@ const api_completed_percent = computed(() => {
         return '0'; // 如果数据无效或总数为 0，返回 0
     }
 
-    return (completedTotal / total * 100).toFixed(1) + '%';
+    return (completedTotal / total * 100).toFixed(1);
 });
 
 const goToAPIList = () => {
@@ -318,7 +318,7 @@ const apicase_completed_percent = computed(() => {
         return '0'; // 如果数据无效或总数为 0，返回 0
     }
 
-    return (completedTotal / total * 100).toFixed(1) + '%';
+    return (completedTotal / total * 100).toFixed(1);
 })
 
 const getAPICaseAcountFun = async () => {
