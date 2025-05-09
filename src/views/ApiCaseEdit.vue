@@ -43,9 +43,9 @@
                 <el-text class="mx-1" style="margin-left: 5px;">结果：</el-text>
                 <el-text class="mx-1" v-if="editform.result === 'success'" type="success" style="margin-right: 5px;">{{
                     editform.result
-                }}</el-text>
+                    }}</el-text>
                 <el-text class="mx-1" v-else type="danger" style="margin-right: 5px;">{{ editform.result
-                }}</el-text>
+                    }}</el-text>
             </el-col>
             <el-col :span="8">
                 <el-button type="primary" @click="goToSelectEnv">运行环境</el-button>
@@ -63,12 +63,15 @@
                 <el-form-item label="运行环境" prop="host">
                     <el-select v-model="envdata.host" filterable placeholder="请选择" style="width: 400px;">
                         <el-option v-for="item in envOptions" :key="item.id"
-                            :label="item.name + '    ' + item.protocol + '://' + item.host + ':' + item.port"
-                            :value="item.protocol + '://' + item.host + ':' + item.port">
+                            :label="item.name + '    ' + item.protocol + '://' + item.host + (item.port ? ':' + item.port : '')"
+                            :value="item.protocol + '://' + item.host + (item.port ? ':' + item.port : '')">
 
                             <span style="float: left">{{ item.name }}</span>
-                            <span style="float: right;font-size: 13px;">
+                            <span v-if="item.port" style="float: right;font-size: 13px;">
                                 {{ item.protocol + '://' + item.host + ':' + item.port }}
+                            </span>
+                            <span v-else style="float: right;font-size: 13px;">
+                                {{ item.protocol + '://' + item.host }}
                             </span>
                         </el-option>
                     </el-select>
@@ -109,7 +112,7 @@
                                 <el-text class="mx-1" v-if="step.result === 'success'" type="success"
                                     style="margin-right: 5px;">{{ step.result }}</el-text>
                                 <el-text class="mx-1" v-else type="danger" style="margin-right: 5px;">{{ step.result
-                                }}</el-text>
+                                    }}</el-text>
 
 
                                 <el-button class="mt-2" type="danger" @click.prevent="removeDomain(step)"
@@ -119,7 +122,7 @@
                             <el-form-item label="路径" :prop="'steps.' + index + '.uri'" :rules="[
                                 { required: true, message: '路径不能为空' },
                             ]">
-                                <el-input v-model="step.uri" class="input-with-select" :validate-event='false'>
+                                <el-input v-model="step.uri" class="input-with-select">
                                     <template #prepend>
                                         <el-select v-model="step.method">
                                             <el-option label="GET" value="GET" />
@@ -345,7 +348,7 @@ const cancelDialog = (formEl) => {
         "page": 1,
         "size": 10,
     }
-    if (pagemodule.value !== ''){
+    if (pagemodule.value !== '') {
         pagemodule.value.resetParams();
     }
     Dialog.value = false;
@@ -488,19 +491,19 @@ const SelectApi = async (id) => {
         // 请求头
         for (let key in res.data.headers) {
             let value = res.data.headers[key];
-            headers[key] = { 'value': value.value, 'datatype':value.datatype, 'decription': value.decription }
+            headers[key] = { 'value': value.value, 'datatype': value.datatype, 'decription': value.decription }
         }
         editform.steps[APIDialog_id.value].headers = headers;
         // 请求参数
         for (let key in res.data.params) {
             let value = res.data.params[key];
-            params[key] = { 'value': value.value, 'datatype':value.datatype, 'decription': value.decription }
+            params[key] = { 'value': value.value, 'datatype': value.datatype, 'decription': value.decription }
         }
         editform.steps[APIDialog_id.value].params = params;
         // 请求体
         for (let key in res.data.body) {
             let value = res.data.body[key];
-            body[key] = { 'value': value.value, 'datatype':value.datatype, 'decription': value.decription }
+            body[key] = { 'value': value.value, 'datatype': value.datatype, 'decription': value.decription }
         }
         editform.steps[APIDialog_id.value].body = body;
         await nextTick();

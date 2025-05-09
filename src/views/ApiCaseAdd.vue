@@ -34,9 +34,9 @@
                 <el-text class="mx-1" style="margin-left: 5px;">结果：</el-text>
                 <el-text class="mx-1" v-if="addForm.result === 'success'" type="success" style="margin-right: 5px;">{{
                     addForm.result
-                }}</el-text>
+                    }}</el-text>
                 <el-text class="mx-1" v-else type="danger" style="margin-right: 5px;">{{ addForm.result
-                }}</el-text>
+                    }}</el-text>
             </el-col>
             <el-col :span="8">
                 <el-button type="primary" @click="goToSelectEnv">运行环境</el-button>
@@ -53,13 +53,17 @@
             <el-form :model="envdata" label-width="80px" ref="envformRef">
                 <el-form-item label="运行环境" prop="host">
                     <el-select v-model="envdata.host" filterable placeholder="请选择" style="width: 400px;">
+
                         <el-option v-for="item in envOptions" :key="item.id"
-                            :label="item.name + '    ' + item.protocol + '://' + item.host + ':' + item.port"
-                            :value="item.protocol + '://' + item.host + ':' + item.port">
+                            :label="item.name + '    ' + item.protocol + '://' + item.host + (item.port ? ':' + item.port : '')"
+                            :value="item.protocol + '://' + item.host + (item.port ? ':' + item.port : '')">
 
                             <span style="float: left">{{ item.name }}</span>
-                            <span style="float: right;font-size: 13px;">
+                            <span v-if="item.port" style="float: right;font-size: 13px;">
                                 {{ item.protocol + '://' + item.host + ':' + item.port }}
+                            </span>
+                            <span v-else style="float: right;font-size: 13px;">
+                                {{ item.protocol + '://' + item.host }}
                             </span>
                         </el-option>
                     </el-select>
@@ -91,7 +95,7 @@
                                         { required: true, message: '步骤名称不能为空' },
                                         { min: 3, max: 30, message: '长度需要为3-30个字符' },
                                     ]">
-                                    <el-input v-model="step.name" @click.stop/>
+                                    <el-input v-model="step.name" @click.stop />
                                 </el-form-item>
 
                                 <el-text class="mx-1">耗时：</el-text>
@@ -103,7 +107,7 @@
                                 <el-text class="mx-1" v-if="step.result === 'success'" type="success"
                                     style="margin-right: 5px;">{{ step.result }}</el-text>
                                 <el-text class="mx-1" v-else type="danger" style="margin-right: 5px;">{{ step.result
-                                }}</el-text>
+                                    }}</el-text>
 
 
                                 <el-button class="mt-2" type="danger" @click.prevent="removeDomain(step)"
@@ -115,7 +119,7 @@
                             <el-form-item label="路径" :prop="'steps.' + index + '.uri'" :rules="[
                                 { required: true, message: '路径不能为空' },
                             ]">
-                                <el-input v-model="step.uri" class="input-with-select" :validate-event='false'>
+                                <el-input v-model="step.uri" class="input-with-select">
                                     <template #prepend>
                                         <el-select v-model="step.method">
                                             <el-option label="GET" value="GET" />
@@ -180,7 +184,8 @@
         </draggable>
     </el-form>
 
-    <el-button type="primary" class="api_case_save_btn" @click="onSubmit(ruleFormRef)" :loading="is_loading">保存</el-button>
+    <el-button type="primary" class="api_case_save_btn" @click="onSubmit(ruleFormRef)"
+        :loading="is_loading">保存</el-button>
     <el-button class="api_case_cancel_btn" @click="cancelBtn">取消</el-button>
 
     <!-- 弹窗 -->
@@ -341,7 +346,7 @@ const cancelDialog = (formEl) => {
         "page": 1,
         "size": 10,
     }
-    if (pagemodule.value !== ''){
+    if (pagemodule.value !== '') {
         pagemodule.value.resetParams();
     }
     Dialog.value = false;
@@ -492,19 +497,19 @@ const SelectApi = async (id) => {
         // 请求头
         for (let key in res.data.headers) {
             let value = res.data.headers[key];
-            headers[key] = { 'value': value.value, 'datatype':value.datatype, 'decription': value.decription }
+            headers[key] = { 'value': value.value, 'datatype': value.datatype, 'decription': value.decription }
         }
         addForm.steps[APIDialog_id.value].headers = headers;
         // 请求参数
         for (let key in res.data.params) {
             let value = res.data.params[key];
-            params[key] = { 'value': value.value, 'datatype':value.datatype, 'decription': value.decription }
+            params[key] = { 'value': value.value, 'datatype': value.datatype, 'decription': value.decription }
         }
         addForm.steps[APIDialog_id.value].params = params;
         // 请求体
         for (let key in res.data.body) {
             let value = res.data.body[key];
-            body[key] = { 'value': value.value, 'datatype':value.datatype, 'decription': value.decription }
+            body[key] = { 'value': value.value, 'datatype': value.datatype, 'decription': value.decription }
         }
         addForm.steps[APIDialog_id.value].body = body;
         await nextTick();
@@ -648,7 +653,7 @@ const debug = async () => {
                 //将步骤时间合计到总时间
                 addForm.time = addForm.steps[i].time + addForm.time;
             }
-            
+
             // 如果用例没有设置成error，则将结果设置为success
             if (addForm.result !== 'error') {
                 addForm.result = 'success';

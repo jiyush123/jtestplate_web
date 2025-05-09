@@ -27,7 +27,7 @@
         <el-form-item label="路径" prop="uri" :rules="[
             { required: true, message: '路径不能为空' },
         ]">
-            <el-input v-model="addform.uri" class="input-with-select" :validate-event='false'>
+            <el-input v-model="addform.uri" class="input-with-select">
                 <template #prepend>
                     <el-select v-model="addform.method">
                         <el-option label="GET" value="GET" />
@@ -69,16 +69,20 @@
     <el-dialog v-model="Dialog" title="选择运行环境" width="40%" align-center @close="cancelDialog(formRef)">
         <el-form :model="formdata" label-width="80px" ref="formRef">
             <el-form-item label="运行环境" prop="host" :rules="[
-            { required: true, message: '请选择运行环境' },
-        ]">
+                { required: true, message: '请选择运行环境' },
+            ]">
                 <el-select v-model="formdata.host" filterable placeholder="请选择" style="width: 400px;">
+
                     <el-option v-for="item in envOptions" :key="item.id"
-                        :label="item.name + '    ' + item.protocol + '://' + item.host + ':' + item.port"
-                        :value="item.protocol + '://' + item.host + ':' + item.port">
+                        :label="item.name + '    ' + item.protocol + '://' + item.host + (item.port ? ':' + item.port : '')"
+                        :value="item.protocol + '://' + item.host + (item.port ? ':' + item.port : '')">
 
                         <span style="float: left">{{ item.name }}</span>
-                        <span style="float: right;font-size: 13px;">
+                        <span v-if="item.port" style="float: right;font-size: 13px;">
                             {{ item.protocol + '://' + item.host + ':' + item.port }}
+                        </span>
+                        <span v-else style="float: right;font-size: 13px;">
+                            {{ item.protocol + '://' + item.host }}
                         </span>
                     </el-option>
                 </el-select>
@@ -147,7 +151,7 @@ const debug_res = reactive({
 const addform = reactive({
     name: '',
     description: '',
-    module: parseInt(localStorage.getItem('api_module_id'),10),
+    module: parseInt(localStorage.getItem('api_module_id'), 10),
     method: 'GET',
     uri: '',
     headers: {},
@@ -167,7 +171,7 @@ const assertForm = async () => {
     }
 }
 
-const is_loading= ref(false);
+const is_loading = ref(false);
 
 const onSubmit = async () => {
 

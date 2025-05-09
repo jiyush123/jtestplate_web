@@ -35,7 +35,7 @@
                 <el-form-item label="路径" prop="uri" :rules="[
             { required: true, message: '路径不能为空' },
         ]">
-            <el-input v-model="editform.uri" class="input-with-select" :validate-event='false'>
+            <el-input v-model="editform.uri" class="input-with-select">
                 <template #prepend>
                     <el-select v-model="editform.method">
                         <el-option label="GET" value="GET" />
@@ -84,8 +84,11 @@
                         :value="item.protocol + '://' + item.host + ':' + item.port">
 
                         <span style="float: left">{{ item.name }}</span>
-                        <span style="float: right;font-size: 13px;">
+                        <span v-if="item.port" style="float: right;font-size: 13px;">
                             {{ item.protocol + '://' + item.host + ':' + item.port }}
+                        </span>
+                        <span v-else style="float: right;font-size: 13px;">
+                            {{ item.protocol + '://' + item.host }}
                         </span>
                     </el-option>
                 </el-select>
