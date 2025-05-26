@@ -139,6 +139,7 @@
 <script setup>
 import { reactive, ref, onMounted, watch } from 'vue'
 import { getAPIList, delAPI, getImportAPI, importAPI } from '../http/api'
+import $http from '../http'
 import { ElMessage } from 'element-plus'
 import router from "../router/index"
 import PaginationModule from './PaginationModule.vue'
@@ -151,7 +152,7 @@ const importPreviewDialog = ref(false);
 // 导入文件接口需要的请求头
 const headers_token = ref({ Authorization: localStorage.getItem('token') });
 // 导入文件接口
-const uploadUrl = ref("http://127.0.0.1:8000/api/get_import_list/");
+const uploadUrl = ref($http.defaults.baseURL + "/api/get_import_list/");
 // 导入文件组件
 const upload_file = ref('');
 const clearFiles = () => {
